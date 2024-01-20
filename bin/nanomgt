@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+
+import argparse
+import sys
+import os
+
+# Adding the parent directory to sys.path for module imports
+sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + sys.path
+
+# Importing modules from the nanomgt package
+from nanomgt import version
+from nanomgt import nanopore_variantcaller
+
+__author__ = "Malte B. Hallgren"
+__version__ = version.__version__
+
+def main():
+    """
+    Main function to handle command-line arguments and execute the decontaminate function.
+    The function initializes the argument parser, sets up the command-line arguments,
+    and then calls the decontaminate function from the nanomgt package with the parsed arguments.
+    """
+
+    # Description for the command-line interface
+    description = f'NanoMGT - Nanopore Marker Gene Typing, Version: {__version__}'
+    parser = argparse.ArgumentParser(description=description)
+
+    # Defining command-line arguments
+    parser.add_argument('--nanopore', action="store", type=str, dest='nanopore',
+                        default=None, help='Nanopore input.')
+    parser.add_argument('--db_dir', action="store", type=str, dest='db_dir',
+                        help='Path to NanoMGT databases.')
+    parser.add_argument('--o', action="store", type=str, dest='output',
+                        help='Output directory')
+    parser.add_argument('--threads', action="store", type=int, dest='threads', default=4,
+                        help='Number of threads to use. Default: 4')
+    parser.add_argument('--min_n', action="store", type=int, dest='min_n', default=3,
+                        help='Minimum number of nucleotides required to call a SNV. Default: 3')
+    parser.add_argument('--mrd', action="store", type=float, dest='mrd', default=0.03,
+                        help='Minimum related depth (MRD) for validating single allele SNVs. Default: 0.03')
+    parser.add_argument('--cor', action="store", type=float, dest='cor', default=0.5,
+                        help='Co-occurrence reward. -= MRD * cor. Default: 0.5')
+    parser.add_argument('--bp', action="store", type=float, dest='bp', default=1.5,
+                        help='Biological penalty. += MRD * bp. Default: 1.5')
+    parser.add_argument('--pp', action="store", type=float, dest='pp', default=0.25,
+                        help='Proximity penalty. += MRD * pp. Default: 0.25')
+    parser.add_argument('--dp', action="store", type=float, dest='dp', default=0.15,
+                        help='Density Penalty. += n_mutation_in_window * dp * MRD. Default: 0.15')
+    parser.add_argument('--dp_window', action="store", type=float, dest='dp_window', default=15,
+                        help='Density penalty window size. Default: 15')
+    parser.add_argument('--proxi', action="store", type=int, dest='proxi', default=5,
+                        help='Proximity between SNVs incurring a penalty. Default: 5')
+    parser.add_argument('--q_score', action="store", type=int, dest='q_score', default=14,
+                        help='Minimum average q-score for reads to be included. Default: 14')
+    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
+
+    # Parsing command-line arguments
+    args = parser.parse_args()
+
+    # Executing the decontaminate function with parsed arguments
+    nanopore_variantcaller.nanopore_metagenomics_variantcaller(args)
+
+if __name__ == '__main__':
+    main()
