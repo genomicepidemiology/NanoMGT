@@ -12,7 +12,7 @@ data = {
         "version": version.__version__
     },
     "source": {
-        "url": "https://github.com/genomicepidemiology/nanomgt/archive/refs/tags/{}.tar.gz".format(version.__version__),
+        "url": "https://github.com/genomicepidemiology/NanoMGT/archive/refs/tags/{}.tar.gz".format(version.__version__),
     },
     "build": {
         "number": 0,
