@@ -1,5 +1,0 @@
-channels:
-  - genomicepidemiology
-  - conda-forge
-dependencies:
-  - kma
