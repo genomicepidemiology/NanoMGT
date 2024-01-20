@@ -101,7 +101,6 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     sys.exit()
 
-
 def highest_scoring_hit(file_path):
     """
     Identifies and returns the highest scoring template from a tab-separated file.
