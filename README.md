@@ -4,8 +4,8 @@ NanoMGT is a Python-based tool designed for metagenomic variant calling using Na
 
 ## Features
 
-- Efficient alignment of reference and query sequences using CIGAR strings.
-- Metagenomic variant calling tailored for Nanopore sequencing data.
+- Metagenomic variant calling tailored for metagenomic Nanopore sequencing data of the same species.
+- Identifies minority position variant calls which originates from strains which are not the most abundant.
 
 ## Installation
 
@@ -44,7 +44,8 @@ Follow these steps to download the Ribosomal MLST genome and Ribosomal MLST locu
 5. **Download Homology Reduced Bacteria Database**
    - Download the homology reduced bacteria database from the CGE server:
      ```bash
-     # Replace COMMAND with the actual command or steps to download the database.
+     wget https://cge.food.dtu.dk/services/nanomgt/nanomgt_db.tar.gz
+     tar -xf nanomgt_db.tar.gz
      ```
 
 6. **Organize Files**
@@ -64,13 +65,12 @@ bac_db.name
 bac_db.seq.b
 bac_db.comp.b
 bac_db.len.b
-
 ```
 
 ## Usage
 
 ```bash
-nanomgt -h
+nanomgt --nanopore /complete/path/to/input.fastq --o any_output_name --threads <int, default:4> --mrd <float, default:0.05> --db_dir /path/to/database_as_described_above/
 ```
 
 ## License
