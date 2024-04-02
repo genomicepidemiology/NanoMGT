@@ -73,6 +73,10 @@ def nanopore_metagenomics_variantcaller(arguments):
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
 
+    for item in consensus_dict:
+        print(item, consensus_dict[item])
+    sys.exit()
+
     # Adjust the consensus dictionary based on individual quality scores
     # Currently not doing anything.
     consensus_dict, read_positions_blacklisted_dict = adjust_consensus_dict_for_individual_qscores(consensus_dict, os.path.join(arguments.output, 'rmlst_alignment.sam'), arguments.nanopore, arguments.q_score)
@@ -86,9 +90,6 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     # Co-occurrence analysis until convergence
     confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count = co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict, bio_validation_dict)
-
-
-    # DERIVE QSCORES
 
     # Format and output the results
     format_output(confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict)
