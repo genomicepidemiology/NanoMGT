@@ -45,7 +45,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     kma.KMARunner(arguments.nanopore,
                   os.path.join(arguments.output, "initial_rmlst_alignment"),
                   os.path.join(arguments.output, 'specie_db'),
-                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.5 -sam 2096> initial_rmlst_alignment.sam").run()
+                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.5 -sam 2096> {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
 
     # Decompress alignment results
     os.system(f'gunzip {os.path.join(arguments.output, "initial_rmlst_alignment.frag.gz")}')
@@ -543,15 +543,11 @@ def extract_mapped_rmlst_read(output_directory, nanopore_fastq):
     read_set = set()
 
     # Extract read IDs from the initial rMLST alignment file
-    with open(output_directory + '/initial_rmlst_alignment.frag', 'r') as frag:
-        for line in frag:
-            line = line.rstrip()
-            line = line.split('\t')
-            if line[-1] in read_set:
-                print ('Duplicate read ID found in the alignment file.')
-            read_set.add(line[-1])
+    with open(output_directory + '/initial_rmlst_alignment.sam', 'r') as sam_file:
+        for line in sam_file:
+            if not line.startswith('@'):
+                read_set.add(line.split('\t')[0])
 
-    sys.exit()
     # Write the extracted read IDs to a text file
     with open(output_directory + '/rmlst_reads.txt', 'w') as f:
         for item in read_set:
