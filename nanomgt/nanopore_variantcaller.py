@@ -45,7 +45,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     kma.KMARunner(arguments.nanopore,
                   os.path.join(arguments.output, "initial_rmlst_alignment"),
                   os.path.join(arguments.output, 'specie_db'),
-                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.5 -sam 2096> {os.path.join(arguments.output, 'initial_rmlst_alignment.sam')}").run()
+                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.5 -sam 2096 > {os.path.join(arguments.output, 'initial_rmlst_alignment.sam')}").run()
 
     # Decompress alignment results
     os.system(f'gunzip {os.path.join(arguments.output, "initial_rmlst_alignment.frag.gz")}')
@@ -64,7 +64,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     kma.KMARunner(arguments.nanopore,
                   os.path.join(arguments.output, "rmlst_alignment"),
                   os.path.join(arguments.output, 'top_hits_db'),
-                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -mct 0.5 -sam 2096> {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
+                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -mct 0.5 -sam 2096 > {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
 
 
     os.system(f'gunzip {os.path.join(arguments.output, "rmlst_alignment.mat.gz")}')
@@ -75,7 +75,7 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     print_majority_alelles(consensus_dict, arguments)
 
-    if args.majority_alleles_only: #End the program if only majority alleles are requested
+    if arguments.majority_alleles_only: #End the program if only majority alleles are requested
         sys.exit()
 
     # Adjust the consensus dictionary based on individual quality scores
@@ -541,17 +541,22 @@ def extract_mapped_rmlst_read(output_directory, nanopore_fastq):
         None
     """
     read_set = set()
+    total = 0
 
     # Extract read IDs from the initial rMLST alignment file
     with open(output_directory + '/initial_rmlst_alignment.sam', 'r') as sam_file:
         for line in sam_file:
             if not line.startswith('@'):
                 read_set.add(line.split('\t')[0])
+                total += 1
 
     # Write the extracted read IDs to a text file
     with open(output_directory + '/rmlst_reads.txt', 'w') as f:
         for item in read_set:
             f.write(item + '\n')
+
+    print ('Number of reads extracted: ', len(read_set))
+    print ('Total number of alignments in sam file: ', total)
 
     # Use seqtk to extract the corresponding reads from the nanopore FASTQ file
     os.system('seqtk subseq {} {} > {}'.format(nanopore_fastq, output_directory + '/rmlst_reads.txt',
