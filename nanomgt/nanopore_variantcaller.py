@@ -75,6 +75,9 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     print_majority_alelles(consensus_dict, arguments)
 
+    if args.majority_alleles_only: #End the program if only majority alleles are requested
+        sys.exit()
+
     # Adjust the consensus dictionary based on individual quality scores
     # Currently not doing anything.
     consensus_dict, read_positions_blacklisted_dict = adjust_consensus_dict_for_individual_qscores(consensus_dict, os.path.join(arguments.output, 'rmlst_alignment.sam'), arguments.nanopore, arguments.q_score)
@@ -544,8 +547,11 @@ def extract_mapped_rmlst_read(output_directory, nanopore_fastq):
         for line in frag:
             line = line.rstrip()
             line = line.split('\t')
+            if line[-1] in read_set:
+                print ('Duplicate read ID found in the alignment file.')
             read_set.add(line[-1])
 
+    sys.exit()
     # Write the extracted read IDs to a text file
     with open(output_directory + '/rmlst_reads.txt', 'w') as f:
         for item in read_set:

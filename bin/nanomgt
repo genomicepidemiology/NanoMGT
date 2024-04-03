@@ -52,6 +52,8 @@ def main():
                         help='Proximity between SNVs incurring a penalty. Default: 5')
     parser.add_argument('--q_score', action="store", type=int, dest='q_score', default=14,
                         help='Minimum average q-score for reads to be included. Default: 14')
+    parser.add_argument('--majority_alleles_only', action="store_true", dest='majority_alleles_only',
+                        help='Only output majority alleles.')
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
 
     # Parsing command-line arguments

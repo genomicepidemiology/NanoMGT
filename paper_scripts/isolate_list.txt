@@ -1,0 +1,15 @@
+SRR28399430 Escherichia coli ~125x depth
+SRR26899125 Escherichia coli
+SRR26899129 Escherichia coli
+SRR28370694	Staphylococcus aureus
+ERR8958843 Staphylococcus aureus
+SRR27167517 Staphylococcus aureus
+SRR28375015 Acinetobacter baumannii
+SRR27710531 Acinetobacter baumannii
+SRR25480264	Acinetobacter baumannii
+SRR27638397 Campylobacter jejuni
+SRR26899121	Campylobacter jejuni
+SRR27710526	Campylobacter jejuni
+SRR28399428	Salmonella enterica
+SRR27136088	Salmonella enterica
+SRR27755678	Salmonella enterica
