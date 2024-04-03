@@ -73,23 +73,27 @@ def nanopore_metagenomics_variantcaller(arguments):
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
 
-    # Corrected code to calculate majority nucleotide and total depth
+    print("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER")
     nucleotides = ['A', 'C', 'G', 'T']
 
     for item in consensus_dict:
         allele = item
-        depths = consensus_dict[item][0]  # The first element is the list of depth data
-        for sequence_position in depths:
-            # Extracting only the counts for A, C, G, T (assuming they are the first four elements)
+        depths = consensus_dict[item][0]
+        for i, sequence_position in enumerate(depths):
             nucleotide_frequencies = dict(zip(nucleotides, sequence_position[0:4]))
-            # Find the nucleotide with the highest frequency
             majority_nucleotide = max(nucleotide_frequencies, key=nucleotide_frequencies.get)
-            # Calculate the total depth as the sum of the frequencies
             total_depth = sum(nucleotide_frequencies.values())
 
-            # Now, you can use majority_nucleotide and total_depth as needed
-            # For example, printing them:
-            print(f"Allele: {allele}, Majority Nucleotide: {majority_nucleotide}, Total Depth: {total_depth}")
+            # For this example, we'll set some placeholder values
+            chrom = "Unknown"  # Placeholder, as we don't have chromosome info
+            pos = i + 1  # Assuming positions are sequential and start at 1
+            ref = "N"  # Placeholder, as we don't have reference base info
+            alt = majority_nucleotide
+            qual = 99  # Dummy quality score
+            filter_status = "PASS"  # Assuming all variants pass
+
+            print(f"{chrom}\t{pos}\t{allele}\t{ref}\t{alt}\t{qual}\t{filter_status}")
+
     sys.exit()
 
     # Adjust the consensus dictionary based on individual quality scores
