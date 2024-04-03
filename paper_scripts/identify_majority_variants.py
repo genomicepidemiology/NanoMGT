@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 
 # Path to the directory
 directory_path = '/home/people/malhal/data/new_nanomgt'
@@ -28,5 +29,6 @@ for fastq_file in fastq_files:
 
     # Optionally, print the output of the command
     print(process.stdout.decode())
+    sys.exit()
 
 print("Processing complete.")
