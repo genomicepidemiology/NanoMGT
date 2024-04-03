@@ -48,23 +48,23 @@ def nanopore_metagenomics_variantcaller(arguments):
                   f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.5 -sam 2096 > {os.path.join(arguments.output, 'initial_rmlst_alignment.sam')}").run()
 
     # Decompress alignment results
-    os.system(f'gunzip {os.path.join(arguments.output, "initial_rmlst_alignment.frag.gz")}')
+    #os.system(f'gunzip {os.path.join(arguments.output, "initial_rmlst_alignment.frag.gz")}')
 
     # Extract mapped rMLST reads
-    extract_mapped_rmlst_read(arguments.output, arguments.nanopore)
+    #extract_mapped_rmlst_read(arguments.output, arguments.nanopore)
 
     # Index top hits from the initial RMLST alignment
     index_top_hits_db(arguments.output)
 
 
     # Update nanopore file path for trimmed rMLST reads
-    arguments.nanopore = os.path.join(arguments.output, 'trimmed_rmlst_reads.fastq')
+    #arguments.nanopore = os.path.join(arguments.output, 'trimmed_rmlst_reads.fastq')
 
     # Run KMA alignment for rMLST
     kma.KMARunner(arguments.nanopore,
                   os.path.join(arguments.output, "rmlst_alignment"),
                   os.path.join(arguments.output, 'top_hits_db'),
-                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -mct 0.5 -sam 2096 > {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
+                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -eq {arguments.q_score} -matrix -mct 0.5 -sam 2096 > {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
 
 
     os.system(f'gunzip {os.path.join(arguments.output, "rmlst_alignment.mat.gz")}')
