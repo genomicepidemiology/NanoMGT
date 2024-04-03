@@ -73,26 +73,37 @@ def nanopore_metagenomics_variantcaller(arguments):
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
 
-    print("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER")
     nucleotides = ['A', 'C', 'G', 'T']
 
-    for item in consensus_dict:
-        allele = item
-        depths = consensus_dict[item][0]
-        for i, sequence_position in enumerate(depths):
-            nucleotide_frequencies = dict(zip(nucleotides, sequence_position[0:4]))
-            majority_nucleotide = max(nucleotide_frequencies, key=nucleotide_frequencies.get)
-            total_depth = sum(nucleotide_frequencies.values())
+    with open('/mnt/data/majority_variants.vcf', 'w') as file:
+        # Print header lines for VCF format and describe the INFO field contents
+        print("##fileformat=VCFv4.2", file=file)
+        print("##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total Depth\">", file=file)
+        print("##INFO=<ID=MD,Number=1,Type=Integer,Description=\"Depth of Majority Variant\">", file=file)
+        print("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO", file=file)
 
-            # For this example, we'll set some placeholder values
-            chrom = allele
-            pos = i + 1  # Assuming positions are sequential and start at 1
-            ref = consensus_dict[item][1][i]
-            alt = majority_nucleotide
-            qual = 'NA'
-            filter_status = "PASS"  # Assuming all variants pass
+        for item in consensus_dict:
+            allele = item
+            depths = consensus_dict[item][0]
+            for i, sequence_position in enumerate(depths):
+                nucleotide_frequencies = dict(zip(nucleotides, sequence_position[0:4]))
+                majority_nucleotide = max(nucleotide_frequencies, key=nucleotide_frequencies.get)
+                total_depth = sum(nucleotide_frequencies.values())
+                majority_depth = nucleotide_frequencies[majority_nucleotide]
 
-            print(f"{chrom}\t{pos}\t{allele}\t{ref}\t{alt}\t{qual}\t{filter_status}")
+                # Assuming the allele identifier as CHROM and additional fields as described
+                chrom = allele
+                pos = i + 1
+                ref = consensus_dict[item][1][i]  # Assuming this is the correct reference base
+                alt = majority_nucleotide
+                qual = 'NA'
+                filter_status = "PASS"
+
+                # Constructing the INFO field content
+                info = f"DP={total_depth};MD={majority_depth}"
+
+                # Printing the line with the INFO field included
+                print(f"{chrom}\t{pos}\t{allele}\t{ref}\t{alt}\t{qual}\t{filter_status}\t{info}", file=file)
 
     sys.exit()
 
