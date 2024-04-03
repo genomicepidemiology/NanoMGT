@@ -45,7 +45,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     kma.KMARunner(arguments.nanopore,
                   os.path.join(arguments.output, "initial_rmlst_alignment"),
                   os.path.join(arguments.output, 'specie_db'),
-                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.5 -sam 2096> {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
+                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.5 -sam 2096> {os.path.join(arguments.output, 'initial_rmlst_alignment.sam')}").run()
 
     # Decompress alignment results
     os.system(f'gunzip {os.path.join(arguments.output, "initial_rmlst_alignment.frag.gz")}')
