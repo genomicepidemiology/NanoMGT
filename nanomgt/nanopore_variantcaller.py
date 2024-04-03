@@ -73,6 +73,39 @@ def nanopore_metagenomics_variantcaller(arguments):
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
 
+    print_majority_alelles(consensus_dict, arguments)
+
+    # Adjust the consensus dictionary based on individual quality scores
+    # Currently not doing anything.
+    consensus_dict, read_positions_blacklisted_dict = adjust_consensus_dict_for_individual_qscores(consensus_dict, os.path.join(arguments.output, 'rmlst_alignment.sam'), arguments.nanopore, arguments.q_score)
+
+    # Derive mutation positions from consensus data
+    confirmed_mutation_dict = derive_mutation_positions(consensus_dict, arguments)
+
+    # Perform biological validation of mutations
+    bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(arguments.output, 'specie.fsa'))
+
+    # Co-occurrence analysis until convergence
+    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count = co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict, bio_validation_dict)
+
+    for item in confirmed_mutation_dict:
+        print(item, confirmed_mutation_dict[item])
+
+    sys.exit()
+    # Format and output the results
+    format_output(confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict)
+
+    # Write majority sequences to file
+    with open(os.path.join(arguments.output, 'majority_seqs.fasta'), 'w') as f:
+        for allele in consensus_dict:
+            print(f'>{allele}', file=f)
+            print(consensus_dict[allele][1], file=f)
+
+    sys.exit()
+
+
+
+def print_majority_alelles(consensus_dict, arguments):
     nucleotides = ['A', 'C', 'G', 'T']
 
     with open(arguments.output + '/majority_variants.vcf', 'w') as file:
@@ -104,36 +137,6 @@ def nanopore_metagenomics_variantcaller(arguments):
 
                 # Printing the line with the INFO field included
                 print(f"{chrom}\t{pos}\t{allele}\t{ref}\t{alt}\t{qual}\t{filter_status}\t{info}", file=file)
-
-    sys.exit()
-
-    # Adjust the consensus dictionary based on individual quality scores
-    # Currently not doing anything.
-    consensus_dict, read_positions_blacklisted_dict = adjust_consensus_dict_for_individual_qscores(consensus_dict, os.path.join(arguments.output, 'rmlst_alignment.sam'), arguments.nanopore, arguments.q_score)
-
-    # Derive mutation positions from consensus data
-    confirmed_mutation_dict = derive_mutation_positions(consensus_dict, arguments)
-
-
-    # Perform biological validation of mutations
-    bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(arguments.output, 'specie.fsa'))
-
-    # Co-occurrence analysis until convergence
-    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count = co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict, bio_validation_dict)
-
-    # Format and output the results
-    format_output(confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict)
-
-    # Write majority sequences to file
-    with open(os.path.join(arguments.output, 'majority_seqs.fasta'), 'w') as f:
-        for allele in consensus_dict:
-            print(f'>{allele}', file=f)
-            print(consensus_dict[allele][1], file=f)
-
-    sys.exit()
-
-
-
 
 
 def highest_scoring_hit(file_path):
