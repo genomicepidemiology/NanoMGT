@@ -75,7 +75,7 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     nucleotides = ['A', 'C', 'G', 'T']
 
-    with open('/mnt/data/majority_variants.vcf', 'w') as file:
+    with open(arguments.output + '/majority_variants.vcf', 'w') as file:
         # Print header lines for VCF format and describe the INFO field contents
         print("##fileformat=VCFv4.2", file=file)
         print("##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total Depth\">", file=file)
