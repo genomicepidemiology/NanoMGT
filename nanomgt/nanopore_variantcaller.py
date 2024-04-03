@@ -91,6 +91,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     for item in confirmed_mutation_dict:
         print(item, confirmed_mutation_dict[item])
 
+    print_minor_variants(confirmed_mutation_dict, consensus_dict, arguments.output)
     sys.exit()
     # Format and output the results
     format_output(confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict)
@@ -134,6 +135,45 @@ def print_majority_alelles(consensus_dict, arguments):
 
                 # Constructing the INFO field content
                 info = f"DP={total_depth};MD={majority_depth}"
+
+                # Printing the line with the INFO field included
+                print(f"{chrom}\t{pos}\t{allele}\t{ref}\t{alt}\t{qual}\t{filter_status}\t{info}", file=file)
+
+
+def print_minor_variants(confirmed_mutation_dict, consensus_dict, output_path):
+    with open(f'{output_path}/minor_variants.vcf', 'w') as file:
+        # Print header lines for VCF format
+        print("##fileformat=VCFv4.2", file=file)
+        print("##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Depth of Variant\">", file=file)
+        print("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO", file=file)
+
+        for item in confirmed_mutation_dict:
+            allele = item
+            mutations = confirmed_mutation_dict[item][0]
+            depths = confirmed_mutation_dict[item][1]
+
+            # Ensure allele exists in consensus_dict before proceeding
+            if allele not in consensus_dict:
+                continue
+
+            sequence = consensus_dict[allele][1]  # The nucleotide sequence for the allele
+
+            for mutation, depth in zip(mutations, depths):
+                position_str, alt = mutation.split('_')
+                pos = int(position_str)
+                chrom = allele
+
+                # Use the position from the mutation to get the reference nucleotide from the sequence
+                # Note: Assuming that the positions in mutations are 1-based indexing
+                try:
+                    ref = sequence[pos - 1]  # Adjusting for zero-based indexing
+                except IndexError:
+                    # If the position is out of range, set REF as unknown
+                    ref = "N"
+
+                qual = 'NA'  # Placeholder for quality
+                filter_status = "PASS"
+                info = f"DP={depth}"  # Constructing the INFO field content
 
                 # Printing the line with the INFO field included
                 print(f"{chrom}\t{pos}\t{allele}\t{ref}\t{alt}\t{qual}\t{filter_status}\t{info}", file=file)
