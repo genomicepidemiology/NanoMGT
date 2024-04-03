@@ -120,7 +120,7 @@ def print_majority_alelles(consensus_dict, arguments):
             allele = item
             depths = consensus_dict[item][0]
             for i, sequence_position in enumerate(depths):
-                nucleotide_frequencies = dict(zip(nucleotides, sequence_position[0:4]))
+                nucleotide_frequencies = dict(zip(nucleotides, sequence_position))
                 majority_nucleotide = max(nucleotide_frequencies, key=nucleotide_frequencies.get)
                 total_depth = sum(nucleotide_frequencies.values())
                 majority_depth = nucleotide_frequencies[majority_nucleotide]
@@ -162,6 +162,7 @@ def print_minor_variants(confirmed_mutation_dict, consensus_dict, output_path):
                 position_str, alt = mutation.split('_')
                 pos = int(position_str)
                 chrom = allele
+                total_depth = sum(consensus_dict[allele][0][pos - 1])
 
                 # Use the position from the mutation to get the reference nucleotide from the sequence
                 # Note: Assuming that the positions in mutations are 1-based indexing
@@ -173,7 +174,8 @@ def print_minor_variants(confirmed_mutation_dict, consensus_dict, output_path):
 
                 qual = 'NA'  # Placeholder for quality
                 filter_status = "PASS"
-                info = f"DP={depth}"  # Constructing the INFO field content
+                info = f"DP={total_depth};MD={depth}"
+
 
                 # Printing the line with the INFO field included
                 print(f"{chrom}\t{pos}\t{allele}\t{ref}\t{alt}\t{qual}\t{filter_status}\t{info}", file=file)
