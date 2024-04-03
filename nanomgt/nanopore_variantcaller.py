@@ -92,7 +92,6 @@ def nanopore_metagenomics_variantcaller(arguments):
         print(item, confirmed_mutation_dict[item])
 
     print_minor_variants(confirmed_mutation_dict, consensus_dict, arguments.output)
-    sys.exit()
     # Format and output the results
     format_output(confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict)
 
@@ -144,7 +143,8 @@ def print_minor_variants(confirmed_mutation_dict, consensus_dict, output_path):
     with open(f'{output_path}/minor_variants.vcf', 'w') as file:
         # Print header lines for VCF format
         print("##fileformat=VCFv4.2", file=file)
-        print("##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Depth of Variant\">", file=file)
+        print("##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total Depth\">", file=file)
+        print("##INFO=<ID=MD,Number=1,Type=Integer,Description=\"Depth of Majority Variant\">", file=file)
         print("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO", file=file)
 
         for item in confirmed_mutation_dict:
