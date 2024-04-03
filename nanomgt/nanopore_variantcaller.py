@@ -85,11 +85,11 @@ def nanopore_metagenomics_variantcaller(arguments):
             total_depth = sum(nucleotide_frequencies.values())
 
             # For this example, we'll set some placeholder values
-            chrom = "Unknown"  # Placeholder, as we don't have chromosome info
+            chrom = allele
             pos = i + 1  # Assuming positions are sequential and start at 1
-            ref = "N"  # Placeholder, as we don't have reference base info
+            ref = consensus_dict[item][1][i]
             alt = majority_nucleotide
-            qual = 99  # Dummy quality score
+            qual = 'NA'
             filter_status = "PASS"  # Assuming all variants pass
 
             print(f"{chrom}\t{pos}\t{allele}\t{ref}\t{alt}\t{qual}\t{filter_status}")
