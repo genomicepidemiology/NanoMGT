@@ -13,16 +13,14 @@ def align_and_identify_mutations(seq1, seq2):
 
     # Assuming we take the first alignment (typically the highest scoring)
     alignment_a, alignment_b, score, begin, end = alignments[0]
-    print(alignment_a)
-    print(alignment_b)
 
     # Identify point mutations, excluding gaps
-    point_mutations = []
-    for i in range(len(alignment_a)):
-        if alignment_a[i] != alignment_b[i]:
-            point_mutations.append((i + 1, alignment_a[i], alignment_b[i]))  # i+1 for 1-based indexing
+    #point_mutations = []
+    #for i in range(len(alignment_a)):
+    #    if alignment_a[i] != alignment_b[i]:
+    #        point_mutations.append((i + 1, alignment_a[i], alignment_b[i]))  # i+1 for 1-based indexing
 
-    return point_mutations
+    return alignment_a, alignment_b
 
 
 def extract_alignment(reference, query, cigar_string):
@@ -122,20 +120,22 @@ def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read
     - list[str]: A list where each mutation is described as a string in the format "POSITION_NUCLEOTIDE".
     """
     mutations = []
+    alignment_query, alignment_ref = align_and_identify_mutations(reference_sequence, ''.join(mutation_vector))
+    index_ref = 0  # Index for tracking positions in the reference sequence
 
-    # Ensure that mutation vector and reference have equal lengths
-    if len(mutation_vector) != len(reference_sequence):
-        print (len(mutation_vector), len(reference_sequence))
-        print (mutation_vector)
-        print (reference_sequence)
-        point_mutations = align_and_identify_mutations(reference_sequence, ''.join(mutation_vector))
-        raise ValueError("The mutation vector and reference sequence must have the same length.")
+    for i in range(len(alignment_query)):
+        # Check if there is a gap in the reference or a mismatch
+        if alignment_ref[i] != alignment_query[i]:
+            # For gaps in the reference, we do not increment index_ref
+            if alignment_ref[i] == '-':
+                mutations.append(f"{index_ref}_-")  # Indicates a deletion relative to the reference
+            else:
+                # Mismatch or gap in the query
+                mutations.append(f"{index_ref + 1}_{alignment_query[i]}")
 
-    for i in range(len(mutation_vector)):
-        if read_id in read_positions_blacklisted_dict: # If this redundant? Check up.
-            if i+1 not in read_positions_blacklisted_dict[read_id]:
-                if '{}_{}'.format(i+1, mutation_vector[i]) in gene_mutations:
-                    mutations.append('{}_{}'.format(i+1, mutation_vector[i]))
+        # Only increment index_ref if the current position in the reference is not a gap
+        if alignment_ref[i] != '-':
+            index_ref += 1
 
     return mutations
 
