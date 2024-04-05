@@ -22,7 +22,7 @@ def nanopore_metagenomics_variantcaller(arguments):
         arguments: Parsed command-line arguments containing parameters and file paths.
     """
     # Set up output directory and verify input file
-
+    """
     set_up_output_and_check_input(arguments)
 
     # Run KMA alignment for bacteria mapping
@@ -57,9 +57,9 @@ def nanopore_metagenomics_variantcaller(arguments):
                   os.path.join(arguments.output, 'top_hits_db'),
                   f"-t {arguments.threads} -ID 10 -ont -md 1.5 -eq {arguments.q_score} -matrix -mct 0.5 -sam 2096 > {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
 
-
+    
     os.system(f'gunzip {os.path.join(arguments.output, "rmlst_alignment.mat.gz")}')
-
+    """
     # Build a consensus dictionary from alignment results
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
