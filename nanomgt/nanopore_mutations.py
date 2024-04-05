@@ -187,9 +187,9 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
                 # Storing mutations in the dictionary
                 name = read_id + ' ' + rname
                 mutations_dict[name] = mutations
-                t += 1
-                if t == 100:
-                    print (t)
+            t += 1
+            if t % 5 == 0:
+                print (t)
 
     return mutations_dict
 
