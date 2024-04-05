@@ -121,7 +121,7 @@ def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read
     - list[str]: A list where each mutation is described as a string in the format "POSITION_NUCLEOTIDE".
     """
     mutations = []
-    alignment_query, alignment_ref = align_and_identify_mutations(reference_sequence, ''.join(mutation_vector))
+    alignment_query, alignment_ref = align_and_identify_mutations(''.join(mutation_vector), reference_sequence)
     print (alignment_query)
     print (len(alignment_query))
     print (alignment_ref)
