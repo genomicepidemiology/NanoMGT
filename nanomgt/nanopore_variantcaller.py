@@ -22,7 +22,7 @@ def nanopore_metagenomics_variantcaller(arguments):
         arguments: Parsed command-line arguments containing parameters and file paths.
     """
     # Set up output directory and verify input file
-    """
+
     set_up_output_and_check_input(arguments)
 
     # Run KMA alignment for bacteria mapping
@@ -45,7 +45,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     kma.KMARunner(arguments.nanopore,
                   os.path.join(arguments.output, "initial_rmlst_alignment"),
                   os.path.join(arguments.output, 'specie_db'),
-                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.5 -sam 2096 > {os.path.join(arguments.output, 'initial_rmlst_alignment.sam')}").run()
+                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.75 -sam 2096 > {os.path.join(arguments.output, 'initial_rmlst_alignment.sam')}").run()
 
     # Index top hits from the initial RMLST alignment
     index_top_hits_db(arguments.output)
@@ -55,11 +55,11 @@ def nanopore_metagenomics_variantcaller(arguments):
     kma.KMARunner(arguments.nanopore,
                   os.path.join(arguments.output, "rmlst_alignment"),
                   os.path.join(arguments.output, 'top_hits_db'),
-                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -eq {arguments.q_score} -matrix -mct 0.5 -sam 2096 > {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
+                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -eq {arguments.q_score} -matrix -mct 0.75 -sam 2096 > {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
 
     
     os.system(f'gunzip {os.path.join(arguments.output, "rmlst_alignment.mat.gz")}')
-    """
+
     # Build a consensus dictionary from alignment results
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
@@ -680,6 +680,8 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                     mutation_threshold = mutation_threshold + arguments.pp * position_depth * arguments.mrd
                 if density_mutations != []:
                     mutation_threshold = mutation_threshold + arguments.dp * position_depth * arguments.mrd * len(density_mutations)
+                #TBD Consider if we should include gaps in our co-occurence strategy.
+                #TBD Consider gaps related scoring strategy.
                 if mutation[-1] == '-': #Default, figure out a strategy.
                     mutation_threshold = position_depth * arguments.mrd
                 if mutation_depth >= mutation_threshold:
