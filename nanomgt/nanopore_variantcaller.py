@@ -22,7 +22,7 @@ def nanopore_metagenomics_variantcaller(arguments):
         arguments: Parsed command-line arguments containing parameters and file paths.
     """
     # Set up output directory and verify input file
-
+    """
     set_up_output_and_check_input(arguments)
 
     # Run KMA alignment for bacteria mapping
@@ -59,7 +59,7 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     
     os.system(f'gunzip {os.path.join(arguments.output, "rmlst_alignment.mat.gz")}')
-
+    """
     # Build a consensus dictionary from alignment results
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
@@ -674,11 +674,11 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                             co_occurrence_tmp_dict[allele].append(item)
                     mutation_threshold = mutation_threshold - position_depth * arguments.mrd * arguments.cor
 
-                if not biological_existence:
+                if not biological_existence and mutation[-1] != '-': #Exclude gaps from this
                     mutation_threshold = mutation_threshold + arguments.bp * position_depth * arguments.mrd
-                if proxi_mutations != []:
+                if proxi_mutations != [] and mutation[-1] != '-':
                     mutation_threshold = mutation_threshold + arguments.pp * position_depth * arguments.mrd
-                if density_mutations != []:
+                if density_mutations != [] and mutation[-1] != '-':
                     mutation_threshold = mutation_threshold + arguments.dp * position_depth * arguments.mrd * len(density_mutations)
                 if mutation_depth >= mutation_threshold:
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][i])
