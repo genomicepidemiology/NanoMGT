@@ -233,6 +233,14 @@ def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensu
     original_dp = arguments.dp
     start_time = time.time()
 
+    print ('loading reads_mutation_dict...')
+
+    reads_mutation_dict = parse_sam_and_find_mutations(arguments.output + '/rmlst_alignment.sam',
+                                                       confirmed_mutation_dict,
+                                                       consensus_dict,
+                                                       read_positions_blacklisted_dict)
+    print ('reads_mutation_dict loaded')
+
     with open(arguments.output + '/convergence_results.txt', 'w') as convergence_file:
         print('Interations,Mutations', file=convergence_file)
 
@@ -247,7 +255,8 @@ def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensu
                 confirmed_mutation_dict,
                 consensus_dict,
                 read_positions_blacklisted_dict,
-                bio_validation_dict
+                bio_validation_dict,
+                reads_mutation_dict
             )
 
             new_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
@@ -593,7 +602,7 @@ def derive_mutation_positions(consensus_dict, arguments):
 
 
 def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, consensus_dict,
-                                         read_positions_blacklisted_dict, bio_validation_dict):
+                                         read_positions_blacklisted_dict, bio_validation_dict, reads_mutation_dict):
     """
     Filter and adjust confirmed mutations based on co-occurrence, depth, and biological validation.
 
@@ -607,10 +616,6 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
     Returns:
         dict: A filtered and adjusted mutation dictionary for alleles.
     """
-    reads_mutation_dict = parse_sam_and_find_mutations(arguments.output + '/rmlst_alignment.sam',
-                                                       confirmed_mutation_dict,
-                                                       consensus_dict,
-                                                       read_positions_blacklisted_dict)
 
     co_occurrence_tmp_dict = {}
     co_occurrence_matrix_dict = {}
