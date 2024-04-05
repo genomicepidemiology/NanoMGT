@@ -64,10 +64,6 @@ def nanopore_metagenomics_variantcaller(arguments):
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
 
-    for item in consensus_dict:
-        print(item, consensus_dict[item])
-    sys.exit()
-
     print_majority_alelles(consensus_dict, arguments)
 
     if arguments.majority_alleles_only: #End the program if only majority alleles are requested
@@ -575,10 +571,10 @@ def derive_mutation_positions(consensus_dict, arguments):
         all_confirmed_mutation_dict[allele] = [[], []]
 
         for i in range(len(allele_data[0])):
-            positions = allele_data[0][i][:4]
+            positions = allele_data[0][i][:6]
             max_number = max(positions)
             index_of_max = positions.index(max_number)
-            nucleotide_index = ['A', 'C', 'G', 'T']
+            nucleotide_index = ['A', 'C', 'G', 'T', 'N', '-']
 
             for t in range(len(positions)):
                 if t != index_of_max:
