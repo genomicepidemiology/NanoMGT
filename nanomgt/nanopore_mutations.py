@@ -122,10 +122,10 @@ def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read
     """
     mutations = []
     alignment_query, alignment_ref = align_and_identify_mutations(''.join(mutation_vector), reference_sequence)
-    print (alignment_query)
-    print (len(alignment_query))
-    print (alignment_ref)
-    print (len(alignment_ref))
+    #print (alignment_query)
+    #print (len(alignment_query))
+    #print (alignment_ref)
+    #print (len(alignment_ref))
     index_ref = 0  # Index for tracking positions in the reference sequence
 
     for i in range(len(alignment_query)):
@@ -182,11 +182,10 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
                 aligned_ref, aligned_query = extract_alignment(majority_seq[pos-1:pos-1+tlen], seq, cigar_str)
                 mutation_vector = create_mutation_vector(aligned_ref, aligned_query)
                 mutations = identify_mutations(mutation_vector, majority_seq[pos-1:pos-1+tlen], confirmed_mutation_dict[rname][0], read_id, read_positions_blacklisted_dict)
-                print (mutations)
+                #print (mutations)
                 # Storing mutations in the dictionary
                 name = read_id + ' ' + rname
                 mutations_dict[name] = mutations
-    sys.exit()
 
     return mutations_dict
 
