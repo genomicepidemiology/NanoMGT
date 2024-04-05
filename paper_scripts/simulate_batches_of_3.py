@@ -8,7 +8,7 @@ ecoli_sequencing_ids = ['SRR28399430', 'SRR26899125', 'SRR26899129']
 staph_aureus_sequencing_ids = ['SRR28370694', 'ERR8958843', 'SRR27167517']
 
 # Acinetobacter baumannii
-acinetobacter_baumannii_sequencing_ids = ['SRR28375015', 'SRR27710531', 'SRR25480264']
+acinetobacter_baumannii_sequencing_ids = ['SRR26643493', 'SRR27710531', 'SRR23387317']
 
 # Campylobacter jejuni
 campylobacter_jejuni_sequencing_ids = ['SRR27638397', 'SRR26899121', 'SRR27710526']
@@ -25,10 +25,10 @@ print("Batch, ID1, Percentage1, ID2, Percentage2, ID3, Percentage3")
 # Generate batches
 for i in range(num_batches):
     # Randomly select 2 sequencing IDs
-    selected_ids = random.sample(ecoli_sequencing_ids, 3)
+    selected_ids = random.sample(campylobacter_jejuni_sequencing_ids, 3)
 
     # Calculate percentages
-    percent_1 = 100 - i*2
+    percent_1 = 98 - i*2
     percent_2 = i + 1
     percent_3 = i + 1
 

@@ -29,6 +29,5 @@ for fastq_file in fastq_files:
 
     # Optionally, print the output of the command
     print(process.stdout.decode())
-    sys.exit()
 
 print("Processing complete.")

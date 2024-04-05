@@ -1,15 +1,34 @@
+
+120x
 SRR28399430 Escherichia coli ~125x depth
-SRR26899125 Escherichia coli
-SRR26899129 Escherichia coli
-SRR28370694	Staphylococcus aureus
-ERR8958843 Staphylococcus aureus
-SRR27167517 Staphylococcus aureus
-SRR28375015 Acinetobacter baumannii
-SRR27710531 Acinetobacter baumannii
-SRR25480264	Acinetobacter baumannii
-SRR27638397 Campylobacter jejuni
-SRR26899121	Campylobacter jejuni
-SRR27710526	Campylobacter jejuni
-SRR28399428	Salmonella enterica
-SRR27136088	Salmonella enterica
-SRR27755678	Salmonella enterica
+SRR26899125 Escherichia coli >1000x depth
+SRR26899129 Escherichia coli ~120x depth
+
+170x
+SRR28370694	Staphylococcus aureus ~200x depth
+ERR8958843 Staphylococcus aureus >2000x depth
+SRR27167517 Staphylococcus aureus ~160x depth
+
+140x
+SRR26643493 Acinetobacter baumannii ~225x depth
+SRR27710531 Acinetobacter baumannii ~170x depth
+SRR23387317	Acinetobacter baumannii ~150x depth
+
+350x
+SRR27638397 Campylobacter jejuni ~1800x depth
+SRR26899121	Campylobacter jejuni ~750x depth
+SRR27710526	Campylobacter jejuni >2000x depth
+
+225x
+SRR28399428	Salmonella enterica >1000x depth
+SRR27136088	Salmonella enterica ~320x depth
+SRR27755678	Salmonella enterica ~400x depth
+
+
+Escherichia coli approx. genome size for depth simulation: 5000000
+Staphylococcus aureus approx. genome size for depth simulation: 3000000
+Acinetobacter baumannii approx. genome size for depth simulation: 4000000
+Campylobacter jejuni approx. genome size for depth simulation: 1700000
+Salmonella enterica approx. genome size for depth simulation: 5000000
+
+```

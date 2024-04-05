@@ -47,18 +47,9 @@ def nanopore_metagenomics_variantcaller(arguments):
                   os.path.join(arguments.output, 'specie_db'),
                   f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.5 -sam 2096 > {os.path.join(arguments.output, 'initial_rmlst_alignment.sam')}").run()
 
-    # Decompress alignment results
-    #os.system(f'gunzip {os.path.join(arguments.output, "initial_rmlst_alignment.frag.gz")}')
-
-    # Extract mapped rMLST reads
-    #extract_mapped_rmlst_read(arguments.output, arguments.nanopore)
-
     # Index top hits from the initial RMLST alignment
     index_top_hits_db(arguments.output)
 
-
-    # Update nanopore file path for trimmed rMLST reads
-    #arguments.nanopore = os.path.join(arguments.output, 'trimmed_rmlst_reads.fastq')
 
     # Run KMA alignment for rMLST
     kma.KMARunner(arguments.nanopore,
@@ -72,6 +63,10 @@ def nanopore_metagenomics_variantcaller(arguments):
     # Build a consensus dictionary from alignment results
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
+
+    for item in consensus_dict:
+        print(item, consensus_dict[item])
+    sys.exit()
 
     print_majority_alelles(consensus_dict, arguments)
 
@@ -939,7 +934,7 @@ def build_consensus_dict(res_file, mat_file):
     # Generate consensus sequences for alleles
     for allele in consensus_dict:
         for position in consensus_dict[allele][0]:
-            consensus_dict[allele][1] += 'ACGT'[position[:4].index(max(position[:4]))]
+            consensus_dict[allele][1] += 'ACGTN-'[position[:6].index(max(position[:6]))]
 
     return consensus_dict
 
