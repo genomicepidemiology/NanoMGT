@@ -1,4 +1,5 @@
 import re
+import sys
 from Bio import pairwise2
 from Bio.Seq import Seq
 
