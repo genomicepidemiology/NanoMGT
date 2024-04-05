@@ -76,6 +76,9 @@ def nanopore_metagenomics_variantcaller(arguments):
     # Derive mutation positions from consensus data
     confirmed_mutation_dict = derive_mutation_positions(consensus_dict, arguments)
 
+    for item in consensus_dict:
+        print (item, confirmed_mutation_dict[item])
+
     # Perform biological validation of mutations
     bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(arguments.output, 'specie.fsa'))
 
