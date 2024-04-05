@@ -674,12 +674,14 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                             co_occurrence_tmp_dict[allele].append(item)
                     mutation_threshold = mutation_threshold - position_depth * arguments.mrd * arguments.cor
 
-                if not biological_existence and mutation[-1] != '-': #Exclude gaps from this
+                if not biological_existence:
                     mutation_threshold = mutation_threshold + arguments.bp * position_depth * arguments.mrd
-                if proxi_mutations != [] and mutation[-1] != '-':
+                if proxi_mutations != []:
                     mutation_threshold = mutation_threshold + arguments.pp * position_depth * arguments.mrd
-                if density_mutations != [] and mutation[-1] != '-':
+                if density_mutations != []:
                     mutation_threshold = mutation_threshold + arguments.dp * position_depth * arguments.mrd * len(density_mutations)
+                if mutation[-1] == '-': #Default, figure out a strategy.
+                    mutation_threshold = position_depth * arguments.mrd
                 if mutation_depth >= mutation_threshold:
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][i])
                     adjusted_mutation_dict[allele][1].append(confirmed_mutation_dict[allele][1][i])
