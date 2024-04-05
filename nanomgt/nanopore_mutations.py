@@ -183,10 +183,11 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
                 mutation_vector = create_mutation_vector(aligned_ref, aligned_query)
                 mutations = identify_mutations(mutation_vector, majority_seq[pos-1:pos-1+tlen], confirmed_mutation_dict[rname][0], read_id, read_positions_blacklisted_dict)
                 print (mutations)
-                sys.exit()
                 # Storing mutations in the dictionary
                 name = read_id + ' ' + rname
                 mutations_dict[name] = mutations
+    sys.exit()
+
     return mutations_dict
 
 def parse_fsa_get_references(fsa_file_path):
