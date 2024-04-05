@@ -161,6 +161,7 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
     #reference_sequences = load_references_from_fasta(fasta_file, references)
 
     mutations_dict = {}
+    t = 0
     with open(sam_file_path, 'r') as sam_file:
         for line in sam_file:
             # Skip header lines
@@ -186,6 +187,9 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
                 # Storing mutations in the dictionary
                 name = read_id + ' ' + rname
                 mutations_dict[name] = mutations
+                t += 1
+                if t == 100:
+                    print (t)
 
     return mutations_dict
 
