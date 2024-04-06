@@ -198,9 +198,15 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
             #TBD could we optimize this is still work with partial alignments? I guess we dont need to have full coverage.
             if pos == 1 and len(seq) >= tlen:
                 majority_seq = consensus_dict[rname][1]
+                #TBD consider if this majority_seq is a problem if it contains gaps
                 # Obtaining the alignment using your function
                 aligned_ref, aligned_query = extract_alignment(majority_seq[pos-1:pos-1+tlen], seq, cigar_str)
+                print (aligned_ref)
+                print (aligned_query)
+                sys.exit()
                 mutation_vector = create_mutation_vector(aligned_ref, aligned_query)
+                if 'BACT000001_' in rname:
+                    print (mutation_vector)
                 mutations = identify_mutations(mutation_vector, majority_seq[pos-1:pos-1+tlen], confirmed_mutation_dict[rname][0], read_id, read_positions_blacklisted_dict)
                 name = read_id + ' ' + rname
                 mutations_dict[name] = mutations
