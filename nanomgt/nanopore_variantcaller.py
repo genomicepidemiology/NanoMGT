@@ -64,6 +64,10 @@ def nanopore_metagenomics_variantcaller(arguments):
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
 
+    for item in consensus_dict:
+        print(item, consensus_dict[item])
+    sys.exit()
+
     print_majority_alelles(consensus_dict, arguments)
 
     if arguments.majority_alleles_only: #End the program if only majority alleles are requested
@@ -228,6 +232,14 @@ def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensu
         tuple: A tuple containing the updated dictionary of confirmed mutations, temporary co-occurrence data, and iteration count.
     """
 
+    print('loading reads_mutation_dict...')
+
+    reads_mutation_dict = parse_sam_and_find_mutations(arguments.output + '/rmlst_alignment.sam',
+                                                       confirmed_mutation_dict,
+                                                       consensus_dict,
+                                                       read_positions_blacklisted_dict)
+    print('reads_mutation_dict loaded')
+
     current_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
     iteration_count = 0
     original_cor = arguments.cor
@@ -249,7 +261,8 @@ def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensu
                 confirmed_mutation_dict,
                 consensus_dict,
                 read_positions_blacklisted_dict,
-                bio_validation_dict
+                bio_validation_dict,
+                reads_mutation_dict
             )
 
             new_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
@@ -596,7 +609,7 @@ def derive_mutation_positions(consensus_dict, arguments):
 
 
 def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, consensus_dict,
-                                         read_positions_blacklisted_dict, bio_validation_dict):
+                                         read_positions_blacklisted_dict, bio_validation_dict, reads_mutation_dict):
     """
     Filter and adjust confirmed mutations based on co-occurrence, depth, and biological validation.
 
@@ -611,14 +624,6 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
         dict: A filtered and adjusted mutation dictionary for alleles.
     """
 
-    print('loading reads_mutation_dict...')
-
-    reads_mutation_dict = parse_sam_and_find_mutations(arguments.output + '/rmlst_alignment.sam',
-                                                       confirmed_mutation_dict,
-                                                       consensus_dict,
-                                                       read_positions_blacklisted_dict)
-    print('reads_mutation_dict loaded')
-
     co_occurrence_tmp_dict = {}
     co_occurrence_matrix_dict = {}
     for allele in confirmed_mutation_dict:
@@ -631,6 +636,8 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                 if read_allele == allele:
                     read_mutations = reads_mutation_dict[read]
                     valid_mutations = [mutation for mutation in read_mutations if mutation in mutation_list]
+                    if allele == 'BACT000001_1153':
+                        print (read, valid_mutations, mutation_list)
                     if len(valid_mutations) > 1:
                         for i in range(len(valid_mutations)):
                             for j in range(i + 1, len(valid_mutations)):
@@ -639,11 +646,11 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                                 co_occurrence_matrix[mutation1][mutation2] += 1
                                 co_occurrence_matrix[mutation2][mutation1] += 1
             co_occurrence_matrix_dict[allele] = [co_occurrence_matrix, mutation_list]
-            if allele == 'BACT000001_1153':
-                print (allele)
-                for i in range(len(co_occurrence_matrix)):
-                    print (mutation_list[i], co_occurrence_matrix[i])
-
+            #if allele == 'BACT000001_1153':
+            #    print (allele)
+            #    for i in range(len(co_occurrence_matrix)):
+            #        print (mutation_list[i], co_occurrence_matrix[i])
+    sys.exit()
     adjusted_mutation_dict = {}
     for allele in confirmed_mutation_dict:
         co_occurrence_tmp_dict[allele] = []

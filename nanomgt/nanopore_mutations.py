@@ -195,6 +195,7 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
             tlen = int(tlen)
 
             #Should be start pos of the alignment and not of the read
+            #TBD could we optimize this is still work with partial alignments? I guess we dont need to have full coverage.
             if pos == 1 and len(seq) >= tlen:
                 majority_seq = consensus_dict[rname][1]
                 # Obtaining the alignment using your function
