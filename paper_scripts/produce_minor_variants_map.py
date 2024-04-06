@@ -71,6 +71,7 @@ for item in combined_list_of_ids:
                         ref = ref_dict[key]
                         alignment_query, alignment_ref = align_and_identify_mutations(query, ref)
 
+                        index = 0
 
                         for i in range(len(alignment_query)):
                             # Check if there is a gap in the reference or a mismatch
@@ -78,7 +79,10 @@ for item in combined_list_of_ids:
                             if alignment_ref[i] != alignment_query[i]:
                                 # For gaps in the reference, we do not increment index_ref
                                 if alignment_query[i] != '-':
-                                    mutations.append(f"{i+1}_{alignment_query[i]}")
+                                    mutations.append(f"{index+1}_{alignment_query[i]}")
+                            if alignment_query[i] != '-':
+                                index += 1
+
                         if mutations != []:
                             print (key, file = write_file)
                             print (",".join(mutations), file = write_file)

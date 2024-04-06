@@ -125,33 +125,46 @@ def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read
         #TBD implement check for high amount of mutations is super bad coding, write better as a function when you have time.
         alignment_query = ''.join(mutation_vector)
         alignment_ref = reference_sequence
-        index_ref = 0  # Index for tracking positions in the reference sequence
+        index = 0
 
         for i in range(len(alignment_query)):
+            # Check if there is a gap in the reference or a mismatch
             # Check if there is a gap in the reference or a mismatch
             if alignment_ref[i] != alignment_query[i]:
                 # For gaps in the reference, we do not increment index_ref
                 if alignment_query[i] != '-':
-                    mutations.append(f"{i + 1}_{alignment_query[i]}")
+                    mutations.append(f"{index + 1}_{alignment_query[i]}")
+            if alignment_query[i] != '-':
+                index += 1
 
         if len(mutations)/len(reference_sequence) > 0.05: #5% mutations, likely a need for alignment
             mutations = []
             alignment_query, alignment_ref = align_and_identify_mutations(''.join(mutation_vector), reference_sequence)
+            index = 0
+
             for i in range(len(alignment_query)):
+                # Check if there is a gap in the reference or a mismatch
                 # Check if there is a gap in the reference or a mismatch
                 if alignment_ref[i] != alignment_query[i]:
                     # For gaps in the reference, we do not increment index_ref
                     if alignment_query[i] != '-':
-                        mutations.append(f"{i+1}_{alignment_query[i]}")
+                        mutations.append(f"{index + 1}_{alignment_query[i]}")
+                if alignment_query[i] != '-':
+                    index += 1
     else:
         alignment_query, alignment_ref = align_and_identify_mutations(''.join(mutation_vector), reference_sequence)
 
+        index = 0
+
         for i in range(len(alignment_query)):
+            # Check if there is a gap in the reference or a mismatch
             # Check if there is a gap in the reference or a mismatch
             if alignment_ref[i] != alignment_query[i]:
                 # For gaps in the reference, we do not increment index_ref
                 if alignment_query[i] != '-':
-                    mutations.append(f"{i+1}_{alignment_query[i]}")
+                    mutations.append(f"{index + 1}_{alignment_query[i]}")
+            if alignment_query[i] != '-':
+                index += 1
     return mutations
 
 def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict):
