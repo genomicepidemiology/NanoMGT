@@ -15,7 +15,7 @@ def count_nucleotides_in_fastq(file_path):
 # Parameters
 description_file = 'simulated_batches/ecoli_2s.csv'  # Path to your file
 genome_size = 5000000  # Genome size
-total_depth = 120  # Total depth
+total_depth = 300  # Total depth
 desired_total_nucleotides = genome_size * total_depth
 output_prefix = 'ecoli_2s'  # Prefix for output files
 output_directory = 'simulated_ecoli_2s'  # Directory to store output files
@@ -37,6 +37,7 @@ average_read_lengths = {
     'SRR28370694.fastq': 4247.29,
     'SRR28399428.fastq': 7268.81,
     'SRR28399430.fastq': 4996.18,
+    'SRR25689478.fastq': 5753.44
 }
 
 # Ensure output directory exists

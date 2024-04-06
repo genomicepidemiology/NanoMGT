@@ -2,7 +2,7 @@ import random
 
 # List of sequencing IDs
 # Escherichia coli
-ecoli_sequencing_ids = ['SRR28399430', 'SRR26899125']
+ecoli_sequencing_ids = ['SRR25689478', 'SRR26899125']
 
 # Staphylococcus aureus
 staph_aureus_sequencing_ids = ['SRR28370694', 'ERR8958843', 'SRR27167517']
@@ -25,7 +25,7 @@ print("Batch, ID1, Percentage1, ID2, Percentage2")
 # Generate batches
 for i in range(num_batches):
     # Randomly select 2 sequencing IDs
-    selected_ids = random.sample(campylobacter_jejuni_sequencing_ids, 2)
+    selected_ids = random.sample(ecoli_sequencing_ids, 2)
 
     # Calculate percentages
     percent_1 = 99 - i

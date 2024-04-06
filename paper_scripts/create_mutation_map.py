@@ -27,9 +27,6 @@ ecoli_sequencing_ids = ['SRR28399430', 'SRR26899125', 'SRR26899129'] # BACT00001
 # Staphylococcus aureus
 staph_aureus_sequencing_ids = ['SRR28370694', 'ERR8958843', 'SRR27167517'] # BACT000030 {690, 693}
 
-# Acinetobacter baumannii
-acinetobacter_baumannii_sequencing_ids = ['SRR26643493', 'SRR27710531', 'SRR23387317'] #All share rqual lengths
-
 # Campylobacter jejuni
 campylobacter_jejuni_sequencing_ids = ['SRR27638397', 'SRR26899121', 'SRR27710526'] # BACT000051 {426: SRR27710526, 444: SRR26899121, SRR27638397}
 
