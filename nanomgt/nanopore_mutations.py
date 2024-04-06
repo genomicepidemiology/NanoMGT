@@ -134,9 +134,8 @@ def identify_mutations(alignment_query, alignment_ref):
         if alignment_query[i] != '-':
             index += 1
 
-    if len(mutations)/len(reference_sequence) > 0.05: #5% mutations, likely a need for alignment
+    if len(mutations)/len(alignment_ref) > 0.05: #5% mutations, likely a need for alignment
         mutations = []
-        alignment_query, alignment_ref = align_sequences(''.join(mutation_vector), reference_sequence)
         index = 0
 
         for i in range(len(alignment_query)):
