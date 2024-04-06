@@ -109,7 +109,7 @@ def create_mutation_vector(aligned_ref, aligned_query):
     return mutation_vector
 
 
-def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read_id, read_positions_blacklisted_dict):
+def identify_mutations(query, reference):
     """
     Identify all mutation positions from a mutation vector compared to the reference.
 
@@ -121,39 +121,24 @@ def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read
     - list[str]: A list where each mutation is described as a string in the format "POSITION_NUCLEOTIDE".
     """
     mutations = []
-    if len(mutation_vector) == len(reference_sequence):
-        #TBD implement check for high amount of mutations is super bad coding, write better as a function when you have time.
-        alignment_query = ''.join(mutation_vector)
-        alignment_ref = reference_sequence
-        index = 0
+    #TBD implement check for high amount of mutations is super bad coding, write better as a function when you have time.
+    alignment_query = ''.join(mutation_vector)
+    alignment_ref = reference_sequence
+    index = 0
 
-        for i in range(len(alignment_query)):
-            # Check if there is a gap in the reference or a mismatch
-            # Check if there is a gap in the reference or a mismatch
-            if alignment_ref[i] != alignment_query[i]:
-                # For gaps in the reference, we do not increment index_ref
-                if alignment_query[i] != '-':
-                    mutations.append(f"{index + 1}_{alignment_query[i]}")
+    for i in range(len(alignment_query)):
+        # Check if there is a gap in the reference or a mismatch
+        # Check if there is a gap in the reference or a mismatch
+        if alignment_ref[i] != alignment_query[i]:
+            # For gaps in the reference, we do not increment index_ref
             if alignment_query[i] != '-':
-                index += 1
+                mutations.append(f"{index + 1}_{alignment_query[i]}")
+        if alignment_query[i] != '-':
+            index += 1
 
-        if len(mutations)/len(reference_sequence) > 0.05: #5% mutations, likely a need for alignment
-            mutations = []
-            alignment_query, alignment_ref = align_sequences(''.join(mutation_vector), reference_sequence)
-            index = 0
-
-            for i in range(len(alignment_query)):
-                # Check if there is a gap in the reference or a mismatch
-                # Check if there is a gap in the reference or a mismatch
-                if alignment_ref[i] != alignment_query[i]:
-                    # For gaps in the reference, we do not increment index_ref
-                    if alignment_query[i] != '-':
-                        mutations.append(f"{index + 1}_{alignment_query[i]}")
-                if alignment_query[i] != '-':
-                    index += 1
-    else:
+    if len(mutations)/len(reference_sequence) > 0.05: #5% mutations, likely a need for alignment
+        mutations = []
         alignment_query, alignment_ref = align_sequences(''.join(mutation_vector), reference_sequence)
-
         index = 0
 
         for i in range(len(alignment_query)):
@@ -167,7 +152,7 @@ def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read
                 index += 1
     return mutations
 
-def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict):
+def parse_sam_and_find_mutations(sam_file_path, consensus_dict):
     """
     Parses a SAM file, extracts necessary information and finds mutations in each read.
 
@@ -205,21 +190,9 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
                 #TBD consider if this majority_seq is a problem if it contains gaps
                 # Obtaining the alignment using your function
                 aligned_ref, aligned_query = extract_alignment(majority_seq[pos-1:pos+tlen], seq, cigar_str)
-                #print (aligned_ref)
-                #print (aligned_query)
-                if len(aligned_ref) != len(aligned_query):
-                    not_same += 1
-                else:
-                    same += 1
-                #if same % 100 == 0 or not_same % 100 == 0:
-                #    sys.exit()
-                #mutation_vector = create_mutation_vector(aligned_ref, aligned_query)
-                #mutations = identify_mutations(mutation_vector, majority_seq[pos-1:pos-1+tlen], confirmed_mutation_dict[rname][0], read_id, read_positions_blacklisted_dict)
-                #name = read_id + ' ' + rname
-                #mutations_dict[name] = mutations
-    print ('same:', same)
-    print ('not_same:', not_same)
-    sys.exit()
+                mutations = identify_mutations(aligned_query, aligned_ref)
+                name = read_id + ' ' + rname
+                mutations_dict[name] = mutations
     return mutations_dict
 
 def parse_fsa_get_references(fsa_file_path):

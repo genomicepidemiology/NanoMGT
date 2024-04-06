@@ -232,9 +232,7 @@ def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensu
     print('loading reads_mutation_dict...')
 
     reads_mutation_dict = parse_sam_and_find_mutations(arguments.output + '/rmlst_alignment.sam',
-                                                       confirmed_mutation_dict,
-                                                       consensus_dict,
-                                                       read_positions_blacklisted_dict)
+                                                       consensus_dict)
     print('reads_mutation_dict loaded')
 
     current_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
