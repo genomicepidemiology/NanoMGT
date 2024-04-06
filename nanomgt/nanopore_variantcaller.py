@@ -65,7 +65,7 @@ def nanopore_metagenomics_variantcaller(arguments):
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
 
     for item in consensus_dict:
-        print(item, consensus_dict[item])
+        print(item, consensus_dict[item][1])
     sys.exit()
 
     print_majority_alelles(consensus_dict, arguments)
