@@ -204,8 +204,8 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
                 #TBD consider if this majority_seq is a problem if it contains gaps
                 # Obtaining the alignment using your function
                 aligned_ref, aligned_query = extract_alignment(majority_seq[pos-1:pos-1+tlen], seq, cigar_str)
-                print (aligned_ref)
-                print (aligned_query)
+                #print (aligned_ref)
+                #print (aligned_query)
                 if len(aligned_ref) != len(aligned_query):
                     not_same += 1
                 else:
