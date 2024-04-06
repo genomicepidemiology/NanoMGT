@@ -192,6 +192,7 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
             cols = line.strip().split('\t')
             qname, flag, rname, pos, mapq, cigar_str, rnext, pnext, tlen, seq = cols[:10]
             read_id = qname.split(' ')[0]
+            print (rname)
 
             # Convert string columns to appropriate types
             pos = int(pos)
