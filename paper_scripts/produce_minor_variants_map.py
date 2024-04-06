@@ -3,6 +3,62 @@ import sys
 from Bio import pairwise2
 from Bio.Seq import Seq
 
+def create_mutation_vector(aligned_ref, aligned_query):
+    """
+    Creates a mutation vector based on the aligned reference and query sequences.
+
+    Parameters:
+    - aligned_ref (str): Aligned portion of the reference sequence.
+    - aligned_query (str): Aligned portion of the query sequence.
+
+    Returns:
+    - list[str]: A mutation vector representing the alignment with respect to the original reference sequence.
+    """
+    mutation_vector = []
+
+    # Loop through the aligned sequences
+    for i in range(len(aligned_ref)):
+        ref_nt = aligned_ref[i]
+        query_nt = aligned_query[i]
+
+        if ref_nt == "-":
+            # Skip insertions in the reference
+            continue
+        elif query_nt == "-":
+            # Represent deletions in the query with "-"
+            mutation_vector.append("-")
+        else:
+            # Otherwise, represent the nucleotide from the query
+            mutation_vector.append(query_nt)
+
+    return mutation_vector
+
+
+def identify_mutations(mutation_vector, reference_sequence):
+    """
+    Identify all mutation positions from a mutation vector compared to the reference.
+
+    Parameters:
+    - mutation_vector (list[str]): The mutation vector.
+    - reference_sequence (str): The original reference sequence.
+
+    Returns:
+    - list[str]: A list where each mutation is described as a string in the format "POSITION_NUCLEOTIDE".
+    """
+    mutations = []
+
+    # Ensure that mutation vector and reference have equal lengths
+    if len(mutation_vector) != len(reference_sequence):
+        print (len(mutation_vector), len(reference_sequence))
+        raise ValueError("The mutation vector and reference sequence must have the same length.")
+
+    for i in range(len(mutation_vector)):
+        if mutation_vector[i] != reference_sequence[i] and mutation_vector[i] != "-":
+            mutations.append('{}_{}'.format(i+1, mutation_vector[i]))
+
+    return mutations
+
+
 def align_and_identify_mutations(seq1, seq2):
     # seq1 = qeury, seq2 = ref
     match_score = 2  # Positive score for matches, encourages alignment to match characters
@@ -36,6 +92,17 @@ def load_majority_seq_from_vcf(vcf_file):
                 ref_dict[chrom] += line.split('\t')[3]
     return ref_dict
 
+def load_majority_seqs_from_fasta_file(fasta_file):
+    ref_dict = dict()
+    with open(fasta_file, 'r') as f:
+        for line in f:
+            if line.startswith('>'):
+                chrom = line[1:].strip().split('_')[0]
+                ref_dict[chrom] = ''
+            else:
+                ref_dict[chrom] += line.strip()
+    return ref_dict
+
 
 ecoli_sequencing_ids = ['SRR25689478', 'SRR26899125'] # BACT000018 {225, 228}
 
@@ -54,15 +121,15 @@ print (combined_list_of_ids)
 
 
 #for item in combined_list_of_ids:
-for item in salmonella_enterica_sequencing_ids:
+for item in combined_list_of_ids:
     for j in item:
         for k in item:
             if j != k:
+                print (j, k)
                 with open('major_{}_minor_{}.txt'.format(k, j), 'w') as write_file:
                     print ('major_{}_minor_{}'.format(k, j))
-                    query_dict = load_majority_seq_from_vcf(f'/home/people/malhal/data/new_nanomgt/majority_variants/{j}/majority_variants.vcf')
-                    ref_dict = load_majority_seq_from_vcf(f'/home/people/malhal/data/new_nanomgt/majority_variants/{k}/majority_variants.vcf')
-
+                    query_dict = load_majority_seqs_from_fasta_file(f'/home/people/malhal/data/new_nanomgt/majority_variants/{j}/majority_seqs.fasta')
+                    ref_dict = load_majority_seqs_from_fasta_file(f'/home/people/malhal/data/new_nanomgt/majority_variants/{k}/majority_seqs.fasta')
                     for key in query_dict:
                         mutations = []
                         if key not in ref_dict:
@@ -72,17 +139,9 @@ for item in salmonella_enterica_sequencing_ids:
                         ref = ref_dict[key]
                         alignment_query, alignment_ref = align_and_identify_mutations(query, ref)
 
-                        index = 0
+                        mutation_vector = create_mutation_vector(alignment_ref, alignment_query)
+                        mutations = identify_mutations(mutation_vector, ref)
 
-                        for i in range(len(alignment_query)):
-                            # Check if there is a gap in the reference or a mismatch
-                            # Check if there is a gap in the reference or a mismatch
-                            if alignment_ref[i] != alignment_query[i]:
-                                # For gaps in the reference, we do not increment index_ref
-                                if alignment_query[i] != '-':
-                                    mutations.append(f"{index+1}_{alignment_query[i]}")
-                            if alignment_query[i] != '-':
-                                index += 1
 
                         if mutations != []:
                             print (key, file = write_file)

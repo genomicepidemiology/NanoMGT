@@ -22,7 +22,7 @@ for fastq_file in fastq_files:
 
     # Run the placeholder command with the full path of the file
     # For example, 'echo Processing file /path/to/file.fastq'
-    cmd = '~/NanoMGT/bin/nanomgt --nanopore {} --db_dir ~/nanomgt_db/ --o {} --threads 2'.format(full_path, name)
+    cmd = '~/NanoMGT/bin/nanomgt --nanopore {} --db_dir ~/nanomgt_db/ --o {} --threads 4'.format(full_path, name)
 
     # Execute the command
     process = subprocess.run(cmd, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
