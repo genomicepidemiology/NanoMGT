@@ -10,7 +10,6 @@ from itertools import combinations
 from nanomgt.nanopore_mutations import parse_sam_and_find_mutations
 from nanomgt.nanopore_mutations import extract_alignment
 from nanomgt.nanopore_mutations import create_mutation_vector
-from nanomgt.nanopore_mutations import identify_mutations
 
 def nanopore_metagenomics_variantcaller(arguments):
     """
@@ -233,7 +232,9 @@ def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensu
 
     reads_mutation_dict = parse_sam_and_find_mutations(arguments.output + '/rmlst_alignment.sam',
                                                        consensus_dict)
+    print (reads_mutation_dict['SRR27755678.258255 BACT000001_1153'])
     print('reads_mutation_dict loaded')
+    sys.exit()
 
     current_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
     iteration_count = 0
