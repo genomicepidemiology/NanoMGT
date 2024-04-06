@@ -2,7 +2,7 @@ import random
 
 # List of sequencing IDs
 # Escherichia coli
-ecoli_sequencing_ids = ['SRR28399430', 'SRR26899125', 'SRR26899129']
+ecoli_sequencing_ids = ['SRR28399430', 'SRR26899125']
 
 # Staphylococcus aureus
 staph_aureus_sequencing_ids = ['SRR28370694', 'ERR8958843', 'SRR27167517']
@@ -11,7 +11,7 @@ staph_aureus_sequencing_ids = ['SRR28370694', 'ERR8958843', 'SRR27167517']
 acinetobacter_baumannii_sequencing_ids = ['SRR26643493', 'SRR27710531', 'SRR23387317']
 
 # Campylobacter jejuni
-campylobacter_jejuni_sequencing_ids = ['SRR27638397', 'SRR26899121', 'SRR27710526']
+campylobacter_jejuni_sequencing_ids = ['SRR27638397', 'SRR27710526']
 
 # Salmonella enterica
 salmonella_enterica_sequencing_ids = ['SRR28399428', 'SRR27136088', 'SRR27755678']

@@ -102,6 +102,7 @@ def nanopore_metagenomics_variantcaller(arguments):
 def print_majority_alelles(consensus_dict, arguments):
     nucleotides = ['A', 'C', 'G', 'T']
 
+    #TBD Change this maybe, not really a vcf output. Maybe simply to a fasta file?
     with open(arguments.output + '/majority_variants.vcf', 'w') as file:
         # Print header lines for VCF format and describe the INFO field contents
         print("##fileformat=VCFv4.2", file=file)
@@ -680,10 +681,6 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                     mutation_threshold = mutation_threshold + arguments.pp * position_depth * arguments.mrd
                 if density_mutations != []:
                     mutation_threshold = mutation_threshold + arguments.dp * position_depth * arguments.mrd * len(density_mutations)
-                #TBD Consider if we should include gaps in our co-occurence strategy.
-                #TBD Consider gaps related scoring strategy.
-                if mutation[-1] == '-': #Default, figure out a strategy.
-                    mutation_threshold = position_depth * arguments.mrd
                 if mutation_depth >= mutation_threshold:
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][i])
                     adjusted_mutation_dict[allele][1].append(confirmed_mutation_dict[allele][1][i])

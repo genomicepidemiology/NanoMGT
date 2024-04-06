@@ -13,12 +13,12 @@ def count_nucleotides_in_fastq(file_path):
 
 
 # Parameters
-description_file = 'simulated_batches/campylobacter_jejuni_3s.csv'  # Path to your file
-genome_size = 1700000  # Genome size
-total_depth = 350  # Total depth
+description_file = 'simulated_batches/ecoli_2s.csv'  # Path to your file
+genome_size = 5000000  # Genome size
+total_depth = 120  # Total depth
 desired_total_nucleotides = genome_size * total_depth
-output_prefix = 'campylobacter_jejuni_3s'  # Prefix for output files
-output_directory = 'simulated_campylobacter_jejuni_3s'  # Directory to store output files
+output_prefix = 'ecoli_2s'  # Prefix for output files
+output_directory = 'simulated_ecoli_2s'  # Directory to store output files
 
 # Average read lengths for each file
 average_read_lengths = {

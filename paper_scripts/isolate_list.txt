@@ -1,8 +1,6 @@
-
 120x
 SRR28399430 Escherichia coli ~125x depth
 SRR26899125 Escherichia coli >1000x depth
-SRR26899129 Escherichia coli ~120x depth
 
 170x
 SRR28370694	Staphylococcus aureus ~200x depth
@@ -14,9 +12,8 @@ SRR26643493 Acinetobacter baumannii ~225x depth
 SRR27710531 Acinetobacter baumannii ~170x depth
 SRR23387317	Acinetobacter baumannii ~150x depth
 
-350x
+500x
 SRR27638397 Campylobacter jejuni ~1800x depth
-SRR26899121	Campylobacter jejuni ~750x depth
 SRR27710526	Campylobacter jejuni >2000x depth
 
 225x
