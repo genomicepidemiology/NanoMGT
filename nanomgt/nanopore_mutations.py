@@ -109,7 +109,7 @@ def create_mutation_vector(aligned_ref, aligned_query):
     return mutation_vector
 
 
-def identify_mutations(query, reference):
+def identify_mutations(alignment_query, alignment_ref):
     """
     Identify all mutation positions from a mutation vector compared to the reference.
 
@@ -122,8 +122,6 @@ def identify_mutations(query, reference):
     """
     mutations = []
     #TBD implement check for high amount of mutations is super bad coding, write better as a function when you have time.
-    alignment_query = ''.join(mutation_vector)
-    alignment_ref = reference_sequence
     index = 0
 
     for i in range(len(alignment_query)):
