@@ -168,15 +168,7 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
                 #TBD consider if this majority_seq is a problem if it contains gaps
                 # Obtaining the alignment using your function
                 aligned_ref, aligned_query = extract_alignment(majority_seq[pos-1:pos+tlen], seq, cigar_str)
-                if read_id == 'SRR27755678.258255':
-                    print (aligned_query)
-                    print (aligned_ref)
-                    if '-' in aligned_query[:675]:
-                        print ('- in query')
-                    if '-' in aligned_ref[:675]:
-                        print ('- in ref')
-                    print(aligned_query[670:675])
-                    print(aligned_ref[670:675])
+
                 #mutations = identify_mutations(aligned_query, aligned_ref)
                 mutation_vector = create_mutation_vector(aligned_ref, aligned_query)
                 mutations = identify_mutations(mutation_vector, majority_seq[pos - 1:pos + tlen],

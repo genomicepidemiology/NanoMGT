@@ -21,7 +21,7 @@ def nanopore_metagenomics_variantcaller(arguments):
         arguments: Parsed command-line arguments containing parameters and file paths.
     """
     # Set up output directory and verify input file
-    """
+
     set_up_output_and_check_input(arguments)
 
     # Run KMA alignment for bacteria mapping
@@ -58,7 +58,7 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     
     os.system(f'gunzip {os.path.join(arguments.output, "rmlst_alignment.mat.gz")}')
-    """
+
     # Build a consensus dictionary from alignment results
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
@@ -632,12 +632,12 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                 if read_allele == allele:
                     read_mutations = reads_mutation_dict[read]
                     valid_mutations = [mutation for mutation in read_mutations if mutation in mutation_list]
-                    if allele == 'BACT000001_1153':
-                        if 'SRR27755678.258255' in read:
-                            print (read)
-                            print (valid_mutations)
-                            print (read_mutations)
-                            print (mutation_list)
+                    #if allele == 'BACT000001_1153':
+                    #    if 'SRR27755678.258255' in read:
+                    #        print (read)
+                    #        print (valid_mutations)
+                    #        print (read_mutations)
+                    #        print (mutation_list)
                     if len(valid_mutations) > 1:
                         for i in range(len(valid_mutations)):
                             for j in range(i + 1, len(valid_mutations)):
@@ -646,10 +646,10 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                                 co_occurrence_matrix[mutation1][mutation2] += 1
                                 co_occurrence_matrix[mutation2][mutation1] += 1
             co_occurrence_matrix_dict[allele] = [co_occurrence_matrix, mutation_list]
-            if allele == 'BACT000001_1153':
-                print (allele)
-                for i in range(len(co_occurrence_matrix)):
-                    print (mutation_list[i], co_occurrence_matrix[i])
+            #if allele == 'BACT000001_1153':
+            #    print (allele)
+            #    for i in range(len(co_occurrence_matrix)):
+            #        print (mutation_list[i], co_occurrence_matrix[i])
     adjusted_mutation_dict = {}
     for allele in confirmed_mutation_dict:
         co_occurrence_tmp_dict[allele] = []
@@ -671,9 +671,9 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                 mutation_threshold = position_depth * arguments.mrd
                 co_occurrence_list = check_mutation_co_occurrence(row, mutation_list, mutation,
                                                                  position_depth, arguments.cor, arguments.pp, arguments.mrd, proxi_mutations, mutation_depth)
-                if allele == 'BACT000001_1153':
-                    print (mutation, co_occurrence_list)
-                    print (mutation_threshold, mutation_depth)
+                #if allele == 'BACT000001_1153':
+                #    print (mutation, co_occurrence_list)
+                #    print (mutation_threshold, mutation_depth)
                 if co_occurrence_list != []:
                     if mutation not in co_occurrence_tmp_dict[allele]:
                         co_occurrence_tmp_dict[allele].append(mutation)
