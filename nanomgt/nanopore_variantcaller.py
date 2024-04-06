@@ -582,10 +582,10 @@ def derive_mutation_positions(consensus_dict, arguments):
         all_confirmed_mutation_dict[allele] = [[], []]
 
         for i in range(len(allele_data[0])):
-            positions = allele_data[0][i][:6]
+            positions = allele_data[0][i][:4]
             max_number = max(positions)
             index_of_max = positions.index(max_number)
-            nucleotide_index = ['A', 'C', 'G', 'T', 'N', '-']
+            nucleotide_index = ['A', 'C', 'G', 'T']
 
             for t in range(len(positions)):
                 if t != index_of_max:
@@ -944,7 +944,7 @@ def build_consensus_dict(res_file, mat_file):
     # Generate consensus sequences for alleles
     for allele in consensus_dict:
         for position in consensus_dict[allele][0]:
-            consensus_dict[allele][1] += 'ACGTN-'[position[:6].index(max(position[:6]))]
+            consensus_dict[allele][1] += 'ACGT'[position[:4].index(max(position[:4]))]
 
     return consensus_dict
 

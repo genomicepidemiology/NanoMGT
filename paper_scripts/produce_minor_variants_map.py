@@ -53,7 +53,8 @@ combined_list_of_ids = [ecoli_sequencing_ids, staph_aureus_sequencing_ids, campy
 print (combined_list_of_ids)
 
 
-for item in combined_list_of_ids:
+#for item in combined_list_of_ids:
+for item in salmonella_enterica_sequencing_ids:
     for j in item:
         for k in item:
             if j != k:
