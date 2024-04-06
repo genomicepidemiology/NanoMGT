@@ -594,9 +594,10 @@ def derive_mutation_positions(consensus_dict, arguments):
 
                         if relative_depth >= arguments.mrd - (arguments.mrd * arguments.cor):
                             # Only consider mutations with minimum depth >= 2
-                            all_confirmed_mutation_dict[allele][0].append(
-                                '{}_{}'.format(i + 1, nucleotide_index[t]))
-                            all_confirmed_mutation_dict[allele][1].append(positions[t])
+                            if nucleotide_index[t] != 'N' and nucleotide_index[t] != '-': #We don't consider there SNVs
+                                all_confirmed_mutation_dict[allele][0].append(
+                                    '{}_{}'.format(i + 1, nucleotide_index[t]))
+                                all_confirmed_mutation_dict[allele][1].append(positions[t])
 
     return all_confirmed_mutation_dict
 
