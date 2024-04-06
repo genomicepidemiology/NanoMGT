@@ -21,7 +21,7 @@ def nanopore_metagenomics_variantcaller(arguments):
         arguments: Parsed command-line arguments containing parameters and file paths.
     """
     # Set up output directory and verify input file
-
+    """
     set_up_output_and_check_input(arguments)
 
     # Run KMA alignment for bacteria mapping
@@ -58,7 +58,7 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     
     os.system(f'gunzip {os.path.join(arguments.output, "rmlst_alignment.mat.gz")}')
-
+    """
     # Build a consensus dictionary from alignment results
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
@@ -230,7 +230,9 @@ def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensu
     print('loading reads_mutation_dict...')
 
     reads_mutation_dict = parse_sam_and_find_mutations(arguments.output + '/rmlst_alignment.sam',
-                                                       consensus_dict)
+                                                       confirmed_mutation_dict,
+                                                       consensus_dict,
+                                                       read_positions_blacklisted_dict)
     print (reads_mutation_dict['SRR27755678.258255 BACT000001_1153'])
     print('reads_mutation_dict loaded')
     sys.exit()
