@@ -63,7 +63,6 @@ def nanopore_metagenomics_variantcaller(arguments):
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
 
-
     print_majority_alelles(consensus_dict, arguments)
 
     if arguments.majority_alleles_only: #End the program if only majority alleles are requested

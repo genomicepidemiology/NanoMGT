@@ -109,7 +109,7 @@ def create_mutation_vector(aligned_ref, aligned_query):
     return mutation_vector
 
 
-def identify_mutations(alignment_query, alignment_ref):
+def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read_id, read_positions_blacklisted_dict):
     """
     Identify all mutation positions from a mutation vector compared to the reference.
 
@@ -121,20 +121,20 @@ def identify_mutations(alignment_query, alignment_ref):
     - list[str]: A list where each mutation is described as a string in the format "POSITION_NUCLEOTIDE".
     """
     mutations = []
-    #TBD implement check for high amount of mutations is super bad coding, write better as a function when you have time.
-    index = 0
 
-    for i in range(len(alignment_query)):
-        # Check if there is a gap in the reference or a mismatch
-        if alignment_ref[i] != alignment_query[i]:
-            if alignment_query[i] != '-':
-                mutations.append(f"{index + 1}_{alignment_query[i]}")
-        if alignment_query[i] != '-':
-            index += 1
+    # Ensure that mutation vector and reference have equal lengths
+    if len(mutation_vector) != len(reference_sequence):
+        print (len(mutation_vector), len(reference_sequence))
+        raise ValueError("The mutation vector and reference sequence must have the same length.")
+
+    for i in range(len(mutation_vector)):
+        if read_id in read_positions_blacklisted_dict: # If this redundant? Check up.
+            if i+1 not in read_positions_blacklisted_dict[read_id]:
+                if '{}_{}'.format(i+1, mutation_vector[i]) in gene_mutations:
+                    mutations.append('{}_{}'.format(i+1, mutation_vector[i]))
 
     return mutations
-
-def parse_sam_and_find_mutations(sam_file_path, consensus_dict):
+def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict):
     """
     Parses a SAM file, extracts necessary information and finds mutations in each read.
 
@@ -145,9 +145,6 @@ def parse_sam_and_find_mutations(sam_file_path, consensus_dict):
     - dict: A dictionary where keys are read names and values are lists of mutation strings.
 
     """
-
-    same = 0
-    not_same = 0
 
     mutations_dict = {}
     with open(sam_file_path, 'r') as sam_file:
@@ -180,7 +177,12 @@ def parse_sam_and_find_mutations(sam_file_path, consensus_dict):
                         print ('- in ref')
                     print(aligned_query[670:675])
                     print(aligned_ref[670:675])
-                mutations = identify_mutations(aligned_query, aligned_ref)
+                #mutations = identify_mutations(aligned_query, aligned_ref)
+                mutation_vector = create_mutation_vector(aligned_ref, aligned_query)
+                mutations = identify_mutations(mutation_vector, majority_seq[pos - 1:pos + tlen],
+                                               confirmed_mutation_dict[rname][0], read_id,
+                                               read_positions_blacklisted_dict)
+                # Storing mutations in the dictionary
                 name = read_id + ' ' + rname
                 mutations_dict[name] = mutations
     return mutations_dict
