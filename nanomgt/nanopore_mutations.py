@@ -127,24 +127,11 @@ def identify_mutations(alignment_query, alignment_ref):
     for i in range(len(alignment_query)):
         # Check if there is a gap in the reference or a mismatch
         if alignment_ref[i] != alignment_query[i]:
-            # For gaps in the reference, we do not increment index_ref
             if alignment_query[i] != '-':
                 mutations.append(f"{index + 1}_{alignment_query[i]}")
         if alignment_query[i] != '-':
             index += 1
 
-    #if len(mutations)/len(alignment_ref) > 0.05: #5% mutations, likely a need for alignment
-    #    mutations = []
-    #    index = 0
-    #    for i in range(len(alignment_query)):
-    #        # Check if there is a gap in the reference or a mismatch
-    #        # Check if there is a gap in the reference or a mismatch
-    #        if alignment_ref[i] != alignment_query[i]:
-    #            # For gaps in the reference, we do not increment index_ref
-    #            if alignment_query[i] != '-':
-    #                mutations.append(f"{index + 1}_{alignment_query[i]}")
-    #        if alignment_query[i] != '-':
-    #            index += 1
     return mutations
 
 def parse_sam_and_find_mutations(sam_file_path, consensus_dict):
@@ -187,6 +174,16 @@ def parse_sam_and_find_mutations(sam_file_path, consensus_dict):
                 if read_id == 'SRR27755678.258255':
                     print (aligned_query)
                     print (aligned_ref)
+                    print(aligned_query[670])
+                    print (aligned_query[671])
+                    print(aligned_query[672])
+                    print(aligned_query[673])
+                    print(aligned_query[674])
+                    print(aligned_ref[670])
+                    print(aligned_ref[671])
+                    print(aligned_ref[672])
+                    print(aligned_ref[673])
+                    print(aligned_ref[674])
                 mutations = identify_mutations(aligned_query, aligned_ref)
                 name = read_id + ' ' + rname
                 mutations_dict[name] = mutations
