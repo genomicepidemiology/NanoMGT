@@ -3,7 +3,7 @@ import sys
 from Bio import pairwise2
 from Bio.Seq import Seq
 
-def align_and_identify_mutations(seq1, seq2):
+def align_sequences(seq1, seq2):
     # seq1 = qeury, seq2 = ref
     match_score = 2  # Positive score for matches, encourages alignment to match characters
     mismatch_score = -3  # Negative score for mismatches, penalizes alignment for mismatching characters
@@ -139,7 +139,7 @@ def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read
 
         if len(mutations)/len(reference_sequence) > 0.05: #5% mutations, likely a need for alignment
             mutations = []
-            alignment_query, alignment_ref = align_and_identify_mutations(''.join(mutation_vector), reference_sequence)
+            alignment_query, alignment_ref = align_sequences(''.join(mutation_vector), reference_sequence)
             index = 0
 
             for i in range(len(alignment_query)):
@@ -152,7 +152,7 @@ def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read
                 if alignment_query[i] != '-':
                     index += 1
     else:
-        alignment_query, alignment_ref = align_and_identify_mutations(''.join(mutation_vector), reference_sequence)
+        alignment_query, alignment_ref = align_sequences(''.join(mutation_vector), reference_sequence)
 
         index = 0
 
