@@ -179,6 +179,9 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
 
     """
 
+    same = 0
+    not_same = 0
+
     mutations_dict = {}
     with open(sam_file_path, 'r') as sam_file:
         for line in sam_file:
@@ -203,14 +206,17 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
                 aligned_ref, aligned_query = extract_alignment(majority_seq[pos-1:pos-1+tlen], seq, cigar_str)
                 print (aligned_ref)
                 print (aligned_query)
-                sys.exit()
+                if len(aligned_ref) != len(aligned_query):
+                    not_same += 1
+                else:
+                    same += 1
                 mutation_vector = create_mutation_vector(aligned_ref, aligned_query)
-                if 'BACT000001_' in rname:
-                    print (mutation_vector)
                 mutations = identify_mutations(mutation_vector, majority_seq[pos-1:pos-1+tlen], confirmed_mutation_dict[rname][0], read_id, read_positions_blacklisted_dict)
                 name = read_id + ' ' + rname
                 mutations_dict[name] = mutations
-
+    print ('same:', same)
+    print ('not_same:', not_same)
+    sys.exit()
     return mutations_dict
 
 def parse_fsa_get_references(fsa_file_path):
