@@ -203,15 +203,15 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
                 majority_seq = consensus_dict[rname][1]
                 #TBD consider if this majority_seq is a problem if it contains gaps
                 # Obtaining the alignment using your function
-                aligned_ref, aligned_query = extract_alignment(majority_seq[pos-1:pos-1+tlen], seq, cigar_str)
-                print (aligned_ref)
-                print (aligned_query)
+                aligned_ref, aligned_query = extract_alignment(majority_seq[pos-1:pos+tlen], seq, cigar_str)
+                #print (aligned_ref)
+                #print (aligned_query)
                 if len(aligned_ref) != len(aligned_query):
                     not_same += 1
                 else:
                     same += 1
-                if same % 100 == 0 or not_same % 100 == 0:
-                    sys.exit()
+                #if same % 100 == 0 or not_same % 100 == 0:
+                #    sys.exit()
                 mutation_vector = create_mutation_vector(aligned_ref, aligned_query)
                 mutations = identify_mutations(mutation_vector, majority_seq[pos-1:pos-1+tlen], confirmed_mutation_dict[rname][0], read_id, read_positions_blacklisted_dict)
                 name = read_id + ' ' + rname
