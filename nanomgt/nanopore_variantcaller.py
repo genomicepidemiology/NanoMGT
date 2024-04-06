@@ -233,9 +233,8 @@ def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensu
                                                        confirmed_mutation_dict,
                                                        consensus_dict,
                                                        read_positions_blacklisted_dict)
-    print (reads_mutation_dict['SRR27755678.258255 BACT000001_1153'])
+    #print (reads_mutation_dict['SRR27755678.258255 BACT000001_1153'])
     print('reads_mutation_dict loaded')
-    sys.exit()
 
     current_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
     iteration_count = 0
@@ -647,11 +646,10 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                                 co_occurrence_matrix[mutation1][mutation2] += 1
                                 co_occurrence_matrix[mutation2][mutation1] += 1
             co_occurrence_matrix_dict[allele] = [co_occurrence_matrix, mutation_list]
-            #if allele == 'BACT000001_1153':
-            #    print (allele)
-            #    for i in range(len(co_occurrence_matrix)):
-            #        print (mutation_list[i], co_occurrence_matrix[i])
-    sys.exit()
+            if allele == 'BACT000001_1153':
+                print (allele)
+                for i in range(len(co_occurrence_matrix)):
+                    print (mutation_list[i], co_occurrence_matrix[i])
     adjusted_mutation_dict = {}
     for allele in confirmed_mutation_dict:
         co_occurrence_tmp_dict[allele] = []
