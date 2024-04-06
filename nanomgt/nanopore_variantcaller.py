@@ -76,9 +76,6 @@ def nanopore_metagenomics_variantcaller(arguments):
     # Derive mutation positions from consensus data
     confirmed_mutation_dict = derive_mutation_positions(consensus_dict, arguments)
 
-    for item in confirmed_mutation_dict:
-        print (item, confirmed_mutation_dict[item])
-    sys.exit()
     # Perform biological validation of mutations
     bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(arguments.output, 'specie.fsa'))
 
@@ -627,6 +624,9 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
     for allele in confirmed_mutation_dict:
         mutation_list = confirmed_mutation_dict[allele][0]
         num_mutations = len(mutation_list)
+        print (allele, 'ALLELE')
+        print (mutation_list, 'MUTATION LIST')
+        sys.exit()
         #if allele == 'BACT000001_1153':
         #    print (mutation_list, 'MUTATION LIST')
         if num_mutations > 1:
