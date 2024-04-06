@@ -632,7 +632,10 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                     read_mutations = reads_mutation_dict[read]
                     valid_mutations = [mutation for mutation in read_mutations if mutation in mutation_list]
                     if allele == 'BACT000001_1153':
-                        print (read, valid_mutations, mutation_list)
+                        print (read)
+                        print (valid_mutations)
+                        print (read_mutations)
+                        print (mutation_list)
                     if len(valid_mutations) > 1:
                         for i in range(len(valid_mutations)):
                             for j in range(i + 1, len(valid_mutations)):
