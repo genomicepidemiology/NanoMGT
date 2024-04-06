@@ -212,10 +212,10 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
                     same += 1
                 #if same % 100 == 0 or not_same % 100 == 0:
                 #    sys.exit()
-                mutation_vector = create_mutation_vector(aligned_ref, aligned_query)
-                mutations = identify_mutations(mutation_vector, majority_seq[pos-1:pos-1+tlen], confirmed_mutation_dict[rname][0], read_id, read_positions_blacklisted_dict)
-                name = read_id + ' ' + rname
-                mutations_dict[name] = mutations
+                #mutation_vector = create_mutation_vector(aligned_ref, aligned_query)
+                #mutations = identify_mutations(mutation_vector, majority_seq[pos-1:pos-1+tlen], confirmed_mutation_dict[rname][0], read_id, read_positions_blacklisted_dict)
+                #name = read_id + ' ' + rname
+                #mutations_dict[name] = mutations
     print ('same:', same)
     print ('not_same:', not_same)
     sys.exit()
