@@ -20,7 +20,6 @@ SRR27755678	Salmonella enterica ~400x depth
 
 Escherichia coli approx. genome size for depth simulation: 5000000
 Staphylococcus aureus approx. genome size for depth simulation: 3000000
-Acinetobacter baumannii approx. genome size for depth simulation: 4000000
 Campylobacter jejuni approx. genome size for depth simulation: 1700000
 Salmonella enterica approx. genome size for depth simulation: 5000000
 
