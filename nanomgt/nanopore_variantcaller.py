@@ -668,6 +668,7 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                 density_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation, arguments.dp_window)
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
 
+                #TBD LOOK INTO THIS
                 mutation_threshold = position_depth * arguments.mrd
                 co_occurrence_list = check_mutation_co_occurrence(row, mutation_list, mutation,
                                                                  position_depth, arguments.cor, arguments.pp, arguments.mrd, proxi_mutations, mutation_depth)
@@ -683,7 +684,7 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                     mutation_threshold = mutation_threshold - position_depth * arguments.mrd * arguments.cor
 
                 if not biological_existence:
-                    mutation_threshold = mutation_threshold + arguments.bp * position_depth * arguments.mrd
+                    mutation_threshold = mutation_threshold + arguments.np * position_depth * arguments.mrd
                 if proxi_mutations != []:
                     mutation_threshold = mutation_threshold + arguments.pp * position_depth * arguments.mrd
                 if density_mutations != []:
@@ -703,7 +704,7 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                 depth = confirmed_mutation_dict[allele][1][0]
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
                 if not biological_existence:
-                    mutation_threshold = mutation_threshold + (arguments.bp-1) * position_depth * arguments.mrd
+                    mutation_threshold = mutation_threshold + (arguments.np-1) * position_depth * arguments.mrd
 
                 if depth >= mutation_threshold:
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][0])
@@ -734,7 +735,7 @@ def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, 
         # Should never happen
         return []  # No co-occurrence and not in proximity
 
-    co_threshold = mutation_depth * (2/3)
+    co_threshold = mutation_depth * (1/2)
     if co_threshold < 3:
         co_threshold = 3
 

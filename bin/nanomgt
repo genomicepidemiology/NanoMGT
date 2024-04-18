@@ -40,8 +40,8 @@ def main():
                         help='Minimum related depth (MRD) for validating single allele SNVs. Default: 0.03')
     parser.add_argument('--cor', action="store", type=float, dest='cor', default=0.5,
                         help='Co-occurrence reward. -= MRD * cor. Default: 0.5')
-    parser.add_argument('--bp', action="store", type=float, dest='bp', default=1.5,
-                        help='Biological penalty. += MRD * bp. Default: 1.5')
+    parser.add_argument('--np', action="store", type=float, dest='np', default=1.5,
+                        help='Novelty penalty. += MRD * np. Default: 1.5')
     parser.add_argument('--pp', action="store", type=float, dest='pp', default=0.25,
                         help='Proximity penalty. += MRD * pp. Default: 0.25')
     parser.add_argument('--dp', action="store", type=float, dest='dp', default=0.15,

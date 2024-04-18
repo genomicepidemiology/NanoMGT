@@ -54,39 +54,35 @@ average_read_lengths = {
 
 # File paths
 file_paths = [
-    '100_klebsiella_pneumoniae_batches.csv',
-    '100_campylobacter_jejuni_batches.csv',
-    '100_ecoli_batches.csv',
-    '100_salmonella_enterica_batches.csv',
-    '100_staph_aureus_batches.csv',
-    '101_klebsiella_pneumoniae_batches.csv',
-    '101_campylobacter_jejuni_batches.csv',
-    '101_ecoli_batches.csv',
-    '101_salmonella_enterica_batches.csv',
-    '101_staph_aureus_batches.csv',
-    '102_klebsiella_pneumoniae_batches.csv',
-    '102_campylobacter_jejuni_batches.csv',
-    '102_ecoli_batches.csv',
-    '102_salmonella_enterica_batches.csv',
-    '102_staph_aureus_batches.csv',
+    'campylobacter_jejuni_SRR27638397_majority_batches.csv',
+    'campylobacter_jejuni_SRR27710526_majority_batches.csv',
+    'ecoli_SRR25689478_majority_batches.csv',
+    'ecoli_SRR26036455_majority_batches.csv',
+    'klebsiella_pneumoniae_ERR8958737_majority_batches.csv',
+    'klebsiella_pneumoniae_SRR27348733_majority_batches.csv',
+    'salmonella_enterica_SRR27136088_majority_batches.csv',
+    'salmonella_enterica_SRR27755678_majority_batches.csv',
+    'salmonella_enterica_SRR28399428_majority_batches.csv',
+    'staph_aureus_ERR8958843_majority_batches.csv',
+    'staph_aureus_SRR28370694_majority_batches.csv'
 ]
+
 
 for file_path in file_paths:
     print(file_path)
-    organism = "_".join(file_path.split('_')[1:-1])
-    seed = file_path.split('_')[0]
+    organism = "_".join(file_path.split('_')[0:-3])
     description_file = f'simulated_batches/{file_path}'
 
     # Load the samples description
     df = pd.read_csv(description_file)
-
     # Iterate over different depths for each organism
     for depth in depths[organism]:
-        output_directory = f'seed{seed}_depth{depth}_{organism}'
+        file_name = file_path.split('.')[0]
+        output_directory = f'depth{depth}_{file_name}'
         if not os.path.exists(output_directory):
             os.makedirs(output_directory)
 
-        output_prefix = f'seed{seed}_depth{depth}_{organism}'
+        output_prefix = f'depth{depth}_{file_name}'
 
         # Adjust genome size and depth
         genome_size = genome_sizes[organism]

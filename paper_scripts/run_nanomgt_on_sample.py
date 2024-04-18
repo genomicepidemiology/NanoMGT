@@ -7,7 +7,7 @@ folders = os.listdir(path)
 
 # Loop through each folder
 for folder in folders:
-    if folder.startswith("seed"):
+    if folder.startswith("depth"):
 
         # Get all 'merged.fastq' files in the folder
         fastq_files = [f for f in os.listdir(path + folder) if f.endswith('merged.fastq')]

@@ -197,12 +197,13 @@ def load_mutations(filename):
 
 
 def benchmark_analysis_result(sample, results_folder):
-    batch = sample.split('_')[-2]
+    #batch = sample.split('_')[-2]
+    print (sample)
     batch_id = int(sample.split('_')[-2][5:])
+    print (batch_id)
     #print(f"Batch ID: {batch_id}")
-    seed = sample[4:7]
-    specie = sample.split('_')[2:-2]
-    batch_csv = seed + '_' + "_".join(specie) + "_" + 'batches' + ".csv"
+    specie = sample.split('_')[1:-5]
+    batch_csv = "_".join(sample.split('_')[1:-2]) + ".csv"
     data = load_data('/home/people/malhal/data/new_nanomgt/simulated_batches/' + batch_csv)
 
     # Change this batch_id to test different batches
@@ -1339,9 +1340,5 @@ for mrd in mrd_list:
     file_list = os.listdir('/home/people/malhal/test/new_nanomgt_results/')
     for folder in file_list:
         if folder.endswith('merged'):
-            if 'staph_aureus' in folder and '150' in folder:
-                run_jobs_in_parallel(75, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, mrd/100)
-            if 'ecoli' in folder and '200' in folder:
-                run_jobs_in_parallel(75, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, mrd/100)
-            if 'campylobacter_jejuni' in folder and '500' in folder:
+            if 'pneumoniae' not in folder and folder.startswith('depth220'):
                 run_jobs_in_parallel(75, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, mrd/100)

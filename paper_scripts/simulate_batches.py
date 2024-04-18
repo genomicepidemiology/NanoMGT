@@ -1,9 +1,8 @@
-import random
-import sys
-# List of sequencing IDs
+import os
 
-seeds = [100, 101, 102]
-
+# Define the directory for output
+output_dir = 'simulated_batches'
+os.makedirs(output_dir, exist_ok=True)
 
 # Escherichia coli
 ecoli_sequencing_ids = ['SRR25689478', 'SRR26036455']
@@ -17,175 +16,45 @@ campylobacter_jejuni_sequencing_ids = ['SRR27638397', 'SRR27710526']
 # Salmonella enterica
 salmonella_enterica_sequencing_ids = ['SRR28399428', 'SRR27136088', 'SRR27755678']
 
-
+# Klebsiella pneumoniae
 klebsiella_pneumoniae_sequencing_ids = ['ERR8958737', 'SRR27348733']
 
 # Number of batches
 num_batches = 10
-for seed in seeds:
-    random.seed(seed)  # You can use any integer value as the seed
-    #with open('simulated_batches/salmonella_enterica_batches.csv', 'w') as f:
-    with open('simulated_batches/{}_klebsiella_pneumoniae_batches.csv'.format(seed), 'w') as f:
-    # Print CSV header
-        print("Batch, ID1, Percentage1, ID2, Percentage2", file=f)
 
-    # Generate batches
-        for i in range(num_batches):
-            # Randomly select 2 sequencing IDs
-            selected_ids = random.sample(klebsiella_pneumoniae_sequencing_ids, 2)
 
-            # Calculate percentages
-            percent_1 = 99 - i
-            percent_2 = i + 1
-
-            # Randomly assign percentages to the selected IDs
-            if random.choice([True, False]):
-                batch = {
-                    selected_ids[0]: percent_1,
-                    selected_ids[1]: percent_2
-                }
+def simulate_batches(species_name, ids):
+    for major_id in ids:
+        filename = f'{output_dir}/{species_name}_{major_id}_majority_batches.csv'
+        with open(filename, 'w') as f:
+            if len(ids) == 2:
+                header = "Batch, ID1, Percentage1, ID2, Percentage2"
             else:
-                batch = {
-                    selected_ids[0]: percent_2,
-                    selected_ids[1]: percent_1
-                }
+                header = "Batch, ID1, Percentage1, ID2, Percentage2, ID3, Percentage3"
+            print(header, file=f)
 
-            # Prepare IDs and percentages for printing
-            id1, id2 = batch.keys()
-            percent1, percent2 = batch.values()
+            for i in range(num_batches):
+                if len(ids) == 2:
+                    # When there are only two IDs
+                    percentages = [100 - (i + 1), i + 1]
+                else:
+                    # When there are three or more IDs
+                    major_percentage = 98 - i * 2
+                    remaining_percentage = 100 - major_percentage
+                    minor_percentages = [remaining_percentage // (len(ids) - 1)] * (len(ids) - 1)
+                    minor_percentages[-1] += remaining_percentage % (len(ids) - 1)  # Ensure total is 100%
+                    percentages = [major_percentage] + minor_percentages
 
-            # Print in CSV format
-            print(f"{i + 1}, {id1}, {percent1}%, {id2}, {percent2}%", file=f)
+                batch = {id: pct for id, pct in zip(ids, percentages)}
+                batch_info = [f"{i + 1}"]
+                for id in ids:
+                    batch_info.append(f"{id}, {batch[id]}%")
 
-    #with open('simulated_batches/salmonella_enterica_batches.csv', 'w') as f:
-    with open('simulated_batches/{}_ecoli_batches.csv'.format(seed), 'w') as f:
-        # Print CSV header
-        print("Batch, ID1, Percentage1, ID2, Percentage2", file=f)
-
-        # Generate batches
-        for i in range(num_batches):
-            # Randomly select 2 sequencing IDs
-            selected_ids = random.sample(ecoli_sequencing_ids, 2)
-
-            # Calculate percentages
-            percent_1 = 99 - i
-            percent_2 = i + 1
-
-            # Randomly assign percentages to the selected IDs
-            if random.choice([True, False]):
-                batch = {
-                    selected_ids[0]: percent_1,
-                    selected_ids[1]: percent_2
-                }
-            else:
-                batch = {
-                    selected_ids[0]: percent_2,
-                    selected_ids[1]: percent_1
-                }
-
-            # Prepare IDs and percentages for printing
-            id1, id2 = batch.keys()
-            percent1, percent2 = batch.values()
-
-            # Print in CSV format
-            print(f"{i + 1}, {id1}, {percent1}%, {id2}, {percent2}%", file=f)
-
-    with open('simulated_batches/{}_campylobacter_jejuni_batches.csv'.format(seed), 'w') as f:
-        # Print CSV header
-        print("Batch, ID1, Percentage1, ID2, Percentage2", file=f)
-
-        # Generate batches
-        for i in range(num_batches):
-            # Randomly select 2 sequencing IDs
-            selected_ids = random.sample(campylobacter_jejuni_sequencing_ids, 2)
-
-            # Calculate percentages
-            percent_1 = 99 - i
-            percent_2 = i + 1
-
-            # Randomly assign percentages to the selected IDs
-            if random.choice([True, False]):
-                batch = {
-                    selected_ids[0]: percent_1,
-                    selected_ids[1]: percent_2
-                }
-            else:
-                batch = {
-                    selected_ids[0]: percent_2,
-                    selected_ids[1]: percent_1
-                }
-
-            # Prepare IDs and percentages for printing
-            id1, id2 = batch.keys()
-            percent1, percent2 = batch.values()
-
-            # Print in CSV format
-            print(f"{i + 1}, {id1}, {percent1}%, {id2}, {percent2}%", file=f)
+                print(", ".join(batch_info), file=f)
 
 
-    with open('simulated_batches/{}_staph_aureus_batches.csv'.format(seed), 'w') as f:
-        # Print CSV header
-        print("Batch, ID1, Percentage1, ID2, Percentage2", file=f)
-
-        # Generate batches
-        for i in range(num_batches):
-            # Randomly select 2 sequencing IDs
-            selected_ids = random.sample(staph_aureus_sequencing_ids, 2)
-
-            # Calculate percentages
-            percent_1 = 99 - i
-            percent_2 = i + 1
-
-            # Randomly assign percentages to the selected IDs
-            if random.choice([True, False]):
-                batch = {
-                    selected_ids[0]: percent_1,
-                    selected_ids[1]: percent_2
-                }
-            else:
-                batch = {
-                    selected_ids[0]: percent_2,
-                    selected_ids[1]: percent_1
-                }
-
-            # Prepare IDs and percentages for printing
-            id1, id2 = batch.keys()
-            percent1, percent2 = batch.values()
-
-            # Print in CSV format
-            print(f"{i + 1}, {id1}, {percent1}%, {id2}, {percent2}%", file=f)
-
-    with open('simulated_batches/{}_salmonella_enterica_batches.csv'.format(seed), 'w') as f:
-        # Print CSV header
-        print("Batch, ID1, Percentage1, ID2, Percentage2, ID3, Percentage3", file=f)
-
-        # Generate batches
-        for i in range(num_batches):
-            # Randomly select 2 sequencing IDs
-            selected_ids = random.sample(salmonella_enterica_sequencing_ids, 3)
-
-            # Calculate percentages
-            percent_1 = 98 - i*2
-            percent_2 = i + 1
-            percent_3 = i + 1
-
-            # Randomly assign percentages to the selected IDs
-            if random.choice([True, False]):
-                batch = {
-                    selected_ids[0]: percent_1,
-                    selected_ids[1]: percent_2,
-                    selected_ids[2]: percent_3
-                }
-            else:
-                batch = {
-                    selected_ids[0]: percent_2,
-                    selected_ids[1]: percent_1,
-                    selected_ids[2]: percent_3
-                }
-
-            # Prepare IDs and percentages for printing
-            id1, id2, id3 = batch.keys()
-            percent1, percent2, percent3 = batch.values()
-
-            # Print in CSV format
-            print(f"{i + 1}, {id1}, {percent1}%, {id2}, {percent2}%, {id3}, {percent3}%", file=f)
+simulate_batches('ecoli', ecoli_sequencing_ids)
+simulate_batches('staph_aureus', staph_aureus_sequencing_ids)
+simulate_batches('campylobacter_jejuni', campylobacter_jejuni_sequencing_ids)
+simulate_batches('salmonella_enterica', salmonella_enterica_sequencing_ids)
+simulate_batches('klebsiella_pneumoniae', klebsiella_pneumoniae_sequencing_ids)
