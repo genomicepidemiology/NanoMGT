@@ -13,6 +13,7 @@ bf = [0.01, 0.02, 0.03, 0.04, 0.05]
 for rate in bf:
     os.system(f"mkdir /home/people/malhal/data/new_nanomgt/confindr_results/bf_{rate}")
     for folder in folders:
-        cmd = f"confindr -i {data_dir_path}/{folder}/ -o /home/people/malhal/data/new_nanomgt/confindr_results/bf_{rate}/{folder} -d /home/people/malhal/contamErase/benchmarking/confindr/rmlst_db/ --rmlst -b 3 -bf {rate} -dt Nanopore -q 14"
-        os.system(cmd)
+        if folder.startswith("seed102"):
+            cmd = f"confindr -i {data_dir_path}/{folder}/ -o /home/people/malhal/data/new_nanomgt/confindr_results/bf_{rate}/{folder} -d /home/people/malhal/contamErase/benchmarking/confindr/rmlst_db/ --rmlst -b 3 -bf {rate} -dt Nanopore -q 14"
+            os.system(cmd)
         #subprocess.run(command, shell=True)

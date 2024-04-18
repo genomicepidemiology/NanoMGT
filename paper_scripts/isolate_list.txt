@@ -1,26 +1,29 @@
-300x
-SRR25689478 Escherichia coli ~580 depth
-SRR26899125 Escherichia coli ~1580x depth
+Used for parameter exploration:
 
-170x
+SRR25689478 Escherichia coli ~580 depth
+SRR26036455 Escherichia coli ~220 depth
+
 SRR28370694	Staphylococcus aureus ~200x depth
 ERR8958843 Staphylococcus aureus >2000x depth
-SRR27167517 Staphylococcus aureus ~160x depth
 
 
-500x
 SRR27638397 Campylobacter jejuni ~1800x depth
 SRR27710526	Campylobacter jejuni >2000x depth
 
-225x
+Additional testing species:
+
 SRR28399428	Salmonella enterica >1000x depth
 SRR27136088	Salmonella enterica ~320x depth
 SRR27755678	Salmonella enterica ~400x depth
+
+ERR8958737 Klebsiella pneumoniae ~1400x depth
+SRR27348733	Klebsiella pneumoniae ~290x depth
+
 
 
 Escherichia coli approx. genome size for depth simulation: 5000000
 Staphylococcus aureus approx. genome size for depth simulation: 3000000
 Campylobacter jejuni approx. genome size for depth simulation: 1700000
 Salmonella enterica approx. genome size for depth simulation: 5000000
-
+Klebsiella pneumoniae approx. genome size for depth simulation: 5500000
 ```

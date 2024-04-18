@@ -201,7 +201,7 @@ def benchmark_analysis_result(sample, results_folder):
     batch_id = int(sample.split('_')[-2][5:])
     #print(f"Batch ID: {batch_id}")
     seed = sample[4:7]
-    specie = sample.split('_')[1:-2]
+    specie = sample.split('_')[2:-2]
     batch_csv = seed + '_' + "_".join(specie) + "_" + 'batches' + ".csv"
     data = load_data('/home/people/malhal/data/new_nanomgt/simulated_batches/' + batch_csv)
 
@@ -1257,6 +1257,15 @@ def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd):
     dp_window = 15
 
     # Parameter intervals
+    #cor_interval = [0.4, 0.45, 0.5, 0.55, 0.6]
+    #iteration_increase_interval = [0.1, 0.125, 0.15, 0.175, 0.2, 0.225]
+    #pp_interval = [0.2, 0.25, 0.3, 0.35, 0.4]
+    #bp_interval = [1, 2, 3, 4]
+    #bp_interval = [2]
+    #dp_interval = [0.1, 0.15, 0.2, 0.25]
+
+    #First grid search
+
     cor_interval = [0.3, 0.5, 0.7, 0.9]
     iteration_increase_interval = [0.05, 0.15, 0.25, 0.35]
     pp_interval = [0.2, 0.3, 0.4, 0.5]
@@ -1325,9 +1334,14 @@ def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd):
 
 mrd_list = [1, 2, 3, 4, 5]
 for mrd in mrd_list:
-    new_output_folder = '/home/people/malhal/test/run_nanomgt_on_all_for_alignments/parameter_output_{}/'.format(mrd)
+    new_output_folder = '/home/people/malhal/test/new_nanomgt_results/first_round_parameter_output_{}/'.format(mrd)
     os.makedirs(new_output_folder, exist_ok=True)
-    file_list = os.listdir('/home/people/malhal/test/run_nanomgt_on_all_for_alignments')
+    file_list = os.listdir('/home/people/malhal/test/new_nanomgt_results/')
     for folder in file_list:
         if folder.endswith('merged'):
-            run_jobs_in_parallel(75, new_output_folder, '/home/people/malhal/test/run_nanomgt_on_all_for_alignments/' + folder, mrd/100)
+            if 'staph_aureus' in folder and '150' in folder:
+                run_jobs_in_parallel(75, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, mrd/100)
+            if 'ecoli' in folder and '200' in folder:
+                run_jobs_in_parallel(75, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, mrd/100)
+            if 'campylobacter_jejuni' in folder and '500' in folder:
+                run_jobs_in_parallel(75, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, mrd/100)

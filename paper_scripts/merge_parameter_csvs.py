@@ -5,7 +5,7 @@ import pandas as pd
 base_dir = '/home/people/malhal/test/run_nanomgt_on_all_for_alignments/'
 
 # Define directory names
-dir_names = [f'parameter_output_{i}' for i in range(1, 6)]
+dir_names = [f'final_parameter_output_{i}' for i in range(1, 6)]
 
 # Loop over each directory
 for idx, dir_name in enumerate(dir_names):
@@ -29,7 +29,7 @@ for idx, dir_name in enumerate(dir_names):
     all_data = pd.concat(dataframes, ignore_index=True)
 
     # Output to csv file in the current working directory
-    output_filename = f'{idx + 1}_all.csv'
+    output_filename = f'final_{idx + 1}_all.csv'
     all_data.to_csv(output_filename, index=False)
 
     print(f"CSV file {output_filename} has been created successfully.")
