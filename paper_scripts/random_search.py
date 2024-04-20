@@ -21,7 +21,7 @@ from random_search_functions import create_mutation_vector
 
 
 def random_sampling(mrd, results_folder, min_n, cor, new_output_folder,
-                    iteration_increase, proxi, dp_window, pp, bp, dp):
+                    iteration_increase, proxi, dp_window, pp, np, dp):
     """
     Conducts metagenomics variant calling for Nanopore sequencing data. This function orchestrates
     the whole process from setting up the output directory, running KMA alignments, extracting reads,
@@ -46,7 +46,7 @@ def random_sampling(mrd, results_folder, min_n, cor, new_output_folder,
                                                                                                        consensus_dict,
                                                                                                        bio_validation_dict,
                                                                                                        min_n, mrd, cor, new_output_folder,
-                                                                                                       iteration_increase, proxi, dp_window, pp, bp, dp)
+                                                                                                       iteration_increase, proxi, dp_window, pp, np, dp)
 
 
     # Format and output the results
@@ -63,7 +63,7 @@ def random_sampling(mrd, results_folder, min_n, cor, new_output_folder,
 
 
 
-    parameter_string = f"mrd_{mrd}_cor_{cor}_pp_{pp}_bp_{bp}_dp_{dp}_iteration_increase_{iteration_increase}"
+    parameter_string = f"mrd_{mrd}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
     
     return f1, parameter_string, precision, recall
 
@@ -354,7 +354,7 @@ def highest_scoring_hit(file_path):
 
 def co_occurrence_until_convergence(input_folder, confirmed_mutation_dict, consensus_dict,
                                     bio_validation_dict, min_n, mrd, cor, new_output_folder,
-                                    iteration_increase, proxi, dp_window, pp, bp, dp):
+                                    iteration_increase, proxi, dp_window, pp, np, dp):
     """
     Executes an iterative process to identify co-occurring mutations in reads until convergence is achieved.
     The process adjusts the parameters for correlation and density penalty in each iteration and checks for
@@ -395,7 +395,7 @@ def co_occurrence_until_convergence(input_folder, confirmed_mutation_dict, conse
             confirmed_mutation_dict, co_occurrence_tmp_dict = upper_co_occuring_mutations_in_reads(
                 confirmed_mutation_dict, consensus_dict,
                 bio_validation_dict, reads_mutation_dict, proxi, dp_window,
-                mrd, cor, pp, bp, dp
+                mrd, cor, pp, np, dp
             )
 
             new_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
@@ -759,7 +759,7 @@ def derive_mutation_positions(consensus_dict, min_n, mrd, cor):
 
 def upper_co_occuring_mutations_in_reads(confirmed_mutation_dict, consensus_dict,
                                          bio_validation_dict, reads_mutation_dict, proxi, dp_window,
-                                         mrd, cor, pp, bp, dp):
+                                         mrd, cor, pp, np, dp):
     """
     Filter and adjust confirmed mutations based on co-occurrence, depth, and biological validation.
 
@@ -839,7 +839,7 @@ def upper_co_occuring_mutations_in_reads(confirmed_mutation_dict, consensus_dict
                     mutation_threshold = mutation_threshold - position_depth * mrd * cor
 
                 if not biological_existence:
-                    mutation_threshold = mutation_threshold + bp * position_depth * mrd
+                    mutation_threshold = mutation_threshold + np * position_depth * mrd
                 if proxi_mutations != []:
                     mutation_threshold = mutation_threshold + pp * position_depth * mrd
                 if density_mutations != []:
@@ -860,7 +860,7 @@ def upper_co_occuring_mutations_in_reads(confirmed_mutation_dict, consensus_dict
                 depth = confirmed_mutation_dict[allele][1][0]
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
                 if not biological_existence:
-                    mutation_threshold = mutation_threshold + (bp - 1) * position_depth * mrd
+                    mutation_threshold = mutation_threshold + (np - 1) * position_depth * mrd
 
                 if depth >= mutation_threshold:
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][0])
@@ -1261,18 +1261,27 @@ def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd):
     #cor_interval = [0.4, 0.45, 0.5, 0.55, 0.6]
     #iteration_increase_interval = [0.1, 0.125, 0.15, 0.175, 0.2, 0.225]
     #pp_interval = [0.2, 0.25, 0.3, 0.35, 0.4]
-    #bp_interval = [1, 2, 3, 4]
-    #bp_interval = [2]
+    #np_interval = [1, 2, 3, 4]
+    #np_interval = [2]
     #dp_interval = [0.1, 0.15, 0.2, 0.25]
 
     #First grid search
+    #cor_interval = [0.3, 0.5, 0.7, 0.9]
+    #iteration_increase_interval = [0.05, 0.15, 0.25, 0.35]
+    #pp_interval = [0.2, 0.3, 0.4, 0.5]
+    #np_interval = [1, 2, 3, 4]
+    #dp_interval = [0.1, 0.2, 0.3, 0.4]
 
-    cor_interval = [0.3, 0.5, 0.7, 0.9]
-    iteration_increase_interval = [0.05, 0.15, 0.25, 0.35]
-    pp_interval = [0.2, 0.3, 0.4, 0.5]
-    bp_interval = [1, 2, 3, 4]
-    dp_interval = [0.1, 0.2, 0.3, 0.4]
-
+    cor_interval = [0.6]
+    iteration_increase_interval = [0.2]
+    pp_interval = [0.3]
+    np_interval = [0, 0.1, 0.2, 0.3, 0.4,
+                   0.5, 0.6, 0.7, 0.8, 0.9,
+                   1, 1.1, 1.2, 1.3, 1.4,
+                   1.5, 1.6, 1.7, 1.8, 1.9,
+                   2.0, 2.1, 2.2, 2.3, 2.4,
+                   2.5, 2.6, 2.7, 2.8, 2.9, 3.0]
+    dp_interval = [0.15]
     # Best score initialization
     best_score = 0
     best_params = None
@@ -1280,7 +1289,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd):
     top_recall = None
 
     # Create all combinations of parameters
-    all_params = list(product(cor_interval, iteration_increase_interval, pp_interval, bp_interval, dp_interval))
+    all_params = list(product(cor_interval, iteration_increase_interval, pp_interval, np_interval, dp_interval))
     total_combinations = len(all_params)
     print(f"Total number of parameter combinations: {total_combinations}")
 
@@ -1335,10 +1344,10 @@ def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd):
 
 mrd_list = [1, 2, 3, 4, 5]
 for mrd in mrd_list:
-    new_output_folder = '/home/people/malhal/test/new_nanomgt_results/first_round_parameter_output_{}/'.format(mrd)
+    new_output_folder = '/home/people/malhal/test/new_nanomgt_results/np_grid_parameter_output_{}/'.format(mrd)
     os.makedirs(new_output_folder, exist_ok=True)
     file_list = os.listdir('/home/people/malhal/test/new_nanomgt_results/')
     for folder in file_list:
         if folder.endswith('merged'):
             if 'pneumoniae' not in folder and folder.startswith('depth220'):
-                run_jobs_in_parallel(75, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, mrd/100)
+                run_jobs_in_parallel(21, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, mrd/100)

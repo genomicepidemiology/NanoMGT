@@ -7,7 +7,7 @@ def parse_parameters(param_str):
         param_dict = {
             'cor': float(params[3]),
             'pp': float(params[5]),
-            'bp': int(params[7]),
+            'np': int(params[7]),
             'dp': float(params[9]),
             'iteration_increase': float(params[-1])
         }
