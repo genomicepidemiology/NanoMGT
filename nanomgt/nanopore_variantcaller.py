@@ -29,51 +29,42 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     arguments = initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp)
 
-    print (arguments.cor)
-    print (arguments.iteration_increase)
-    print (arguments.pp)
-    print (arguments.np)
-    print (arguments.dp)
-
-
-    sys.exit()
-
-    set_up_output_and_check_input(arguments)
+    #set_up_output_and_check_input(arguments)
 
     # Run KMA alignment for bacteria mapping
-    kma.KMARunner(arguments.nanopore,
-                  os.path.join(arguments.output, "bacteria_mapping"),
-                  os.path.join(arguments.db_dir, "bac_db"),
-                  f"-mem_mode -Sparse -ss c -t {arguments.threads}").run()
+    #kma.KMARunner(arguments.nanopore,
+    #              os.path.join(arguments.output, "bacteria_mapping"),
+    #              os.path.join(arguments.db_dir, "bac_db"),
+    #              f"-mem_mode -Sparse -ss c -t {arguments.threads}").run()
 
     # Identify the highest scoring bacterial template
-    highest_scoring_template = highest_scoring_hit(os.path.join(arguments.output, "bacteria_mapping.spa"))
-    primary_specie = ' '.join(highest_scoring_template.split()[1:3])
+    #highest_scoring_template = highest_scoring_hit(os.path.join(arguments.output, "bacteria_mapping.spa"))
+    #primary_specie = ' '.join(highest_scoring_template.split()[1:3])
 
     # Produce a species-specific KMA database
-    produce_specie_specific_kma_db(primary_specie,
-                                   os.path.join(arguments.db_dir, 'rmlst.fsa'),
-                                   os.path.join(arguments.db_dir, 'rmlst_scheme.txt'),
-                                   arguments.output)
+    #produce_specie_specific_kma_db(primary_specie,
+    #                               os.path.join(arguments.db_dir, 'rmlst.fsa'),
+    #                               os.path.join(arguments.db_dir, 'rmlst_scheme.txt'),
+    #                               arguments.output)
 
     # Run KMA alignment for initial rMLST
-    kma.KMARunner(arguments.nanopore,
-                  os.path.join(arguments.output, "initial_rmlst_alignment"),
-                  os.path.join(arguments.output, 'specie_db'),
-                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.75 -sam 2096 > {os.path.join(arguments.output, 'initial_rmlst_alignment.sam')}").run()
+    #kma.KMARunner(arguments.nanopore,
+    #              os.path.join(arguments.output, "initial_rmlst_alignment"),
+    #              os.path.join(arguments.output, 'specie_db'),
+    #              f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.75 -sam 2096 > {os.path.join(arguments.output, 'initial_rmlst_alignment.sam')}").run()
 
     # Index top hits from the initial RMLST alignment
-    index_top_hits_db(arguments.output)
+    #index_top_hits_db(arguments.output)
 
 
     # Run KMA alignment for rMLST
-    kma.KMARunner(arguments.nanopore,
-                  os.path.join(arguments.output, "rmlst_alignment"),
-                  os.path.join(arguments.output, 'top_hits_db'),
-                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -eq {arguments.q_score} -matrix -mct 0.75 -sam 2096 > {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
+    #kma.KMARunner(arguments.nanopore,
+    #              os.path.join(arguments.output, "rmlst_alignment"),
+    #              os.path.join(arguments.output, 'top_hits_db'),
+    #              f"-t {arguments.threads} -ID 10 -ont -md 1.5 -eq {arguments.q_score} -matrix -mct 0.75 -sam 2096 > {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
 
     
-    os.system(f'gunzip {os.path.join(arguments.output, "rmlst_alignment.mat.gz")}')
+    #os.system(f'gunzip {os.path.join(arguments.output, "rmlst_alignment.mat.gz")}')
 
     # Build a consensus dictionary from alignment results
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
@@ -166,7 +157,6 @@ def load_parameters(mrd_value):
     for param, spline in splines.items():
         value = calculate_parameter_value(spline, mrd_value)
         results[param] = value
-        print(f"Value for {param} at MRD {mrd_value} is: {value}")
 
     return results['cor'], results['iteration'], results['pp'], results['np'], results['dp']
 
