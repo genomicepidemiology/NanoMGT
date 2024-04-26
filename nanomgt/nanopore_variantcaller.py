@@ -3,7 +3,7 @@ import sys
 import gzip
 import time
 import json
-import np
+import numpy as np
 from Bio import SeqIO
 from nanomgt import kma
 from nanomgt import util
