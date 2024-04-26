@@ -42,9 +42,9 @@ def main():
                         help='Co-occurrence reward. -= MRD * cor. Default: auto')
     parser.add_argument('--np', action="store", type=str, dest='np', default='auto',
                         help='Novelty penalty. += MRD * np. Default: auto')
-    parser.add_argument('--pp', action="store", type=float, dest='pp', default='auto',
+    parser.add_argument('--pp', action="store", type=str, dest='pp', default='auto',
                         help='Proximity penalty. += MRD * pp. Default: auto')
-    parser.add_argument('--dp', action="store", type=float, dest='dp', default='auto',
+    parser.add_argument('--dp', action="store", type=str, dest='dp', default='auto',
                         help='Density Penalty. += n_mutation_in_window * dp * MRD. Default: auto')
     parser.add_argument('--dp_window', action="store", type=float, dest='dp_window', default=15,
                         help='Density penalty window size. Default: 15')

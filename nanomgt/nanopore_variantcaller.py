@@ -22,7 +22,17 @@ def nanopore_metagenomics_variantcaller(arguments):
     """
     # Set up output directory and verify input file
 
-    arguments.cor, arguments.iteration_increase, arguments.pp, arguments.np, arguments.dp = load_parameters(arguments.mrd)
+    auto_cor, auto_iteration_increase, auto_pp, auto_.np, auto_dp = load_parameters(arguments.mrd)
+
+    arguments = initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp)
+
+    print (arguments.cor)
+    print (arguments.iteration_increase)
+    print (arguments.pp)
+    print (arguments.np)
+    print (arguments.dp)
+
+
     sys.exit()
 
     set_up_output_and_check_input(arguments)
@@ -99,6 +109,34 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     sys.exit()
 
+def initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp):
+    if arguments.cor == 'auto':
+        arguments.cor = auto_cor
+    else:
+        arguments.cor = float(arguments.cor)
+
+    if arguments.iteration_increase == 'auto':
+        arguments.iteration_increase = auto_iteration_increase
+    else:
+        arguments.iteration_increase = float(arguments.iteration_increase)
+
+    if arguments.pp == 'auto':
+        arguments.pp = auto_pp
+    else:
+        arguments.pp = float(arguments.pp)
+
+    if arguments.np == 'auto':
+        arguments.np = auto_np
+    else:
+        arguments.np = float(arguments.np)
+
+    if arguments.dp == 'auto':
+        arguments.dp = auto_dp
+    else:
+        arguments.dp = float(arguments.dp)
+
+    return arguments
+
 
 def load_parameters(mrd_value):
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -127,7 +165,7 @@ def load_parameters(mrd_value):
         results[param] = value
         print(f"Value for {param} at MRD {mrd_value} is: {value}")
 
-    return cor, iteration, pp, np, dp
+    return results['cor'], results['iteration'], results['pp'], results['np'], results['dp']
 
 def load_spline_from_json(filename):
     """ Load spline data from JSON file and recreate the spline object. """
