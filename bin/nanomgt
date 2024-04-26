@@ -50,7 +50,7 @@ def main():
                         help='Density penalty window size. Default: 15')
     parser.add_argument('--proxi', action="store", type=int, dest='proxi', default=5,
                         help='Proximity between SNVs incurring a penalty. Default: 5')
-    parser.add_argument('--ii', action="store", type=float, dest='iteration_increase', default='auto',
+    parser.add_argument('--ii', action="store", type=str, dest='iteration_increase', default='auto',
                         help='Iteration increase. Default: auto')
     parser.add_argument('--q_score', action="store", type=int, dest='q_score', default=14,
                         help='Minimum average q-score for reads to be included. Default: 14')
