@@ -2,6 +2,7 @@ import os
 import sys
 import gzip
 import time
+import json
 from Bio import SeqIO
 from nanomgt import kma
 from nanomgt import util
