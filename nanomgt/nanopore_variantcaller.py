@@ -25,7 +25,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     """
     # Set up output directory and verify input file
 
-    auto_cor, auto_iteration_increase, auto_pp, auto_.np, auto_dp = load_parameters(arguments.mrd)
+    auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp = load_parameters(arguments.mrd)
 
     arguments = initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp)
 
