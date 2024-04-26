@@ -22,6 +22,9 @@ def nanopore_metagenomics_variantcaller(arguments):
     """
     # Set up output directory and verify input file
 
+    arguments.cor, arguments.iteration_increase, arguments.pp, arguments.np, arguments.dp = load_parameters(arguments.mrd)
+    sys.exit()
+
     set_up_output_and_check_input(arguments)
 
     # Run KMA alignment for bacteria mapping
@@ -96,6 +99,51 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     sys.exit()
 
+
+def load_parameters(mrd_value):
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    parameters_dir = os.path.join(script_dir, 'parameter_functions')
+
+    # Names of the parameters and their corresponding JSON files
+    parameters = {
+        'cor': 'cor_spline_fits.json',
+        'iteration': 'iteration_spline_fits.json',
+        'pp': 'pp_spline_fits.json',
+        'np': 'np_spline_fits.json',
+        'dp': 'dp_spline_fits.json'
+    }
+
+    splines = {}
+
+    # Load splines from JSON files
+    for param, filename in parameters.items():
+        full_path = os.path.join(parameters_dir, filename)
+        splines[param] = load_spline_from_json(full_path)
+
+    # Calculate and print the parameters values for the given MRD
+    results = {}
+    for param, spline in splines.items():
+        value = calculate_parameter_value(spline, mrd_value)
+        results[param] = value
+        print(f"Value for {param} at MRD {mrd_value} is: {value}")
+
+    return cor, iteration, pp, np, dp
+
+def load_spline_from_json(filename):
+    """ Load spline data from JSON file and recreate the spline object. """
+    with open(filename, 'r') as file:
+        data = json.load(file)
+    # Convert keys back to floats and sort by keys
+    x_values = np.array(sorted(map(float, data.keys())))
+    y_values = np.array([data[str(x)] for x in x_values])
+    spline = UnivariateSpline(x_values, y_values, s=None)
+    return spline
+
+def calculate_parameter_value(spline, mrd):
+    """ Calculate the parameter value for a given mrd using the spline. """
+    value = spline(mrd)
+    # Ensure that the value is non-negative
+    return max(value, 0)
 
 
 def print_majority_alelles(consensus_dict, arguments):

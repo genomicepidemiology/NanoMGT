@@ -236,7 +236,8 @@ def find_close_mutations(mutations):
 
 
 # Escherichia coli
-ecoli_sequencing_ids = ['SRR25689478', 'SRR26036455', 'SRR25608259']
+#ecoli_sequencing_ids = ['SRR25689478', 'SRR26036455', 'SRR25608259']
+ecoli_sequencing_ids = ['SRR25689478', 'ERR12533301', 'SRR26036455']
 
 # Staphylococcus aureus
 staph_aureus_sequencing_ids = ['SRR28370694', 'ERR8958843']
@@ -252,7 +253,7 @@ klebsiella_pneumoniae_sequencing_ids = ['ERR8958737', 'SRR27348733']
 
 combined_list_of_ids = [ecoli_sequencing_ids, staph_aureus_sequencing_ids, campylobacter_jejuni_sequencing_ids, salmonella_enterica_sequencing_ids, klebsiella_pneumoniae_sequencing_ids]
 
-print (combined_list_of_ids)
+#print (combined_list_of_ids)
 
 #for item in combined_list_of_ids:
 for item in combined_list_of_ids:
@@ -298,6 +299,7 @@ for item in combined_list_of_ids:
                                     novel_mutation_count += 1
                                     print (key, mutation)
                     print (f"Total mutations: {total_mutations}")
+                    print (f"Novel mutations: {novel_mutation_count}")
                     print (f"Mutations in proximity: {mutations_in_proximity}")
                     print (f"Total density: {total_proximity_density}")
                     if mutations_in_proximity > 0:

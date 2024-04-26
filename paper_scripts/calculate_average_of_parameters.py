@@ -7,7 +7,7 @@ def parse_parameters(param_str):
         param_dict = {
             'cor': float(params[3]),
             'pp': float(params[5]),
-            'np': int(params[7]),
+            'np': float(params[7]),
             'dp': float(params[9]),
             'iteration_increase': float(params[-1])
         }
@@ -17,10 +17,11 @@ def parse_parameters(param_str):
         return None
 
 def main():
-    numbers = [1, 2, 3, 4, 5]
+    #numbers = [1, 2, 3, 4, 5]
+    numbers = [1, 2]
     for number in numbers:
         # Load the data
-        df = pd.read_csv('final_{}_all.csv'.format(number))
+        df = pd.read_csv('first_grid_{}_all.csv'.format(number))
 
         # Prepare a dictionary to store parameter sums and counts for averaging
         param_sums = {}

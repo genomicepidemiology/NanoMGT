@@ -50,7 +50,7 @@ def random_sampling(mrd, results_folder, min_n, cor, new_output_folder,
 
 
     # Format and output the results
-    format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict)
+    format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict, np)
 
     sample = results_folder.split('/')[-1]
     minor_mutation_expected = benchmark_analysis_result(sample, results_folder)
@@ -59,13 +59,11 @@ def random_sampling(mrd, results_folder, min_n, cor, new_output_folder,
     #minor_mutation_results = load_mutations(results_folder + '/minor_mutations.csv')
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
 
-    precision, recall, f1 = calculate_metrics(minor_mutation_expected, minor_mutation_results)
-
-
+    precision, recall, f1,  tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
 
     parameter_string = f"mrd_{mrd}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
     
-    return f1, parameter_string, precision, recall
+    return f1, parameter_string, precision, recall, tp, fp, fn
 
 def convert_mutation_dict_to_object(mutation_dict):
     mutation_object = {}
@@ -116,6 +114,10 @@ def calculate_metrics(expected_mutations, actual_mutations):
     sum_precision, sum_recall, sum_f1 = 0, 0, 0
     genes_counted = 0
 
+    total_tp = 0
+    total_fp = 0
+    total_fn = 0
+
     # Iterate over expected mutations by gene to calculate metrics
     for gene, expected_set in expected_mutations.items():
         if gene in actual_mutations:
@@ -127,23 +129,15 @@ def calculate_metrics(expected_mutations, actual_mutations):
             # False Negatives (FN): Mutations missed (in expected but not in actual)
             fn = len(expected_set - actual_set)
 
-            # Calculate Precision, Recall, and F1 for this gene
-            precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-            recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-            f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+            total_tp += tp
+            total_fp += fp
+            total_fn += fn
 
-            # Add to sum of metrics
-            sum_precision += precision
-            sum_recall += recall
-            sum_f1 += f1
-            genes_counted += 1
+    precision = total_tp / (total_tp + total_fp) if (total_tp + total_fp) > 0 else 0
+    recall = total_tp / (total_tp + total_fn) if (total_tp + total_fn) > 0 else 0
+    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
 
-    # Calculate average metrics across all genes
-    avg_precision = sum_precision / genes_counted if genes_counted > 0 else 0
-    avg_recall = sum_recall / genes_counted if genes_counted > 0 else 0
-    avg_f1 = sum_f1 / genes_counted if genes_counted > 0 else 0
-
-    return avg_precision, avg_recall, avg_f1
+    return precision, recall, f1, total_tp, total_fp, total_fn
 
 
 def load_mutations_from_files(file_paths):
@@ -198,14 +192,13 @@ def load_mutations(filename):
 
 def benchmark_analysis_result(sample, results_folder):
     #batch = sample.split('_')[-2]
-    print (sample)
+    #print (sample)
     batch_id = int(sample.split('_')[-2][5:])
-    print (batch_id)
+    #print (batch_id)
     #print(f"Batch ID: {batch_id}")
     specie = sample.split('_')[1:-5]
     batch_csv = "_".join(sample.split('_')[1:-2]) + ".csv"
     data = load_data('/home/people/malhal/data/new_nanomgt/simulated_batches/' + batch_csv)
-
     # Change this batch_id to test different batches
     # batch_id = 10
     #print(f"Highest percentage ID for batch {batch_id}: {find_highest_percentage_id(batch_id, data)}")
@@ -221,13 +214,13 @@ def benchmark_analysis_result(sample, results_folder):
     if 'ecoli' in sample:
         map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
             top_id, minor[0])
-        mutation_map = load_mutations_from_files([map_file_1])
-    if 'staph_aureus' in sample:
-        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
-            top_id, minor[0])
         map_file_2 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
             top_id, minor[1])
         mutation_map = load_mutations_from_files([map_file_1, map_file_2])
+    if 'staph_aureus' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        mutation_map = load_mutations_from_files([map_file_1])
     if 'campylobacter_jejuni' in sample:
         map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
             top_id, minor[0])
@@ -603,48 +596,8 @@ def blacklist_positions(fastq_file, quality_threshold):
     return blacklist_dict
 
 
-def format_output_for_plots(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
-                            co_occurrence_tmp_dict):
-    """
-    Format and print the output of confirmed mutations with additional information.
 
-    Args:
-        confirmed_mutation_dict (dict): A dictionary containing confirmed mutations for alleles.
-        consensus_dict (dict): A dictionary containing consensus information for alleles.
-        bio_validation_dict (dict): A dictionary containing biological validation data for genes.
-
-    Returns:
-        None
-    """
-    with open(new_output_folder + '/minor_mutations.csv', 'w') as outfile:
-        header = 'Gene,Position,MajorityBase,MutationBase,MutationDepth,TotalDepth,GeneLength,MutationComment,CoOccurrence'
-        print(header, file=outfile)
-
-        for allele in confirmed_mutation_dict:
-            for mutation in zip(confirmed_mutation_dict[allele][0], confirmed_mutation_dict[allele][1]):
-                position = mutation[0].split('_')[0]
-                mutation_base = mutation[0].split('_')[1]
-                mutation_depth = mutation[1]
-                majority_base = consensus_dict[allele][1][int(position) - 1]
-                total_depth = sum(consensus_dict[allele][0][int(position) - 1])
-                biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation[0])
-                gene_length = len(consensus_dict[allele][1])
-                if mutation[0] in co_occurrence_tmp_dict[allele]:
-                    co_occurrence = 'Yes'
-                else:
-                    co_occurrence = 'No'
-
-                if biological_existence:
-                    print('{},{},{},{},{},{},{},{},{}'.format(allele, position, majority_base, mutation_base,
-                                                              mutation_depth, total_depth, gene_length,
-                                                              'Mutation seen in database', co_occurrence), file=outfile)
-                else:
-                    print('{},{},{},{},{},{},{},{},{}'.format(allele, position, majority_base, mutation_base,
-                                                              mutation_depth, total_depth, gene_length,
-                                                              'Novel mutation', co_occurrence), file=outfile)
-
-
-def format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict):
+def format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict, np):
     """
     Format and print the output of confirmed mutations with additional information.
 
@@ -1247,7 +1200,7 @@ def set_up_output_and_check_input(arguments):
             sys.exit()
 
 
-def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd):
+def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd, parameters):
     name = results_folder.split('/')[-1]
     new_output_folder = new_output_folder + '/' + name
     os.makedirs(new_output_folder, exist_ok=True)
@@ -1257,31 +1210,13 @@ def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd):
     proxi = 5
     dp_window = 15
 
-    # Parameter intervals
-    #cor_interval = [0.4, 0.45, 0.5, 0.55, 0.6]
-    #iteration_increase_interval = [0.1, 0.125, 0.15, 0.175, 0.2, 0.225]
-    #pp_interval = [0.2, 0.25, 0.3, 0.35, 0.4]
-    #np_interval = [1, 2, 3, 4]
-    #np_interval = [2]
-    #dp_interval = [0.1, 0.15, 0.2, 0.25]
-
     #First grid search
-    #cor_interval = [0.3, 0.5, 0.7, 0.9]
-    #iteration_increase_interval = [0.05, 0.15, 0.25, 0.35]
-    #pp_interval = [0.2, 0.3, 0.4, 0.5]
-    #np_interval = [1, 2, 3, 4]
-    #dp_interval = [0.1, 0.2, 0.3, 0.4]
+    cor_interval = parameters['cor_interval']
+    iteration_increase_interval = parameters['iteration_increase_interval']
+    pp_interval = parameters['pp_interval']
+    np_interval = parameters['np_interval']
+    dp_interval = parameters['dp_interval']
 
-    cor_interval = [0.6]
-    iteration_increase_interval = [0.2]
-    pp_interval = [0.3]
-    np_interval = [0, 0.1, 0.2, 0.3, 0.4,
-                   0.5, 0.6, 0.7, 0.8, 0.9,
-                   1, 1.1, 1.2, 1.3, 1.4,
-                   1.5, 1.6, 1.7, 1.8, 1.9,
-                   2.0, 2.1, 2.2, 2.3, 2.4,
-                   2.5, 2.6, 2.7, 2.8, 2.9, 3.0]
-    dp_interval = [0.15]
     # Best score initialization
     best_score = 0
     best_params = None
@@ -1297,7 +1232,6 @@ def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd):
     top_result_filename = new_output_folder + "/top_result.csv"
 
     all_results = []
-
 
     processed_combinations = 0
 
@@ -1318,10 +1252,10 @@ def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd):
             #if processed_combinations % 1 == 0:
             print(f"Processed {processed_combinations}/{total_combinations} combinations.")
             try:
-                f1, parameter_string, precision, recall = future.result()
+                f1, parameter_string, precision, recall, tp, fp, fn = future.result()
 
                 # Write each result to the CSV
-                all_results.append([f1, parameter_string, precision, recall])
+                all_results.append([f1, parameter_string, precision, recall, tp, fp, fn])
 
                 if f1 > best_score:
                     best_score = f1
@@ -1333,21 +1267,71 @@ def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd):
 
     with open(results_filename, 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall'])
+        writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN'])
         writer.writerows(all_results)
 
     # Write the top result to its own CSV
     with open(top_result_filename, 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall'])
-        writer.writerow([best_score, best_params, top_precision, top_recall])
+        writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN'])
+        writer.writerow([best_score, best_params, top_precision, top_recall, tp, fp, fn])
 
 mrd_list = [1, 2, 3, 4, 5]
+
+parameters_list = []
+
+parameters_1 = {
+    'cor_interval': [0.3],
+    'iteration_increase_interval': [0.51],
+    'pp_interval': [0.56],
+    'np_interval': [3.3],
+    'dp_interval': [0.4]
+}
+parameters_list.append(parameters_1)
+
+parameters_2 = {
+    'cor_interval': [0.34],
+    'iteration_increase_interval': [0.23],
+    'pp_interval': [0.51],
+    'np_interval': [3.0],
+    'dp_interval': [0.25]
+}
+parameters_list.append(parameters_2)
+
+parameters_3 = {
+    'cor_interval': [0.37],
+    'iteration_increase_interval': [0.24],
+    'pp_interval': [0.37],
+    'np_interval': [2.8],
+    'dp_interval': [0.11]
+}
+parameters_list.append(parameters_3)
+
+parameters_4 = {
+    'cor_interval': [0.58],
+    'iteration_increase_interval': [0.03],
+    'pp_interval': [0.26],
+    'np_interval': [2.7],
+    'dp_interval': [0.07]
+}
+parameters_list.append(parameters_4)
+
+parameters_5 = {
+    'cor_interval': [0.65],
+    'iteration_increase_interval': [0.01],
+    'pp_interval': [0.10],
+    'np_interval': [2.65],
+    'dp_interval': [0.07]
+}
+
+parameters_list.append(parameters_5)
+
 for mrd in mrd_list:
-    new_output_folder = '/home/people/malhal/test/new_nanomgt_results/np_grid_parameter_output_{}/'.format(mrd)
+    parameters = parameters_list[mrd-1]
+    new_output_folder = '/home/people/malhal/test/new_nanomgt_results/ii_search_output_{}/'.format(mrd)
     os.makedirs(new_output_folder, exist_ok=True)
     file_list = os.listdir('/home/people/malhal/test/new_nanomgt_results/')
     for folder in file_list:
         if folder.endswith('merged'):
-            if 'pneumoniae' not in folder and folder.startswith('depth220'):
-                run_jobs_in_parallel(21, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, mrd/100)
+            if 'klebsiella' not in folder and 'salmonella' not in folder and folder.startswith('depth220'):
+                run_jobs_in_parallel(40, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, mrd/100, parameters)

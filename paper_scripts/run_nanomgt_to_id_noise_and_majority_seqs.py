@@ -7,7 +7,7 @@ def construct_command(file_path, output_dir):
 
     # Construct the command with all parameters set to 0
     command = f"~/NanoMGT/bin/nanomgt --nanopore {file_path} --o {output_dir}/{output_name} --threads 8 --db_dir ~/nanomgt_db/" \
-              f" --mrd 0.03 --cor 0 --bp 0 --dp 0 --ii 0 --pp 0"
+              f" --mrd 0.03 --cor 0 --np 0 --dp 0 --ii 0 --pp 0"
     return command
 
 def main():
@@ -16,13 +16,14 @@ def main():
 
     # List all files in the directory
     for filename in os.listdir(directory):
-        file_path = os.path.join(directory, filename)
+        if 'ERR12533301' in filename:
+            file_path = os.path.join(directory, filename)
 
-        # Check if the file ends with .fastq
-        if file_path.endswith(".fastq"):
-            # Generate and print the command
-            command = construct_command(file_path, output_directory)
-            os.system(command)
+            # Check if the file ends with .fastq
+            if file_path.endswith(".fastq"):
+                # Generate and print the command
+                command = construct_command(file_path, output_directory)
+                os.system(command)
 
 if __name__ == "__main__":
     main()
