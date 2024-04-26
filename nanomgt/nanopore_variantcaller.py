@@ -8,6 +8,7 @@ from Bio import SeqIO
 from nanomgt import kma
 from nanomgt import util
 from itertools import combinations
+from scipy.interpolate import UnivariateSpline
 
 from nanomgt.nanopore_mutations import parse_sam_and_find_mutations
 from nanomgt.nanopore_mutations import extract_alignment
