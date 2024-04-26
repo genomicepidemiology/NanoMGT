@@ -68,8 +68,8 @@ for params in parameters_list:
 
 # Fit splines and store results
 splines = {}
-x_values = np.linspace(1, 5, 5)  # MRD values from 0.01 to 0.05
-fine_x_values = np.linspace(1, 5, 100)  # Use more points for a smoother plot
+x_values = np.linspace(0.01, 0.05, 5)  # MRD values from 0.01 to 0.05
+fine_x_values = np.linspace(0.01, 0.05, 100)  # Use more points for a smoother plot
 fig, axes = plt.subplots(nrows=1, ncols=5, figsize=(25, 5))
 fig.subplots_adjust(hspace=0.4, wspace=0.4)
 
