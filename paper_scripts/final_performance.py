@@ -2,19 +2,28 @@ import os
 import sys
 import gzip
 import time
-import json
+import pandas as pd
 import numpy as np
+import csv
+import json
+from scipy.interpolate import UnivariateSpline
+
 from Bio import SeqIO
 from nanomgt import kma
 from nanomgt import util
 from itertools import combinations
-from scipy.interpolate import UnivariateSpline
+import concurrent.futures
+from itertools import product
 
-from nanomgt.nanopore_mutations import parse_sam_and_find_mutations
-from nanomgt.nanopore_mutations import extract_alignment
-from nanomgt.nanopore_mutations import create_mutation_vector
+from random_search_functions import parse_sam_and_find_mutations
+from random_search_functions import extract_alignment
+from random_search_functions import create_mutation_vector
 
-def nanopore_metagenomics_variantcaller(arguments):
+
+
+
+def random_sampling(mrd, results_folder, min_n, cor, new_output_folder,
+                    iteration_increase, proxi, dp_window, pp, np, dp):
     """
     Conducts metagenomics variant calling for Nanopore sequencing data. This function orchestrates
     the whole process from setting up the output directory, running KMA alignments, extracting reads,
@@ -23,164 +32,213 @@ def nanopore_metagenomics_variantcaller(arguments):
     Args:
         arguments: Parsed command-line arguments containing parameters and file paths.
     """
-    # Set up output directory and verify input file
-
-    auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp = load_parameters(arguments.mrd)
-
-    arguments = initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp)
-
-    set_up_output_and_check_input(arguments)
-
-    # Run KMA alignment for bacteria mapping
-    kma.KMARunner(arguments.nanopore,
-                  os.path.join(arguments.output, "bacteria_mapping"),
-                  os.path.join(arguments.db_dir, "bac_db"),
-                  f"-mem_mode -Sparse -ss c -t {arguments.threads}").run()
-
-    # Identify the highest scoring bacterial template
-    highest_scoring_template = highest_scoring_hit(os.path.join(arguments.output, "bacteria_mapping.spa"))
-    primary_specie = ' '.join(highest_scoring_template.split()[1:3])
-
-    # Produce a species-specific KMA database
-    produce_specie_specific_kma_db(primary_specie,
-                                   os.path.join(arguments.db_dir, 'rmlst.fsa'),
-                                   os.path.join(arguments.db_dir, 'rmlst_scheme.txt'),
-                                   arguments.output)
-
-    # Run KMA alignment for initial rMLST
-    kma.KMARunner(arguments.nanopore,
-                  os.path.join(arguments.output, "initial_rmlst_alignment"),
-                  os.path.join(arguments.output, 'specie_db'),
-                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.75 -sam 2096 > {os.path.join(arguments.output, 'initial_rmlst_alignment.sam')}").run()
-
-    # Index top hits from the initial RMLST alignment
-    index_top_hits_db(arguments.output)
-
-
-    # Run KMA alignment for rMLST
-    kma.KMARunner(arguments.nanopore,
-                  os.path.join(arguments.output, "rmlst_alignment"),
-                  os.path.join(arguments.output, 'top_hits_db'),
-                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -eq {arguments.q_score} -matrix -mct 0.75 -sam 2096 > {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
-
-    
-    os.system(f'gunzip {os.path.join(arguments.output, "rmlst_alignment.mat.gz")}')
-
+    os.system(f'mkdir -p {new_output_folder}')
+    print (f"Running random sampling for MRD {mrd}, cor {cor}, pp {pp}, np {np}, dp {dp}, ii {iteration_increase}")
+    parameter_string = f"mrd_{mrd}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
     # Build a consensus dictionary from alignment results
-    consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
-                                          os.path.join(arguments.output, 'rmlst_alignment.mat'))
+    consensus_dict = build_consensus_dict(os.path.join(results_folder, 'rmlst_alignment.res'),
+                                          os.path.join(results_folder, 'rmlst_alignment.mat'))
 
-    print_majority_alelles(consensus_dict, arguments)
-
-    if arguments.majority_alleles_only: #End the program if only majority alleles are requested
-        sys.exit()
-
-    # Adjust the consensus dictionary based on individual quality scores
-    # Currently not doing anything.
-    consensus_dict, read_positions_blacklisted_dict = adjust_consensus_dict_for_individual_qscores(consensus_dict, os.path.join(arguments.output, 'rmlst_alignment.sam'), arguments.nanopore, arguments.q_score)
-
-    # Derive mutation positions from consensus data
-    confirmed_mutation_dict = derive_mutation_positions(consensus_dict, arguments)
+    confirmed_mutation_dict = derive_mutation_positions(consensus_dict, min_n, mrd, cor)
 
     # Perform biological validation of mutations
-    bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(arguments.output, 'specie.fsa'))
-
+    bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
     # Co-occurrence analysis until convergence
-    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count = co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict, bio_validation_dict)
+    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count = co_occurrence_until_convergence(results_folder,
+                                                                                                       confirmed_mutation_dict,
+                                                                                                       consensus_dict,
+                                                                                                       bio_validation_dict,
+                                                                                                       min_n, mrd, cor, new_output_folder,
+                                                                                                       iteration_increase, proxi, dp_window, pp, np, dp)
 
-    for item in confirmed_mutation_dict:
-        print(item, confirmed_mutation_dict[item])
 
-    print_minor_variants(confirmed_mutation_dict, consensus_dict, arguments.output)
     # Format and output the results
-    format_output(arguments, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict)
+    format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict, np)
 
-    # Write majority sequences to file
-    with open(os.path.join(arguments.output, 'majority_seqs.fasta'), 'w') as f:
-        for allele in consensus_dict:
-            print(f'>{allele}', file=f)
-            print(consensus_dict[allele][1], file=f)
-
-    sys.exit()
-
-def initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp):
-    if arguments.cor == 'auto':
-        arguments.cor = auto_cor
-    else:
-        arguments.cor = float(arguments.cor)
-
-    if arguments.iteration_increase == 'auto':
-        arguments.iteration_increase = auto_iteration_increase
-    else:
-        arguments.iteration_increase = float(arguments.iteration_increase)
-
-    if arguments.pp == 'auto':
-        arguments.pp = auto_pp
-    else:
-        arguments.pp = float(arguments.pp)
-
-    if arguments.np == 'auto':
-        arguments.np = auto_np
-    else:
-        arguments.np = float(arguments.np)
-
-    if arguments.dp == 'auto':
-        arguments.dp = auto_dp
-    else:
-        arguments.dp = float(arguments.dp)
-
-    return arguments
+    sample = results_folder.split('/')[-1]
+    minor_mutation_expected = benchmark_analysis_result(sample, results_folder)
 
 
-def load_parameters(mrd_value):
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    parameters_dir = os.path.join(script_dir, 'parameter_functions')
+    #minor_mutation_results = load_mutations(results_folder + '/minor_mutations.csv')
+    minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
 
-    # Names of the parameters and their corresponding JSON files
-    parameters = {
-        'cor': 'cor_spline_fits.json',
-        'iteration': 'iteration_spline_fits.json',
-        'pp': 'pp_spline_fits.json',
-        'np': 'np_spline_fits.json',
-        'dp': 'dp_spline_fits.json'
-    }
+    precision, recall, f1,  tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
 
-    splines = {}
 
-    # Load splines from JSON files
-    for param, filename in parameters.items():
-        full_path = os.path.join(parameters_dir, filename)
-        splines[param] = load_spline_from_json(full_path)
+    return f1, parameter_string, precision, recall
 
-    # Calculate and print the parameters values for the given MRD
-    results = {}
-    for param, spline in splines.items():
-        value = calculate_parameter_value(spline, mrd_value)
-        results[param] = value
+def convert_mutation_dict_to_object(mutation_dict):
+    mutation_object = {}
+    for allele in mutation_dict:
+        gene = allele.split('_')[0]
+        mutation_object[gene] = set()
+        for mutation in mutation_dict[allele][0]:
+            mutation_object[gene].add(mutation)
+    return mutation_object
 
-    return results['cor'], results['iteration'], results['pp'], results['np'], results['dp']
+def find_highest_percentage_id(batch_id, df):
+    # Filter the DataFrame for the given batch ID
+    batch_data = df[df['Batch'] == batch_id]
+    if batch_data.empty:
+        return "Batch ID not found."
+    # Iterate over the rows and find the ID with the highest percentage
+    highest_percentage = 0
+    highest_percentage_id = ''
+    all = []
+    for index, row in batch_data.iterrows():
+        if 'Percentage3' in df.columns:
+            for i in range(1, 4):
+                # Extracting percentage value correctly after handling potential space issue
+                percentage = int(row[f'Percentage{i}'][:-1])  # Remove the '%' and convert to int
+                if percentage > highest_percentage:
+                    highest_percentage = percentage
+                    highest_percentage_id = row[f'ID{i}']
+                all.append((row[f'ID{i}']))
+        else:
+            for i in range(1, 3):
+                # Extracting percentage value correctly after handling potential space issue
+                percentage = int(row[f'Percentage{i}'][:-1])  # Remove the '%' and convert to int
+                if percentage > highest_percentage:
+                    highest_percentage = percentage
+                    highest_percentage_id = row[f'ID{i}']
+                all.append((row[f'ID{i}']))
 
-def load_spline_from_json(filename):
-    """ Load spline data from JSON file and recreate the spline object. """
+    minor = []
+
+    for item in all:
+        if item != highest_percentage_id:
+            minor.append(item)
+
+    return highest_percentage_id, minor
+
+def calculate_metrics(expected_mutations, actual_mutations):
+    # Initialize variables to calculate sum of metrics across all genes
+    sum_precision, sum_recall, sum_f1 = 0, 0, 0
+    genes_counted = 0
+
+    total_tp = 0
+    total_fp = 0
+    total_fn = 0
+
+    # Iterate over expected mutations by gene to calculate metrics
+    for gene, expected_set in expected_mutations.items():
+        if gene in actual_mutations:
+            actual_set = actual_mutations[gene]
+            # True Positives (TP): Mutations correctly predicted
+            tp = len(expected_set & actual_set)
+            # False Positives (FP): Mutations incorrectly predicted (not in expected but in actual)
+            fp = len(actual_set - expected_set)
+            # False Negatives (FN): Mutations missed (in expected but not in actual)
+            fn = len(expected_set - actual_set)
+
+            total_tp += tp
+            total_fp += fp
+            total_fn += fn
+
+    precision = total_tp / (total_tp + total_fp) if (total_tp + total_fp) > 0 else 0
+    recall = total_tp / (total_tp + total_fn) if (total_tp + total_fn) > 0 else 0
+    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+
+    return precision, recall, f1, total_tp, total_fp, total_fn
+
+
+def load_mutations_from_files(file_paths):
+    """
+    Loads mutations from multiple files and returns a dictionary with gene IDs as keys
+    and sets of mutations as values.
+
+    :param file_paths: List of file paths to load mutations from
+    :return: Dictionary with gene IDs as keys and sets of mutations as values
+    """
+    mutations_dict = {}
+
+    for file_path in file_paths:
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+            for i in range(0, len(lines), 2):
+                gene_id = lines[i].strip()
+                mutations = set(lines[i + 1].strip().split(','))
+
+                if gene_id in mutations_dict:
+                    mutations_dict[gene_id].update(mutations)
+                else:
+                    mutations_dict[gene_id] = mutations
+
+    return mutations_dict
+
+# Adjusted function to load the data from the CSV file, accounting for initial spaces in column names
+def load_data(filepath):
+    # Added skipinitialspace=True to handle any initial spaces in column names
+    return pd.read_csv(filepath, skipinitialspace=True)
+
+def load_mutations(filename):
+    mutations_dict = {}
     with open(filename, 'r') as file:
-        data = json.load(file)
-    # Convert keys back to floats and sort by keys
-    x_values = np.array(sorted(map(float, data.keys())))
-    y_values = np.array([data[str(x)] for x in x_values])
-    spline = UnivariateSpline(x_values, y_values, s=None)
-    return spline
+        next(file)  # Skip the header line
+        for line in file:
+            # Split the line into components
+            allele, position, _, mutation_base, _, _, _, _, _ = line.strip().split(',')
+            gene = allele.split('_')[0]
+            # Generate the mutation identifier as 'Position_MutationBase'
+            mutation_identifier = f"{position}_{mutation_base}"
 
-def calculate_parameter_value(spline, mrd):
-    """ Calculate the parameter value for a given mrd using the spline. """
-    value = spline(mrd)
-    # Ensure that the value is non-negative
-    return max(value, 0)
+            # If the gene is not already in the dictionary, add it with an empty set
+            if gene not in mutations_dict:
+                mutations_dict[gene] = set()
+
+            # Add the mutation identifier to the gene's set
+            mutations_dict[gene].add(mutation_identifier)
+
+    return mutations_dict
+
+
+def benchmark_analysis_result(sample, results_folder):
+    batch_id = int(sample.split('_')[-2][5:])
+    specie = sample.split('_')[1:-5]
+    batch_csv = "_".join(sample.split('_')[1:-2]) + ".csv"
+    data = load_data('/home/people/malhal/data/new_nanomgt/simulated_batches/' + batch_csv)
+    # Change this batch_id to test different batches
+    # batch_id = 10
+    #print(f"Highest percentage ID for batch {batch_id}: {find_highest_percentage_id(batch_id, data)}")
+
+    top_id, minor = find_highest_percentage_id(batch_id, data)
+    # Use names and batch ID to get the correct mutation map
+    if 'salmonella_enterica' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        map_file_2 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[1])
+        mutation_map = load_mutations_from_files([map_file_1, map_file_2])
+    if 'ecoli' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        map_file_2 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[1])
+        mutation_map = load_mutations_from_files([map_file_1, map_file_2])
+    if 'staph_aureus' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        mutation_map = load_mutations_from_files([map_file_1])
+    if 'campylobacter_jejuni' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        mutation_map = load_mutations_from_files([map_file_1])
+    if 'klebsiella_pneumoniae' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        mutation_map = load_mutations_from_files([map_file_1])
+    #print ('My expected output')
+    #for item in mutation_map:
+    #    print(item, mutation_map[item])
+
+    return mutation_map
+
 
 
 def print_majority_alelles(consensus_dict, arguments):
     nucleotides = ['A', 'C', 'G', 'T']
 
-    #TBD Change this maybe, not really a vcf output. Maybe simply to a fasta file?
+    # TBD Change this maybe, not really a vcf output. Maybe simply to a fasta file?
     with open(arguments.output + '/majority_variants.vcf', 'w') as file:
         # Print header lines for VCF format and describe the INFO field contents
         print("##fileformat=VCFv4.2", file=file)
@@ -249,7 +307,6 @@ def print_minor_variants(confirmed_mutation_dict, consensus_dict, output_path):
                 filter_status = "PASS"
                 info = f"DP={total_depth};MD={depth}"
 
-
                 # Printing the line with the INFO field included
                 print(f"{chrom}\t{pos}\t{allele}\t{ref}\t{alt}\t{qual}\t{filter_status}\t{info}", file=file)
 
@@ -289,7 +346,10 @@ def highest_scoring_hit(file_path):
 
     return highest_scoring_template
 
-def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict, bio_validation_dict):
+
+def co_occurrence_until_convergence(input_folder, confirmed_mutation_dict, consensus_dict,
+                                    bio_validation_dict, min_n, mrd, cor, new_output_folder,
+                                    iteration_increase, proxi, dp_window, pp, np, dp):
     """
     Executes an iterative process to identify co-occurring mutations in reads until convergence is achieved.
     The process adjusts the parameters for correlation and density penalty in each iteration and checks for
@@ -305,47 +365,40 @@ def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensu
     Returns:
         tuple: A tuple containing the updated dictionary of confirmed mutations, temporary co-occurrence data, and iteration count.
     """
+    #print('loading reads_mutation_dict...')
 
-    print('loading reads_mutation_dict...')
-
-    reads_mutation_dict = parse_sam_and_find_mutations(arguments.output + '/rmlst_alignment.sam',
+    reads_mutation_dict = parse_sam_and_find_mutations(input_folder + '/rmlst_alignment.sam',
                                                        confirmed_mutation_dict,
-                                                       consensus_dict,
-                                                       read_positions_blacklisted_dict)
-    #print (reads_mutation_dict['SRR27755678.258255 BACT000001_1153'])
-    print('reads_mutation_dict loaded')
+                                                       consensus_dict)
+    #print('reads_mutation_dict loaded')
 
     current_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
     iteration_count = 0
-    original_cor = arguments.cor
-    original_dp = arguments.dp
+    original_cor = cor
+    original_dp = dp
     start_time = time.time()
 
-
-    with open(arguments.output + '/convergence_results.txt', 'w') as convergence_file:
+    with open(new_output_folder + '/convergence_results.txt', 'w') as convergence_file:
         print('Interations,Mutations', file=convergence_file)
 
         while True:
             # Adjust the correlation and density penalty parameters for each iteration
-            arguments.cor += original_cor * arguments.iteration_increase # Increase of 20% per iteration
-            arguments.dp += original_dp * arguments.iteration_increase  # Increase of 20% per iteration
-
+            cor += original_cor * iteration_increase  # Increase of 20% per iteration
+            dp += original_dp * iteration_increase  # Increase of 20% per iteration
+            #HERE
             # Perform upper co-occurring mutations analysis
             confirmed_mutation_dict, co_occurrence_tmp_dict = upper_co_occuring_mutations_in_reads(
-                arguments,
-                confirmed_mutation_dict,
-                consensus_dict,
-                read_positions_blacklisted_dict,
-                bio_validation_dict,
-                reads_mutation_dict
+                confirmed_mutation_dict, consensus_dict,
+                bio_validation_dict, reads_mutation_dict, proxi, dp_window,
+                mrd, cor, pp, np, dp
             )
 
             new_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
             iteration_count += 1
-            print(f'Iteration: {iteration_count}', file=sys.stderr)
-            print(f'Mutations: {new_count}', file=sys.stderr)
+            #print(f'Iteration: {iteration_count}', file=sys.stderr)
+            #print(f'Mutations: {new_count}', file=sys.stderr)
             print(f'{iteration_count},{new_count}', file=convergence_file)
-            #for item in co_occurrence_tmp_dict:
+            # for item in co_occurrence_tmp_dict:
             #    print(f'{item},{co_occurrence_tmp_dict[item]}', file=sys.stderr)
 
             # Check for convergence: no change in mutation count
@@ -354,10 +407,10 @@ def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensu
             current_count = new_count
 
     end_time = time.time()
-    print(f'Time taken for all iterations: {end_time - start_time} seconds', file=sys.stderr)
+    #print(f'Time taken for all iterations: {end_time - start_time} seconds', file=sys.stderr)
+
 
     return confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count
-
 
 
 def count_mutations_in_mutations_dict(mutation_dict):
@@ -401,7 +454,6 @@ def bio_validation_mutations(consensus_dict, fsa_file):
         mutation_dict[gene] = mutation_set
 
     return mutation_dict
-
 
 
 def index_top_hits_db(output_directory):
@@ -452,6 +504,7 @@ def index_top_hits_db(output_directory):
     top_hits_db = os.path.join(output_directory, 'top_hits_db')
     os.system(f'kma index -i {fasta_file} -o {top_hits_db} 2>/dev/null')
 
+
 def adjust_consensus_dict_for_individual_qscores(consensus_dict, sam_file, fastq_file, q_score):
     """
     Adjusts the consensus dictionary based on individual quality scores derived from SAM and FASTQ files.
@@ -468,8 +521,9 @@ def adjust_consensus_dict_for_individual_qscores(consensus_dict, sam_file, fastq
     """
 
     # Blacklist low-quality positions based on quality scores from the FASTQ file
-    #black_listed_positions = blacklist_positions(fastq_file, quality_threshold=q_score)
-    black_listed_positions = blacklist_positions(fastq_file, quality_threshold=1) #Decided not to use quality threshold. Revisit another time. Invidivial positions are not being blacklisted due to their respective quality scores.
+    # black_listed_positions = blacklist_positions(fastq_file, quality_threshold=q_score)
+    black_listed_positions = blacklist_positions(fastq_file,
+                                                 quality_threshold=1)  # Decided not to use quality threshold. Revisit another time. Invidivial positions are not being blacklisted due to their respective quality scores.
 
     # Initialize the adjusted consensus dictionary
     adjusted_consensus_dict = {}
@@ -503,6 +557,7 @@ def adjust_consensus_dict_for_individual_qscores(consensus_dict, sam_file, fastq
 
     return adjusted_consensus_dict, black_listed_positions
 
+
 def mutation_to_index(mutation):
     """
     Converts a mutation character to its corresponding index.
@@ -516,7 +571,8 @@ def mutation_to_index(mutation):
     nucleotide_list = ['A', 'C', 'G', 'T', 'N', '-']
     return nucleotide_list.index(mutation)
 
-#Here
+
+# Here
 def blacklist_positions(fastq_file, quality_threshold):
     """
     Generates a dictionary of low-quality positions for each read in a FASTQ file.
@@ -533,14 +589,17 @@ def blacklist_positions(fastq_file, quality_threshold):
     # Parsing each read in the FASTQ file
     for record in SeqIO.parse(fastq_file, "fastq"):
         # Identifying positions with quality scores below the threshold
-        blacklist = [pos for pos, score in enumerate(record.letter_annotations["phred_quality"]) if score < quality_threshold]
+        blacklist = [pos for pos, score in enumerate(record.letter_annotations["phred_quality"]) if
+                     score < quality_threshold]
 
         # Adding identified positions to the blacklist dictionary
         blacklist_dict[record.id] = blacklist
 
     return blacklist_dict
 
-def format_output_for_plots(arguments, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict):
+
+
+def format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict, np):
     """
     Format and print the output of confirmed mutations with additional information.
 
@@ -552,9 +611,9 @@ def format_output_for_plots(arguments, confirmed_mutation_dict, consensus_dict, 
     Returns:
         None
     """
-    with open(arguments.output + '/minor_mutations.csv', 'w') as outfile:
+    with open(new_output_folder + '/minor_mutations.csv', 'w') as outfile:
         header = 'Gene,Position,MajorityBase,MutationBase,MutationDepth,TotalDepth,GeneLength,MutationComment,CoOccurrence'
-        print(header, file = outfile)
+        print(header, file=outfile)
 
         for allele in confirmed_mutation_dict:
             for mutation in zip(confirmed_mutation_dict[allele][0], confirmed_mutation_dict[allele][1]):
@@ -571,44 +630,14 @@ def format_output_for_plots(arguments, confirmed_mutation_dict, consensus_dict, 
                     co_occurrence = 'No'
 
                 if biological_existence:
-                    print('{},{},{},{},{},{},{},{},{}'.format(allele, position, majority_base, mutation_base, mutation_depth, total_depth, gene_length, 'Mutation seen in database', co_occurrence), file = outfile)
+                    print('{},{},{},{},{},{},{},{},{}'.format(allele, position, majority_base, mutation_base,
+                                                              mutation_depth, total_depth, gene_length,
+                                                              'Mutation seen in database', co_occurrence), file=outfile)
                 else:
-                    print('{},{},{},{},{},{},{},{},{}'.format(allele, position, majority_base, mutation_base, mutation_depth, total_depth, gene_length, 'Novel mutation', co_occurrence), file = outfile)
+                    print('{},{},{},{},{},{},{},{},{}'.format(allele, position, majority_base, mutation_base,
+                                                              mutation_depth, total_depth, gene_length,
+                                                              'Novel mutation', co_occurrence), file=outfile)
 
-def format_output(arguments, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict):
-    """
-    Format and print the output of confirmed mutations with additional information.
-
-    Args:
-        confirmed_mutation_dict (dict): A dictionary containing confirmed mutations for alleles.
-        consensus_dict (dict): A dictionary containing consensus information for alleles.
-        bio_validation_dict (dict): A dictionary containing biological validation data for genes.
-
-    Returns:
-        None
-    """
-    with open(arguments.output + '/minor_mutations.csv', 'w') as outfile:
-        header = 'Gene,Position,MajorityBase,MutationBase,MutationDepth,TotalDepth,GeneLength,MutationComment,CoOccurrence'
-        print(header, file = outfile)
-
-        for allele in confirmed_mutation_dict:
-            for mutation in zip(confirmed_mutation_dict[allele][0], confirmed_mutation_dict[allele][1]):
-                position = mutation[0].split('_')[0]
-                mutation_base = mutation[0].split('_')[1]
-                mutation_depth = mutation[1]
-                majority_base = consensus_dict[allele][1][int(position) - 1]
-                total_depth = sum(consensus_dict[allele][0][int(position) - 1])
-                biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation[0])
-                gene_length = len(consensus_dict[allele][1])
-                if mutation[0] in co_occurrence_tmp_dict[allele]:
-                    co_occurrence = 'Yes'
-                else:
-                    co_occurrence = 'No'
-
-                if biological_existence:
-                    print('{},{},{},{},{},{},{},{},{}'.format(allele, position, majority_base, mutation_base, mutation_depth, total_depth, gene_length, 'Mutation seen in database', co_occurrence), file = outfile)
-                else:
-                    print('{},{},{},{},{},{},{},{},{}'.format(allele, position, majority_base, mutation_base, mutation_depth, total_depth, gene_length, 'Novel mutation', co_occurrence), file = outfile)
 
 def extract_mapped_rmlst_read(output_directory, nanopore_fastq):
     """
@@ -636,15 +665,15 @@ def extract_mapped_rmlst_read(output_directory, nanopore_fastq):
         for item in read_set:
             f.write(item + '\n')
 
-    print ('Number of reads extracted: ', len(read_set))
-    print ('Total number of alignments in sam file: ', total)
+    print('Number of reads extracted: ', len(read_set))
+    print('Total number of alignments in sam file: ', total)
 
     # Use seqtk to extract the corresponding reads from the nanopore FASTQ file
     os.system('seqtk subseq {} {} > {}'.format(nanopore_fastq, output_directory + '/rmlst_reads.txt',
                                                output_directory + '/trimmed_rmlst_reads.fastq'))
 
 
-def derive_mutation_positions(consensus_dict, arguments):
+def derive_mutation_positions(consensus_dict, min_n, mrd, cor):
     """
     Derive mutation positions and their depths from a consensus dictionary.
 
@@ -668,13 +697,14 @@ def derive_mutation_positions(consensus_dict, arguments):
 
             for t in range(len(positions)):
                 if t != index_of_max:
-                    if positions[t] >= arguments.min_n:
+                    if positions[t] >= min_n:
                         total_depth = sum(positions)
                         relative_depth = positions[t] / total_depth
 
-                        if relative_depth >= arguments.mrd - (arguments.mrd * arguments.cor):
+                        if relative_depth >= - (mrd * cor):
                             # Only consider mutations with minimum depth >= 2
-                            if nucleotide_index[t] != 'N' and nucleotide_index[t] != '-': #We don't consider there SNVs
+                            if nucleotide_index[t] != 'N' and nucleotide_index[
+                                t] != '-':  # We don't consider there SNVs
                                 all_confirmed_mutation_dict[allele][0].append(
                                     '{}_{}'.format(i + 1, nucleotide_index[t]))
                                 all_confirmed_mutation_dict[allele][1].append(positions[t])
@@ -682,9 +712,9 @@ def derive_mutation_positions(consensus_dict, arguments):
     return all_confirmed_mutation_dict
 
 
-
-def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, consensus_dict,
-                                         read_positions_blacklisted_dict, bio_validation_dict, reads_mutation_dict):
+def upper_co_occuring_mutations_in_reads(confirmed_mutation_dict, consensus_dict,
+                                         bio_validation_dict, reads_mutation_dict, proxi, dp_window,
+                                         mrd, cor, pp, np, dp):
     """
     Filter and adjust confirmed mutations based on co-occurrence, depth, and biological validation.
 
@@ -711,7 +741,7 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                 if read_allele == allele:
                     read_mutations = reads_mutation_dict[read]
                     valid_mutations = [mutation for mutation in read_mutations if mutation in mutation_list]
-                    #if allele == 'BACT000001_1153':
+                    # if allele == 'BACT000001_1153':
                     #    if 'SRR27755678.258255' in read:
                     #        print (read)
                     #        print (valid_mutations)
@@ -725,7 +755,7 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                                 co_occurrence_matrix[mutation1][mutation2] += 1
                                 co_occurrence_matrix[mutation2][mutation1] += 1
             co_occurrence_matrix_dict[allele] = [co_occurrence_matrix, mutation_list]
-            #if allele == 'BACT000001_1153':
+            # if allele == 'BACT000001_1153':
             #    print (allele)
             #    for i in range(len(co_occurrence_matrix)):
             #        print (mutation_list[i], co_occurrence_matrix[i])
@@ -743,15 +773,16 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                 position = int(mutation.split('_')[0])
                 position_depth = sum(consensus_dict[allele][0][position - 1])
                 mutation_depth = depth_list[i]
-                proxi_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation, arguments.proxi)
-                density_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation, arguments.dp_window)
+                proxi_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation, proxi)
+                density_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation,
+                                                                               dp_window)
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
 
-                #TBD LOOK INTO THIS
-                mutation_threshold = position_depth * arguments.mrd
+                mutation_threshold = position_depth * mrd
                 co_occurrence_list = check_mutation_co_occurrence(row, mutation_list, mutation,
-                                                                 position_depth, arguments.cor, arguments.pp, arguments.mrd, proxi_mutations, mutation_depth)
-                #if allele == 'BACT000001_1153':
+                                                                  position_depth, cor, pp,
+                                                                  mrd, proxi_mutations, mutation_depth)
+                # if allele == 'BACT000001_1153':
                 #    print (mutation, co_occurrence_list)
                 #    print (mutation_threshold, mutation_depth)
                 if co_occurrence_list != []:
@@ -760,14 +791,15 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                     for item in co_occurrence_list:
                         if item not in co_occurrence_tmp_dict[allele]:
                             co_occurrence_tmp_dict[allele].append(item)
-                    mutation_threshold = mutation_threshold - position_depth * arguments.mrd * arguments.cor
+                    mutation_threshold = mutation_threshold - position_depth * mrd * cor
 
                 if not biological_existence:
-                    mutation_threshold = mutation_threshold + arguments.np * position_depth * arguments.mrd
+                    mutation_threshold = mutation_threshold + np * position_depth * mrd
                 if proxi_mutations != []:
-                    mutation_threshold = mutation_threshold + arguments.pp * position_depth * arguments.mrd
+                    mutation_threshold = mutation_threshold + pp * position_depth * mrd
                 if density_mutations != []:
-                    mutation_threshold = mutation_threshold + arguments.dp * position_depth * arguments.mrd * len(density_mutations)
+                    mutation_threshold = mutation_threshold + dp * position_depth * mrd * len(
+                        density_mutations)
                 if mutation_depth >= mutation_threshold:
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][i])
                     adjusted_mutation_dict[allele][1].append(confirmed_mutation_dict[allele][1][i])
@@ -779,11 +811,11 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                 mutation = confirmed_mutation_dict[allele][0][0]
                 position = int(mutation.split('_')[0])
                 position_depth = sum(consensus_dict[allele][0][position - 1])
-                mutation_threshold = position_depth * arguments.mrd
+                mutation_threshold = position_depth * mrd
                 depth = confirmed_mutation_dict[allele][1][0]
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
                 if not biological_existence:
-                    mutation_threshold = mutation_threshold + (arguments.np-1) * position_depth * arguments.mrd
+                    mutation_threshold = mutation_threshold + (np - 1) * position_depth * mrd
 
                 if depth >= mutation_threshold:
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][0])
@@ -791,9 +823,9 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
     return adjusted_mutation_dict, co_occurrence_tmp_dict
 
 
-
 def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, mutation,
-                                 position_depth, correlation_coefficient, proximity_penalty, mrd, proximity_mutations, mutation_depth):
+                                 position_depth, correlation_coefficient, proximity_penalty, mrd, proximity_mutations,
+                                 mutation_depth):
     """
     Check for co-occurrence of a mutation with other mutations in a list.
 
@@ -814,7 +846,7 @@ def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, 
         # Should never happen
         return []  # No co-occurrence and not in proximity
 
-    co_threshold = mutation_depth * (1/2)
+    co_threshold = mutation_depth * (2 / 3)
     if co_threshold < 3:
         co_threshold = 3
 
@@ -832,6 +864,7 @@ def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, 
             co_occurrence_list.append(mutation_list[i])
 
     return co_occurrence_list
+
 
 def check_single_mutation_existence(bio_validation_dict, allele, specific_mutation):
     """
@@ -851,6 +884,7 @@ def check_single_mutation_existence(bio_validation_dict, allele, specific_mutati
         return True
 
     return False
+
 
 def find_mutations_proximity_specific_mutation(mutations, specific_mutation, proximity):
     """
@@ -877,6 +911,7 @@ def find_mutations_proximity_specific_mutation(mutations, specific_mutation, pro
                 proximity_mutations.append(mutation)
 
     return proximity_mutations
+
 
 def derive_correct_length_headers(consensus_dict, fsa_file):
     """
@@ -918,6 +953,7 @@ def derive_correct_length_headers(consensus_dict, fsa_file):
                 correct_length_dict[gene][1].append(sequence)
 
     return correct_length_dict
+
 
 def produce_specie_specific_kma_db(specie, fsa_file, scheme_file, output_directory):
     """
@@ -980,7 +1016,8 @@ def produce_specie_fsa_file(fsa_file, gene_set, output_directory):
                 if write_sequence:
                     outfile.write(line)
 
-#Here
+
+# Here
 def build_consensus_dict(res_file, mat_file):
     """
     Build a consensus dictionary from result and matrix files.
@@ -1028,7 +1065,6 @@ def build_consensus_dict(res_file, mat_file):
     return consensus_dict
 
 
-
 def number_of_bases_in_file(filename):
     """
     Calculate the total number of bases in a FASTA or FASTQ file.
@@ -1061,6 +1097,7 @@ def number_of_bases_in_file(filename):
                     line_count = 1
         return total_bases
 
+
 def eval_bacteria_results(results, total_bacteria_aligning_bases):
     """
     Evaluate bacterial alignment results to determine primary and candidate results.
@@ -1090,8 +1127,6 @@ def eval_bacteria_results(results, total_bacteria_aligning_bases):
             candidate_dict[item['#Template']] = [relative_template_depth, int(item['Template_length'])]
 
     return primary, candidate_dict
-
-
 
 
 def determine_file_type(file):
@@ -1165,3 +1200,146 @@ def set_up_output_and_check_input(arguments):
         if not os.path.isfile(arguments.nanopore):
             print('Input file does not exist')
             sys.exit()
+
+
+def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd, parameters):
+    name = results_folder.split('/')[-1]
+    new_output_folder = new_output_folder + '/' + name
+    os.makedirs(new_output_folder, exist_ok=True)
+    # Fixed parameters
+    #mrd = 0.05
+    min_n = 3
+    proxi = 5
+    dp_window = 15
+
+    #First grid search
+    cor_interval = parameters['cor_interval']
+    iteration_increase_interval = parameters['iteration_increase_interval']
+    pp_interval = parameters['pp_interval']
+    np_interval = parameters['np_interval']
+    dp_interval = parameters['dp_interval']
+
+    # Best score initialization
+    best_score = 0
+    best_params = None
+    top_precision = None
+    top_recall = None
+
+    # Create all combinations of parameters
+    all_params = list(product(cor_interval, iteration_increase_interval, pp_interval, np_interval, dp_interval))
+    total_combinations = len(all_params)
+    print(f"Total number of parameter combinations: {total_combinations}")
+
+    results_filename = new_output_folder + "/all_results.csv"
+    top_result_filename = new_output_folder + "/top_result.csv"
+
+    all_results = []
+
+    processed_combinations = 0
+
+    with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
+        # Create a future for each parameter combination
+        futures_to_params = {
+            executor.submit(
+                random_sampling, mrd, results_folder, min_n,
+                combo[0], new_output_folder, combo[1], proxi, dp_window,
+                combo[2], combo[3], combo[4]
+            ): combo for combo in all_params
+        }
+
+        # Process completed futures
+        for future in concurrent.futures.as_completed(futures_to_params):
+            params = futures_to_params[future]
+            processed_combinations += 1
+            #if processed_combinations % 1 == 0:
+            print(f"Processed {processed_combinations}/{total_combinations} combinations.")
+            try:
+                f1, parameter_string, precision, recall = future.result()
+
+                # Write each result to the CSV
+                all_results.append([f1, parameter_string, precision, recall])
+
+                if f1 > best_score:
+                    best_score = f1
+                    best_params = parameter_string
+                    top_precision = precision
+                    top_recall = recall
+            except Exception as exc:
+                print(f"Generated an exception: {exc}")
+
+    with open(results_filename, 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall'])
+        writer.writerows(all_results)
+
+    # Write the top result to its own CSV
+    with open(top_result_filename, 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall'])
+        writer.writerow([best_score, best_params, top_precision, top_recall])
+
+def calculate_parameter_value(spline, mrd):
+    """ Calculate the parameter value for a given mrd using the spline. """
+    value = spline(mrd)
+    # Ensure that the value is non-negative
+    return max(value, 0)
+
+def load_parameters(mrd_value):
+    parameters_dir = os.path.join('/home/people/malhal/NanoMGT/nanomgt', 'parameter_functions')
+
+    # Names of the parameters and their corresponding JSON files
+    parameters = {
+        'cor': 'cor_spline_fits.json',
+        'iteration': 'iteration_spline_fits.json',
+        'pp': 'pp_spline_fits.json',
+        'np': 'np_spline_fits.json',
+        'dp': 'dp_spline_fits.json'
+    }
+
+    splines = {}
+
+    # Load splines from JSON files
+    for param, filename in parameters.items():
+        full_path = os.path.join(parameters_dir, filename)
+        splines[param] = load_spline_from_json(full_path)
+
+    # Calculate and print the parameters values for the given MRD
+    results = {}
+    for param, spline in splines.items():
+        value = calculate_parameter_value(spline, mrd_value)
+        results[param] = value
+
+    return results['cor'], results['iteration'], results['pp'], results['np'], results['dp']
+
+def load_spline_from_json(filename):
+    """ Load spline data from JSON file and recreate the spline object. """
+    with open(filename, 'r') as file:
+        data = json.load(file)
+    # Convert keys back to floats and sort by keys
+    x_values = np.array(sorted(map(float, data.keys())))
+    y_values = np.array([data[str(x)] for x in x_values])
+    spline = UnivariateSpline(x_values, y_values, s=None)
+    return spline
+
+
+mrd_list = [1, 2, 3, 4, 5]
+
+for mrd in mrd_list:
+    auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp = load_parameters(mrd/100)
+    parameters = {
+        'cor_interval': [auto_cor],
+        'iteration_increase_interval': [auto_iteration_increase],
+        'pp_interval': [auto_pp],
+        'np_interval': [auto_np],
+        'dp_interval': [auto_dp]
+    }
+
+
+    #DP IS NOT LOADING CORRECTLY
+
+    new_output_folder = '/home/people/malhal/test/new_nanomgt_results/final_nanomgt_performance_output_{}/'.format(mrd)
+    os.makedirs(new_output_folder, exist_ok=True)
+    file_list = os.listdir('/home/people/malhal/test/new_nanomgt_results/')
+    for folder in file_list:
+        if folder.endswith('merged'):
+            run_jobs_in_parallel(1, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, mrd/100, parameters)
