@@ -11,7 +11,7 @@ def construct_command(file_path, output_dir):
 
     # Type co-occurencing noise at default setting for 0.03 mrd
     command = f"~/NanoMGT/bin/nanomgt --nanopore {file_path} --o {output_dir}/{output_name} --threads 8 --db_dir ~/nanomgt_db/" \
-             f" --mrd 0.03"
+             f" --mrd 0.05"
     return command
 
 def main():

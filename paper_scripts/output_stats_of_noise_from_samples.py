@@ -30,6 +30,9 @@ def calculate_proximity_density(mutations):
     total_density = sum(density(mut) for mut in mutations)
     return total_density, len(mutations)
 
+def count_co_occurring_mutations(df):
+    return df[df['CoOccurrence'] == 'Yes'].shape[0]
+
 def analyze_mutations(folder_path):
     results = {}
     for root, dirs, files in os.walk(folder_path):
@@ -41,6 +44,7 @@ def analyze_mutations(folder_path):
                 total_mutations = len(df)
                 proximity_mutations, proxi_mutations_set = count_proximity_mutations(df)
                 novel_mutations = df[df['MutationComment'].str.contains('Novel mutation', na=False)].shape[0]
+                co_occurrences = count_co_occurring_mutations(df)
                 if proxi_mutations_set:
                     total_proximity_density, _ = calculate_proximity_density(proxi_mutations_set)
                     average_proximity_density = total_proximity_density / proximity_mutations if proximity_mutations > 0 else 0
@@ -50,12 +54,13 @@ def analyze_mutations(folder_path):
                     'Total Mutations': total_mutations,
                     'Proximity Mutations': proximity_mutations,
                     'Novel Mutations': novel_mutations,
+                    'Co-Occurring Mutations': co_occurrences,
                     'Average Proximity Density': average_proximity_density
                 }
     return results
 
 # Path to the main directory containing the subfolders
-folder_path = '/home/people/malhal/data/new_nanomgt/majority_variants'
+folder_path = '/home/people/malhal/data/new_nanomgt/co_noise'
 mutation_stats = analyze_mutations(folder_path)
 for sample, stats in mutation_stats.items():
     print(f"Sample: {sample}")

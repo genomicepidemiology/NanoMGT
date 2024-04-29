@@ -148,7 +148,8 @@ def main(results_folder):
     df = pd.DataFrame(all_results)
     grouped = df.groupby(['tool', 'specie', 'mrd', 'depth', 'batch'])
     mean_df = grouped[['precision', 'recall', 'f1score']].mean().reset_index()
-    mean_df.to_csv('output.csv', index=False)
+    mean_df.to_csv('confindr_final_results.csv', index=False)
+
 if __name__ == "__main__":
     results_folder_path = "/home/people/malhal/data/new_nanomgt/confindr_results"
     main(results_folder_path)

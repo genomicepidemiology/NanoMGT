@@ -1333,5 +1333,6 @@ for mrd in mrd_list:
     file_list = os.listdir('/home/people/malhal/test/new_nanomgt_results/')
     for folder in file_list:
         if folder.endswith('merged'):
+            #For parameter search
             if 'klebsiella' not in folder and 'salmonella' not in folder and folder.startswith('depth220'):
                 run_jobs_in_parallel(40, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, mrd/100, parameters)

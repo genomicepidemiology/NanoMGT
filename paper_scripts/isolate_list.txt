@@ -16,7 +16,6 @@ SRR28399428	Salmonella enterica >1000x depth
 SRR27136088	Salmonella enterica ~320x depth
 SRR27755678	Salmonella enterica ~400x depth
 
-
 SRR28370694	Staphylococcus aureus ~200x depth
 ERR8958843 Staphylococcus aureus >2000x depth
 
