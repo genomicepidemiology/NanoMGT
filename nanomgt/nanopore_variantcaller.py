@@ -92,7 +92,7 @@ def nanopore_metagenomics_variantcaller(arguments):
         print(item, confirmed_mutation_dict[item])
 
     print_minor_variants(confirmed_mutation_dict, consensus_dict, arguments.output)
-    # Format and output the results
+    ## Format and output the results
     format_output(arguments, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict)
 
     # Write majority sequences to file
