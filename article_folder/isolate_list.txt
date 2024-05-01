@@ -1,4 +1,3 @@
-Used for parameter exploration:
 
 SRR25689478 Escherichia coli ~580 depth
 SRR26036455 Escherichia coli ~220 depth
@@ -9,8 +8,6 @@ SRR27348733	Klebsiella pneumoniae ~290x depth
 
 SRR27638397 Campylobacter jejuni ~1800x depth
 SRR27710526	Campylobacter jejuni >2000x depth
-
-Additional testing species:
 
 SRR28399428	Salmonella enterica >1000x depth
 SRR27136088	Salmonella enterica ~320x depth

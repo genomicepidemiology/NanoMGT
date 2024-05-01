@@ -22,6 +22,7 @@ def map_reads(folders, reference_dir):
     for folder, fastq_file in folders:
         name = fastq_file.split('.fastq')[0]
         depth = int(name.split('_')[0][-3:])  # Assuming depth is part of the file name like 'depth220'
+        # Extract the sequencing ID
         parts = folder.split('_')
         seq_id = [part for part in parts if part.startswith('SRR') or part.startswith('ERR')][0]
         output_dir = os.path.join(os.getcwd(), f'{name}_output')
@@ -38,19 +39,18 @@ def map_reads(folders, reference_dir):
         # Indexing the BAM file
         subprocess.run(['samtools', 'index', bam_output], check=True)
 
-        # Assuming the conversion to Medaka compatible format is here
-        consensus_output = os.path.join(output_dir, f'{name}.hdf')  # Placeholder for the actual output file from a consensus caller
-        # Replace this with actual consensus calling command
-        # generate_consensus(bam_output, consensus_output)
+        # Generate consensus HDF file
+        consensus_hdf = os.path.join(output_dir, f"{name}_consensus.hdf")
+        medaka_consensus_cmd = f"medaka consensus {bam_output} {consensus_hdf}"
+        print(f"Running Medaka consensus...")
+        subprocess.run(medaka_consensus_cmd, shell=True, check=True)
+        print(f"Medaka consensus completed. Output: {consensus_hdf}")
 
-        # Running medaka variant
-        for mrd in mrd_values:
-            min_cov = math.ceil(depth * mrd)
-            vcf_output = os.path.join(output_dir, f'variants_mrd{int(mrd*100)}.vcf')
-            medaka_cmd = f"medaka variant {reference_path} {consensus_output} {vcf_output}"
-            print(f"Executing Medaka variant for consensus: {consensus_output}...")
-            subprocess.run(medaka_cmd, shell=True, check=True)
-            print(f"Medaka variant processing completed. VCF Output: {vcf_output}")
+        vcf_output = os.path.join(output_dir, f'variants.vcf')
+        medaka_variant_cmd = f"medaka variant {reference_path} {consensus_hdf} {vcf_output}"
+        print(f"Executing Medaka variant for HDF: {consensus_hdf}...")
+        subprocess.run(medaka_variant_cmd, shell=True, check=True)
+        print(f"Medaka variant completed. VCF Output: {vcf_output}")
 
 data_directory = '/home/people/malhal/data/new_nanomgt/confindr_data_dir'
 reference_directory = '/home/people/malhal/test/new_nanomgt_results/references'
