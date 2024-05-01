@@ -39,19 +39,19 @@ def main():
     parser.add_argument('--mrd', action="store", type=float, dest='mrd', default=0.03,
                         help='Minimum related depth (MRD) for validating single allele SNVs. Default: 0.03')
     parser.add_argument('--cor', action="store", type=str, dest='cor', default='auto',
-                        help='Co-occurrence reward. -= MRD * cor. Default: auto')
+                        help='Co-occurrence reward. -= MRD * cor. Value is based on the MRD value. Default: auto')
     parser.add_argument('--np', action="store", type=str, dest='np', default='auto',
-                        help='Novelty penalty. += MRD * np. Default: auto')
+                        help='Novelty penalty. += MRD * np. Value is based on the MRD value. Default: auto')
     parser.add_argument('--pp', action="store", type=str, dest='pp', default='auto',
-                        help='Proximity penalty. += MRD * pp. Default: auto')
+                        help='Proximity penalty. += MRD * pp. Value is based on the MRD value. Default: auto')
     parser.add_argument('--dp', action="store", type=str, dest='dp', default='auto',
-                        help='Density Penalty. += n_mutation_in_window * dp * MRD. Default: auto')
+                        help='Density Penalty. += n_mutation_in_window * dp * MRD. Value is based on the MRD value. Default: auto')
     parser.add_argument('--dp_window', action="store", type=float, dest='dp_window', default=15,
                         help='Density penalty window size. Default: 15')
     parser.add_argument('--proxi', action="store", type=int, dest='proxi', default=5,
                         help='Proximity between SNVs incurring a penalty. Default: 5')
     parser.add_argument('--ii', action="store", type=str, dest='iteration_increase', default='auto',
-                        help='Iteration increase. Default: auto')
+                        help='Iteration increase. Value is based on the MRD value. Default: auto')
     parser.add_argument('--q_score', action="store", type=int, dest='q_score', default=14,
                         help='Minimum average q-score for reads to be included. Default: 14')
     parser.add_argument('--majority_alleles_only', action="store_true", dest='majority_alleles_only',

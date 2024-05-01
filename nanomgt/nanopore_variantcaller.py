@@ -134,7 +134,7 @@ def initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp,
 
 def load_parameters(mrd_value):
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    parameters_dir = os.path.join(script_dir, 'parameter_functions')
+    parameters_dir = os.path.join(script_dir)
 
     # Names of the parameters and their corresponding JSON files
     parameters = {
