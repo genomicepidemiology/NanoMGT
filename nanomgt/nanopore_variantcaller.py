@@ -13,7 +13,7 @@ from scipy.interpolate import UnivariateSpline
 from nanomgt.nanopore_mutations import parse_sam_and_find_mutations
 from nanomgt.nanopore_mutations import extract_alignment
 from nanomgt.nanopore_mutations import create_mutation_vector
-import curve_functions as cf
+import nanomgt.curve_functions as cf
 
 def nanopore_metagenomics_variantcaller(arguments):
     """
