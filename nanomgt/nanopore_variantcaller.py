@@ -13,6 +13,7 @@ from scipy.interpolate import UnivariateSpline
 from nanomgt.nanopore_mutations import parse_sam_and_find_mutations
 from nanomgt.nanopore_mutations import extract_alignment
 from nanomgt.nanopore_mutations import create_mutation_vector
+import curve_functions as cf
 
 def nanopore_metagenomics_variantcaller(arguments):
     """
@@ -138,23 +139,16 @@ def load_parameters(mrd_value):
 
     # Names of the parameters and their corresponding JSON files
     parameters = {
-        'cor': 'cor_spline_fits.json',
-        'iteration': 'iteration_spline_fits.json',
-        'pp': 'pp_spline_fits.json',
-        'np': 'np_spline_fits.json',
-        'dp': 'dp_spline_fits.json'
+        'cor': cf.load_cor(),
+        'iteration': cf.load_ii(),
+        'pp': cf.load_pp(),
+        'np': cf.load_np(),
+        'dp': cf.load_dp()
     }
-
-    splines = {}
-
-    # Load splines from JSON files
-    for param, filename in parameters.items():
-        full_path = os.path.join(parameters_dir, filename)
-        splines[param] = load_spline_from_json(full_path)
 
     # Calculate and print the parameters values for the given MRD
     results = {}
-    for param, spline in splines.items():
+    for param, spline in parameters.items():
         value = calculate_parameter_value(spline, mrd_value)
         results[param] = value
 
