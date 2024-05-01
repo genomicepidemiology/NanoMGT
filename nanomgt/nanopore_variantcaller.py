@@ -24,7 +24,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     Args:
         arguments: Parsed command-line arguments containing parameters and file paths.
     """
-    # Set up output directory and verify input file
+    ## Set up output directory and verify input file
 
     auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp = load_parameters(arguments.mrd)
 
