@@ -5,6 +5,7 @@ def construct_command(file_path, output_dir):
     base_name = os.path.basename(file_path)
     output_name = base_name[:-6]  # Strip '.fastq' from the end
 
+    #Adjust these parameters
     # Construct the command with all parameters set to 0
     #command = f"~/NanoMGT/bin/nanomgt --nanopore {file_path} --o {output_dir}/{output_name} --threads 8 --db_dir ~/nanomgt_db/" \
     #          f" --mrd 0.03 --cor 0 --np 0 --dp 0 --ii 0 --pp 0"

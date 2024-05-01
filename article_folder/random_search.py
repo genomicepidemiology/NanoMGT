@@ -1326,6 +1326,8 @@ parameters_5 = {
 
 parameters_list.append(parameters_5)
 
+
+#Adjust the above parameters for grid search.
 for mrd in mrd_list:
     parameters = parameters_list[mrd-1]
     new_output_folder = '/home/people/malhal/test/new_nanomgt_results/ii_search_output_{}/'.format(mrd)
