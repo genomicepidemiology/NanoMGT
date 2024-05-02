@@ -24,7 +24,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     Args:
         arguments: Parsed command-line arguments containing parameters and file paths.
     """
-    ## Set up output directory and verify input file
+    # Set up output directory and verify input file
 
     auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp = load_parameters(arguments.mrd)
 
@@ -134,8 +134,6 @@ def initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp,
 
 
 def load_parameters(mrd_value):
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    parameters_dir = os.path.join(script_dir)
 
     # Names of the parameters and their corresponding JSON files
     parameters = {
@@ -146,18 +144,22 @@ def load_parameters(mrd_value):
         'dp': cf.load_dp()
     }
 
+    splines = {}
+
+    # Load splines from JSON files
+    for param, filename in parameters.items():
+        splines[param] = load_spline_from_json(parameters[param])
+
     # Calculate and print the parameters values for the given MRD
     results = {}
-    for param, spline in parameters.items():
+    for param, spline in splines.items():
         value = calculate_parameter_value(spline, mrd_value)
         results[param] = value
 
+
     return results['cor'], results['iteration'], results['pp'], results['np'], results['dp']
 
-def load_spline_from_json(filename):
-    """ Load spline data from JSON file and recreate the spline object. """
-    with open(filename, 'r') as file:
-        data = json.load(file)
+def load_spline_from_json(data):
     # Convert keys back to floats and sort by keys
     x_values = np.array(sorted(map(float, data.keys())))
     y_values = np.array([data[str(x)] for x in x_values])
