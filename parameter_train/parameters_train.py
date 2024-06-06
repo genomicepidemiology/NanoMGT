@@ -11,18 +11,40 @@ from Bio import SeqIO
 from itertools import combinations
 import concurrent.futures
 from itertools import product
+import argparse
 
 
 sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + sys.path
 
+# Placeholder train_parameters function
+def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
+                    iteration_increase, proxi, dp_window, pp, np, dp):
+    arguments = argparse.Namespace()
+    arguments.maf = maf
+    arguments.output = results_folder
+    arguments.min_n = min_n
+    arguments.cor = cor
+    arguments.new_output = new_output_folder
+    arguments.iteration_increase = iteration_increase
+    arguments.proxi = proxi
+    arguments.dp = dp
+    arguments.pp = pp
+    arguments.np = np
+    arguments.dp_window = dp_window
 
+    # For testing purposes, return some dummy values
+    f1 = 1
+    parameter_string = 'test'
+    precision = 1
+    recall = 1
+    tp = 1
+    fp = 1
+    fn = 1
 
-# Perhaps this path won't work, if not look into adjusting your path
-from nanomgt.nanopore_variantcaller import train_parameters
+    return f1, parameter_string, precision, recall, tp, fp, fn
 
 # List of folders to process
 # Modify this script with the correct path to the data
-#path = "/some/path/to/data/"
 path = '/home/people/malhal/test/training_data_set/'
 files = os.listdir(path)
 fastq_files = [f for f in os.listdir(path) if f.endswith('.fastq')]
@@ -31,14 +53,7 @@ fastq_files = [f for f in os.listdir(path) if f.endswith('.fastq')]
 # Use INT here, they will get divided by 100 later
 maf = 1
 
-#This represents a gridsearch of the parameters
-#dp = [0.1, 0.2, 0.3]
-#np = [0.1. 0.2, 0.3]
-#pp = [0.1, 0.2, 0.3]
-#ii = [0.1, 0.2, 0.3]
-#cor = [0.1, 0.2, 0.3]
-#For fine-tuning consider a wide range for 1-2 parameters, and then a narrow range for the other parameters to limit the search space
-#
+# This represents a gridsearch of the parameters
 cor = [0.1, 0.2, 0.3]
 dp = [0.1]
 np = [0.1]
@@ -54,9 +69,7 @@ parameters = {
 }
 
 cpus = cpu_count_mp = multiprocessing.cpu_count()
-cpus = int(cpus/2) #Use half capacity.
-
-
+cpus = int(cpus / 2)  # Use half capacity.
 
 def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, parameters):
     # Fixed parameters
@@ -64,7 +77,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
     proxi = 5
     dp_window = 15
 
-    #First grid search
+    # First grid search
     cor_interval = parameters['cor_interval']
     iteration_increase_interval = parameters['iteration_increase_interval']
     pp_interval = parameters['pp_interval']
@@ -106,10 +119,11 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
         for future in concurrent.futures.as_completed(futures_to_params):
             params = futures_to_params[future]
             processed_combinations += 1
-            #if processed_combinations % 1 == 0:
             print(f"Processed {processed_combinations}/{total_combinations} combinations.")
             try:
-                f1, parameter_string, precision, recall, tp, fp, fn = future.result()
+                result = future.result()
+                print(f"Result for parameters {params}: {result}")  # Debugging print
+                f1, parameter_string, precision, recall, tp, fp, fn = result
                 # Write each result to the CSV
                 all_results.append([f1, parameter_string, precision, recall, tp, fp, fn])
 
@@ -126,7 +140,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
     # Write all results to a CSV
 
-    print (all_results)
+    print("All results:", all_results)  # Debugging print
 
     with open(results_filename, 'w', newline='') as file:
         writer = csv.writer(file)
@@ -146,7 +160,7 @@ os.makedirs(output_training_folder, exist_ok=True)
 for file in fastq_files:
     # Get all 'merged.fastq' files in the folder
 
-    # Process each filex
+    # Process each file
     output_name = file[:-6]  # Removes the '.fastq' part from the file name for the output directory
     input_file_path = os.path.join(path, file)
 
@@ -156,4 +170,3 @@ for file in fastq_files:
     os.makedirs(new_output_folder, exist_ok=True)
 
     run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters)
-
