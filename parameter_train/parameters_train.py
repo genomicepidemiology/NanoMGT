@@ -78,13 +78,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
     format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
                   co_occurrence_tmp_dict)
 
-    print (arguments.output)
-    print (results_folder)
-
     sample = arguments.output.split('/')[-1]
-
-    print (sample)
-    print (sample)
 
     minor_mutation_expected = benchmark_analysis_result(sample)
 
@@ -107,6 +101,11 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
 
     return f1, parameter_string, precision, recall, tp, fp, fn
+
+
+def load_data(filepath):
+    # Added skipinitialspace=True to handle any initial spaces in column names
+    return pd.read_csv(filepath, skipinitialspace=True)
 
 def benchmark_analysis_result(sample):
     #batch = sample.split('_')[-2]
