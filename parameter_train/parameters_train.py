@@ -88,17 +88,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
     precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
 
-
-    precision = 1
-    recall = 1
-    f1 = 1
-    tp = 1
-    fp = 1
-    fn = 1
-
     parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
-
-
 
     return f1, parameter_string, precision, recall, tp, fp, fn
 
@@ -387,5 +377,5 @@ for file in fastq_files:
     new_output_folder = output_training_folder + '/' + output_name
     os.makedirs(new_output_folder, exist_ok=True)
 
-    #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters)
-    train_parameters(maf / 100, alignment_folder, 3, 0.1, new_output_folder, 1, 5, 0.1, 0.1, 0.1, 0.1)
+    run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters)
+    #train_parameters(maf / 100, alignment_folder, 3, 0.1, new_output_folder, 1, 5, 0.1, 0.1, 0.1, 0.1)
