@@ -324,7 +324,7 @@ for file in fastq_files:
 
     # This is folder in which the run_nanomgt_on_sample.py script produced folders with alignments.
     alignment_folder = '/home/people/malhal/test/training_test/{}/'.format(output_name)
-    new_output_folder = output_training_folder + '/' + output_name + '/'
+    new_output_folder = output_training_folder + '/' + output_name
     os.makedirs(new_output_folder, exist_ok=True)
 
     #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters)
