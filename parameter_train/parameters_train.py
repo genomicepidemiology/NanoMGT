@@ -78,7 +78,9 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
     format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
                   co_occurrence_tmp_dict)
 
-    sample = results_folder.split('/')[-1]
+    print (arguments.output)
+
+    sample = arguments.output.split('/')[-1]
 
     print (sample)
     print (sample)
