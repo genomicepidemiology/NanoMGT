@@ -145,9 +145,6 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
 
-    print (minor_mutation_expected)
-    print (minor_mutation_results)
-
     precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
 
     parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
@@ -308,6 +305,10 @@ def convert_mutation_dict_to_object(mutation_dict):
     return mutation_object
 
 def calculate_metrics(expected_mutations, actual_mutations):
+    """ Calculate precision, recall, and F1 score for the predicted mutations. """
+    print (expected_mutations)
+    print (actual_mutations)
+    sys.exit()
     # Initialize variables to calculate sum of metrics across all genes
     sum_precision, sum_recall, sum_f1 = 0, 0, 0
     genes_counted = 0
