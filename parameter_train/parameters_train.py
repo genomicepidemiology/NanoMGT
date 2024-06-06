@@ -8,8 +8,6 @@ import csv
 import multiprocessing
 
 from Bio import SeqIO
-from nanomgt import kma
-from nanomgt import util
 from itertools import combinations
 import concurrent.futures
 from itertools import product
