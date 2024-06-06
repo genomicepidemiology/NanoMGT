@@ -52,8 +52,6 @@ parameters = {
     'np_interval': np,
     'dp_interval': dp
 }
-output_training_folder = 'training_output_{}'.format(maf)
-os.makedirs(output_training_folder, exist_ok=True)
 
 cpus = cpu_count_mp = multiprocessing.cpu_count()
 cpus = int(cpus/2) #Use half capacity.
@@ -61,9 +59,6 @@ cpus = int(cpus/2) #Use half capacity.
 
 
 def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, parameters):
-    name = alignment_folder.split('/')[-1]
-    new_output_folder = new_output_folder + '/' + name
-    os.makedirs(new_output_folder, exist_ok=True)
     # Fixed parameters
     min_n = 3
     proxi = 5
@@ -143,6 +138,8 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
         writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN'])
         writer.writerow([best_score, best_params, top_precision, top_recall, top_tp, top_fp, top_fn])
 
+output_training_folder = 'training_output_{}'.format(maf)
+os.makedirs(output_training_folder, exist_ok=True)
 
 # Loop through each folder
 for file in fastq_files:
@@ -154,6 +151,7 @@ for file in fastq_files:
 
     # This is folder in which the run_nanomgt_on_sample.py script produced folders with alignments.
     alignment_folder = '/home/people/malhal/test/training_test/{}/'.format(output_name)
+    new_output_folder = output_training_folder + '/' + output_name + '/'
 
-    run_jobs_in_parallel(cpus, output_training_folder, alignment_folder, maf / 100, parameters)
+    run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters)
 
