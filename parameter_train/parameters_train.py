@@ -112,6 +112,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
                 print(f"Generated an exception: {exc}")
 
     # Write all results to a CSV
+    print (all_results)
 
     with open(results_filename, 'w', newline='') as file:
         writer = csv.writer(file)
