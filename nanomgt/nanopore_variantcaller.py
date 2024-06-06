@@ -147,6 +147,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
     precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
 
+    print (f1, precision, recall, tp, fp, fn)
     parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
 
 
