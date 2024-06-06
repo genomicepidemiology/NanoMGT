@@ -73,8 +73,6 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     print_majority_alelles(consensus_dict, arguments)
 
-    sys.exit()
-
     if arguments.majority_alleles_only: #End the program if only majority alleles are requested
         sys.exit()
 
@@ -107,11 +105,21 @@ def nanopore_metagenomics_variantcaller(arguments):
     sys.exit()
 
 
-def train_parameters(arguments):
-    if not os.path.exists(arguments.output):
-        print (f'Error: Output directory {arguments.output} does not exist. '
-               f'Make sure you have an output folder with the alignments from running NanoMGT. See info.txt for more details.')
-        sys.exit(f'Error: Output directory {arguments.output} does not exist.')
+def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
+                    iteration_increase, proxi, dp_window, pp, np, dp):
+
+    arguments = argparse.Namespace()
+    arguments.maf = maf
+    arguments.output = results_folder
+    arguments.min_n = min_n
+    arguments.cor = cor
+    arguments.new_output = new_output_folder
+    arguments.iteration_increase = iteration_increase
+    arguments.proxi = proxi
+    arguments.dp = dp
+    arguments.pp = pp
+    arguments.np = np
+    arguments.dp_window = dp_window
 
     # Build a consensus dictionary from alignment results
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
@@ -122,24 +130,18 @@ def train_parameters(arguments):
     # Perform biological validation of mutations
     bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
     # Co-occurrence analysis until convergence
-    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count = co_occurrence_until_convergence(results_folder,
-                                                                                                       confirmed_mutation_dict,
-                                                                                                       consensus_dict,
-                                                                                                       bio_validation_dict,
-                                                                                                       min_n, maf, cor,
-                                                                                                       new_output_folder,
-                                                                                                       iteration_increase,
-                                                                                                       proxi, dp_window,
-                                                                                                       pp, np, dp)
+    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count =\
+        co_occurrence_until_convergence(arguments, confirmed_mutation_dict,
+                                        consensus_dict, {}, bio_validation_dict)
 
     # Format and output the results
     format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
                   co_occurrence_tmp_dict, np)
 
     sample = results_folder.split('/')[-1]
+
     minor_mutation_expected = benchmark_analysis_result(sample, results_folder)
 
-    # minor_mutation_results = load_mutations(results_folder + '/minor_mutations.csv')
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
 
     precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
@@ -291,6 +293,45 @@ def print_minor_variants(confirmed_mutation_dict, consensus_dict, output_path):
 
                 # Printing the line with the INFO field included
                 print(f"{chrom}\t{pos}\t{allele}\t{ref}\t{alt}\t{qual}\t{filter_status}\t{info}", file=file)
+
+def convert_mutation_dict_to_object(mutation_dict):
+    mutation_object = {}
+    for allele in mutation_dict:
+        gene = allele.split('_')[0]
+        mutation_object[gene] = set()
+        for mutation in mutation_dict[allele][0]:
+            mutation_object[gene].add(mutation)
+    return mutation_object
+
+def calculate_metrics(expected_mutations, actual_mutations):
+    # Initialize variables to calculate sum of metrics across all genes
+    sum_precision, sum_recall, sum_f1 = 0, 0, 0
+    genes_counted = 0
+
+    total_tp = 0
+    total_fp = 0
+    total_fn = 0
+
+    # Iterate over expected mutations by gene to calculate metrics
+    for gene, expected_set in expected_mutations.items():
+        if gene in actual_mutations:
+            actual_set = actual_mutations[gene]
+            # True Positives (TP): Mutations correctly predicted
+            tp = len(expected_set & actual_set)
+            # False Positives (FP): Mutations incorrectly predicted (not in expected but in actual)
+            fp = len(actual_set - expected_set)
+            # False Negatives (FN): Mutations missed (in expected but not in actual)
+            fn = len(expected_set - actual_set)
+
+            total_tp += tp
+            total_fp += fp
+            total_fn += fn
+
+    precision = total_tp / (total_tp + total_fp) if (total_tp + total_fp) > 0 else 0
+    recall = total_tp / (total_tp + total_fn) if (total_tp + total_fn) > 0 else 0
+    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+
+    return precision, recall, f1, total_tp, total_fp, total_fn
 
 
 def highest_scoring_hit(file_path):
@@ -1186,6 +1227,50 @@ def sort_lines_by_score(filename):
     sorted_data = sorted(data, key=lambda x: int(x['Score']), reverse=True)
 
     return sorted_data
+
+def benchmark_analysis_result(sample, results_folder):
+    #batch = sample.split('_')[-2]
+    #print (sample)
+    batch_id = int(sample.split('_')[-2][5:])
+    #print (batch_id)
+    #print(f"Batch ID: {batch_id}")
+    specie = sample.split('_')[1:-5]
+    batch_csv = "_".join(sample.split('_')[1:-2]) + ".csv"
+    data = load_data('/home/people/malhal/data/new_nanomgt/simulated_batches/' + batch_csv)
+    # Change this batch_id to test different batches
+    # batch_id = 10
+    #print(f"Highest percentage ID for batch {batch_id}: {find_highest_percentage_id(batch_id, data)}")
+
+    top_id, minor = find_highest_percentage_id(batch_id, data)
+    # Use names and batch ID to get the correct mutation map
+    if 'salmonella_enterica' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        map_file_2 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[1])
+        mutation_map = load_mutations_from_files([map_file_1, map_file_2])
+    if 'ecoli' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        map_file_2 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[1])
+        mutation_map = load_mutations_from_files([map_file_1, map_file_2])
+    if 'staph_aureus' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        mutation_map = load_mutations_from_files([map_file_1])
+    if 'campylobacter_jejuni' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        mutation_map = load_mutations_from_files([map_file_1])
+    #print ('My expected output')
+    #for item in mutation_map:
+    #    print(item, mutation_map[item])
+
+    return mutation_map
+
+
+
 
 
 def set_up_output_and_check_input(arguments):

@@ -56,18 +56,13 @@ def main():
                         help='Minimum average q-score for reads to be included. Default: 14')
     parser.add_argument('--majority_alleles_only', action="store_true", dest='majority_alleles_only',
                         help='Only output majority alleles.')
-    parser.add_argument('--train', action="store_true", dest='train',
-                        help='Train parameters.')
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
 
     # Parsing command-line arguments
     args = parser.parse_args()
 
     # Executing the decontaminate function with parsed arguments
-    if args.train:
-        nanopore_variantcaller.train_parameters(args)
-    else:
-        nanopore_variantcaller.nanopore_metagenomics_variantcaller(args)
+    nanopore_variantcaller.nanopore_metagenomics_variantcaller(args)
 
 if __name__ == '__main__':
     main()
