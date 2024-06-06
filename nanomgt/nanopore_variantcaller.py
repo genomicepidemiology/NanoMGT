@@ -129,15 +129,15 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
     confirmed_mutation_dict = derive_mutation_positions(consensus_dict, arguments)
 
     # Perform biological validation of mutations
-    #bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
+    bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
     # Co-occurrence analysis until convergence
-    #confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count =\
-    #    co_occurrence_until_convergence(arguments, confirmed_mutation_dict,
-    #                                    consensus_dict, {}, bio_validation_dict)
+    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count =\
+        co_occurrence_until_convergence(arguments, confirmed_mutation_dict,
+                                        consensus_dict, {}, bio_validation_dict)
 
     # Format and output the results
-    #format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
-    #              co_occurrence_tmp_dict)
+    format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
+                  co_occurrence_tmp_dict)
 
     sample = results_folder.split('/')[-1]
 
@@ -149,13 +149,6 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
     parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
 
-    precision = 1
-    recall = 1
-    f1 = 1
-    tp = 1
-    fp = 1
-    fn = 1
-    parameter_string = 'test'
 
     return f1, parameter_string, precision, recall, tp, fp, fn
 def initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp):

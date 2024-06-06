@@ -122,7 +122,6 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
             print(f"Processed {processed_combinations}/{total_combinations} combinations.")
             try:
                 result = future.result()
-                print(f"Result for parameters {params}: {result}")  # Debugging print
                 f1, parameter_string, precision, recall, tp, fp, fn = result
                 # Write each result to the CSV
                 all_results.append([f1, parameter_string, precision, recall, tp, fp, fn])
@@ -139,8 +138,6 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
                 print(f"Generated an exception: {exc}")
 
     # Write all results to a CSV
-
-    print("All results:", all_results)  # Debugging print
 
     with open(results_filename, 'w', newline='') as file:
         writer = csv.writer(file)
