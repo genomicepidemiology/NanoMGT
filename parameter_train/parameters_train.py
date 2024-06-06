@@ -121,11 +121,13 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
                     best_params = parameter_string
                     top_precision = precision
                     top_recall = recall
+                    tp = tp
+                    fp = fp
+                    fn = fn
             except Exception as exc:
                 print(f"Generated an exception: {exc}")
 
     # Write all results to a CSV
-    print (f1, parameter_string, precision, recall, tp, fp, fn)
 
     with open(results_filename, 'w', newline='') as file:
         writer = csv.writer(file)
