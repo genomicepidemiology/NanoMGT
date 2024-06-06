@@ -80,6 +80,9 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
     sample = results_folder.split('/')[-1]
 
+    print (sample)
+    print (sample)
+
     minor_mutation_expected = benchmark_analysis_result(sample)
 
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
