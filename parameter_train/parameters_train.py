@@ -110,6 +110,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
             print(f"Processed {processed_combinations}/{total_combinations} combinations.")
             try:
                 f1, parameter_string, precision, recall, tp, fp, fn = future.result()
+                print (f1, parameter_string, precision, recall, tp, fp, fn)
 
                 # Write each result to the CSV
                 all_results.append([f1, parameter_string, precision, recall, tp, fp, fn])
