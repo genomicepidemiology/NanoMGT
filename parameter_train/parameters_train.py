@@ -121,9 +121,9 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
                     best_params = parameter_string
                     top_precision = precision
                     top_recall = recall
-                    tp = tp
-                    fp = fp
-                    fn = fn
+                    top_tp = tp
+                    top_fp = fp
+                    top_fn = fn
             except Exception as exc:
                 print(f"Generated an exception: {exc}")
 
@@ -138,7 +138,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
     with open(top_result_filename, 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN'])
-        writer.writerow([best_score, best_params, top_precision, top_recall, tp, fp, fn])
+        writer.writerow([best_score, best_params, top_precision, top_recall, top_tp, top_fp, top_fn])
 
 
 # Loop through each folder
