@@ -32,13 +32,18 @@ fastq_files = [f for f in os.listdir(path) if f.endswith('.fastq')]
 maf = 1
 
 #This represents a gridsearch of the parameters
+#dp = [0.1, 0.2, 0.3]
+#np = [0.1. 0.2, 0.3]
+#pp = [0.1, 0.2, 0.3]
+#ii = [0.1, 0.2, 0.3]
+#cor = [0.1, 0.2, 0.3]
 #For fine-tuning consider a wide range for 1-2 parameters, and then a narrow range for the other parameters to limit the search space
 #
 cor = [0.1, 0.2, 0.3]
-dp = [0.1, 0.2, 0.3]
-np = [0.1, 0.2, 0.3]
-pp = [0.1, 0.2, 0.3]
-ii = [0.1, 0.2, 0.3]
+dp = [0.1]
+np = [0.1]
+pp = [0.1]
+ii = [0.1]
 
 parameters = {
     'cor_interval': cor,
