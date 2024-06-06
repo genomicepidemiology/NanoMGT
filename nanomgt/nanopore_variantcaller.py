@@ -4,6 +4,7 @@ import gzip
 import time
 import json
 import numpy as np
+import argparse
 from Bio import SeqIO
 from nanomgt import kma
 from nanomgt import util
