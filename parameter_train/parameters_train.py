@@ -95,7 +95,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
     fp = 1
     fn = 1
 
-parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
+    parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
 
 
 
