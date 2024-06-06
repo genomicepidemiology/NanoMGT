@@ -76,7 +76,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
     # Format and output the results
     #nvc.format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
-                  co_occurrence_tmp_dict)
+    #              co_occurrence_tmp_dict)
 
     #sample = results_folder.split('/')[-1]
 
