@@ -126,7 +126,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
 
-    confirmed_mutation_dict = derive_mutation_positions(consensus_dict, min_n, maf, cor)
+    confirmed_mutation_dict = derive_mutation_positions(consensus_dict, arguments)
 
     # Perform biological validation of mutations
     bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
