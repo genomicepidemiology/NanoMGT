@@ -12,36 +12,10 @@ from itertools import combinations
 import concurrent.futures
 from itertools import product
 import argparse
+from nanomgt.nanopore_variantcaller import train_parameters
 
 
 sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + sys.path
-
-# Placeholder train_parameters function
-def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
-                    iteration_increase, proxi, dp_window, pp, np, dp):
-    arguments = argparse.Namespace()
-    arguments.maf = maf
-    arguments.output = results_folder
-    arguments.min_n = min_n
-    arguments.cor = cor
-    arguments.new_output = new_output_folder
-    arguments.iteration_increase = iteration_increase
-    arguments.proxi = proxi
-    arguments.dp = dp
-    arguments.pp = pp
-    arguments.np = np
-    arguments.dp_window = dp_window
-
-    # For testing purposes, return some dummy values
-    f1 = 1
-    parameter_string = 'test'
-    precision = 1
-    recall = 1
-    tp = 1
-    fp = 1
-    fn = 1
-
-    return f1, parameter_string, precision, recall, tp, fp, fn
 
 # List of folders to process
 # Modify this script with the correct path to the data
