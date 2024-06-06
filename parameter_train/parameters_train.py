@@ -72,7 +72,8 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
     confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count =\
         nvc.co_occurrence_until_convergence(arguments, confirmed_mutation_dict,
                                         consensus_dict, {}, bio_validation_dict)
-    print (len(confirmed_mutation_dict))
+
+    print (confirmed_mutation_dict)
 
     # Format and output the results
     #nvc.format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
