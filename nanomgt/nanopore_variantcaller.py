@@ -137,15 +137,16 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
     # Format and output the results
     format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
-                  co_occurrence_tmp_dict, np)
+                  co_occurrence_tmp_dict)
 
     sample = results_folder.split('/')[-1]
 
-    minor_mutation_expected = benchmark_analysis_result(sample, results_folder)
+    minor_mutation_expected = benchmark_analysis_result(sample)
 
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
 
     precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
+    print (f1, precision, recall, tp, fp, fn)
 
     parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
 
@@ -1229,7 +1230,7 @@ def sort_lines_by_score(filename):
 
     return sorted_data
 
-def benchmark_analysis_result(sample, results_folder):
+def benchmark_analysis_result(sample):
     #batch = sample.split('_')[-2]
     #print (sample)
     batch_id = int(sample.split('_')[-2][5:])
