@@ -15,7 +15,7 @@ import argparse
 
 sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + sys.path
 
-from nanomgt.nanopore_variantcaller import train_parameters
+from nanomgt import nanopore_variantcaller as nvc
 
 # List of folders to process
 # Modify this script with the correct path to the data
@@ -44,6 +44,52 @@ parameters = {
 
 cpus = cpu_count_mp = multiprocessing.cpu_count()
 cpus = int(cpus / 2)  # Use half capacity.
+
+def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
+                    iteration_increase, proxi, dp_window, pp, np, dp):
+    arguments = argparse.Namespace()
+    arguments.maf = maf
+    arguments.output = results_folder
+    arguments.min_n = min_n
+    arguments.cor = cor
+    arguments.new_output = new_output_folder
+    arguments.iteration_increase = iteration_increase
+    arguments.proxi = proxi
+    arguments.dp = dp
+    arguments.pp = pp
+    arguments.np = np
+    arguments.dp_window = dp_window
+
+    # Build a consensus dictionary from alignment results
+    consensus_dict = nvc.build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
+                                          os.path.join(arguments.output, 'rmlst_alignment.mat'))
+
+    confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, arguments)
+
+    # Perform biological validation of mutations
+    bio_validation_dict = nvc.bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
+    # Co-occurrence analysis until convergence
+    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count =\
+        nvc.co_occurrence_until_convergence(arguments, confirmed_mutation_dict,
+                                        consensus_dict, {}, bio_validation_dict)
+
+    # Format and output the results
+    nvc.format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
+                  co_occurrence_tmp_dict)
+
+    sample = results_folder.split('/')[-1]
+
+    minor_mutation_expected = nvc.benchmark_analysis_result(sample)
+
+    minor_mutation_results = nvc.convert_mutation_dict_to_object(confirmed_mutation_dict)
+
+    precision, recall, f1, tp, fp, fn = nvc.calculate_metrics(minor_mutation_expected, minor_mutation_results)
+
+    print (f"Precision: {precision}, Recall: {recall}, F1: {f1}, TP: {tp}, FP: {fp}, FN: {fn}")
+
+    parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
+
+    return f1, parameter_string, precision, recall, tp, fp, fn
 
 def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, parameters):
     # Fixed parameters

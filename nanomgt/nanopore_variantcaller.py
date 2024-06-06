@@ -105,53 +105,6 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     sys.exit()
 
-
-def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
-                    iteration_increase, proxi, dp_window, pp, np, dp):
-
-    arguments = argparse.Namespace()
-    arguments.maf = maf
-    arguments.output = results_folder
-    arguments.min_n = min_n
-    arguments.cor = cor
-    arguments.new_output = new_output_folder
-    arguments.iteration_increase = iteration_increase
-    arguments.proxi = proxi
-    arguments.dp = dp
-    arguments.pp = pp
-    arguments.np = np
-    arguments.dp_window = dp_window
-
-    # Build a consensus dictionary from alignment results
-    consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
-                                          os.path.join(arguments.output, 'rmlst_alignment.mat'))
-
-    confirmed_mutation_dict = derive_mutation_positions(consensus_dict, arguments)
-
-    # Perform biological validation of mutations
-    bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
-    # Co-occurrence analysis until convergence
-    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count =\
-        co_occurrence_until_convergence(arguments, confirmed_mutation_dict,
-                                        consensus_dict, {}, bio_validation_dict)
-
-    # Format and output the results
-    format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
-                  co_occurrence_tmp_dict)
-
-    sample = results_folder.split('/')[-1]
-
-    minor_mutation_expected = benchmark_analysis_result(sample)
-
-    minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
-
-    precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
-
-    print (f"Precision: {precision}, Recall: {recall}, F1: {f1}, TP: {tp}, FP: {fp}, FN: {fn}")
-
-    parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
-
-    return f1, parameter_string, precision, recall, tp, fp, fn
 def initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp):
     if arguments.cor == 'auto':
         arguments.cor = auto_cor
