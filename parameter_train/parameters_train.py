@@ -80,13 +80,13 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
     sample = results_folder.split('/')[-1]
 
-    minor_mutation_expected = nvc.benchmark_analysis_result(sample)
+    minor_mutation_expected = benchmark_analysis_result(sample)
 
-    minor_mutation_results = nvc.convert_mutation_dict_to_object(confirmed_mutation_dict)
+    minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
 
     print (len(minor_mutation_expected), len(minor_mutation_results))
 
-    precision, recall, f1, tp, fp, fn = nvc.calculate_metrics(minor_mutation_expected, minor_mutation_results)
+    precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
 
 
     precision = 1
@@ -101,6 +101,48 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
 
     return f1, parameter_string, precision, recall, tp, fp, fn
+
+def benchmark_analysis_result(sample):
+    #batch = sample.split('_')[-2]
+    #print (sample)
+    batch_id = int(sample.split('_')[-2][5:])
+    #print (batch_id)
+    #print(f"Batch ID: {batch_id}")
+    specie = sample.split('_')[1:-5]
+    batch_csv = "_".join(sample.split('_')[1:-2]) + ".csv"
+    data = load_data('/home/people/malhal/data/new_nanomgt/simulated_batches/' + batch_csv)
+    # Change this batch_id to test different batches
+    # batch_id = 10
+    #print(f"Highest percentage ID for batch {batch_id}: {find_highest_percentage_id(batch_id, data)}")
+
+    top_id, minor = find_highest_percentage_id(batch_id, data)
+    # Use names and batch ID to get the correct mutation map
+    if 'salmonella_enterica' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        map_file_2 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[1])
+        mutation_map = load_mutations_from_files([map_file_1, map_file_2])
+    if 'ecoli' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        map_file_2 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[1])
+        mutation_map = load_mutations_from_files([map_file_1, map_file_2])
+    if 'staph_aureus' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        mutation_map = load_mutations_from_files([map_file_1])
+    if 'campylobacter_jejuni' in sample:
+        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
+            top_id, minor[0])
+        mutation_map = load_mutations_from_files([map_file_1])
+    #print ('My expected output')
+    #for item in mutation_map:
+    #    print(item, mutation_map[item])
+
+    return mutation_map
+
 
 def format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict):
     """
@@ -140,6 +182,47 @@ def format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bi
                     print('{},{},{},{},{},{},{},{},{}'.format(allele, position, majority_base, mutation_base,
                                                               mutation_depth, total_depth, gene_length,
                                                               'Novel mutation', co_occurrence), file=outfile)
+
+
+def convert_mutation_dict_to_object(mutation_dict):
+    mutation_object = {}
+    for allele in mutation_dict:
+        gene = allele.split('_')[0]
+        mutation_object[gene] = set()
+        for mutation in mutation_dict[allele][0]:
+            mutation_object[gene].add(mutation)
+    return mutation_object
+
+def calculate_metrics(expected_mutations, actual_mutations):
+    """ Calculate precision, recall, and F1 score for the predicted mutations. """
+    # Initialize variables to calculate sum of metrics across all genes
+    sum_precision, sum_recall, sum_f1 = 0, 0, 0
+    genes_counted = 0
+
+    total_tp = 0
+    total_fp = 0
+    total_fn = 0
+
+    # Iterate over expected mutations by gene to calculate metrics
+    for gene, expected_set in expected_mutations.items():
+        if gene in actual_mutations:
+            actual_set = actual_mutations[gene]
+            # True Positives (TP): Mutations correctly predicted
+            tp = len(expected_set & actual_set)
+            # False Positives (FP): Mutations incorrectly predicted (not in expected but in actual)
+            fp = len(actual_set - expected_set)
+            # False Negatives (FN): Mutations missed (in expected but not in actual)
+            fn = len(expected_set - actual_set)
+
+            total_tp += tp
+            total_fp += fp
+            total_fn += fn
+
+    precision = total_tp / (total_tp + total_fp) if (total_tp + total_fp) > 0 else 0
+    recall = total_tp / (total_tp + total_fn) if (total_tp + total_fn) > 0 else 0
+    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+
+    return precision, recall, f1, total_tp, total_fp, total_fn
 
 
 def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, parameters):
