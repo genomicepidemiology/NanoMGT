@@ -12,10 +12,10 @@ from itertools import combinations
 import concurrent.futures
 from itertools import product
 import argparse
-from nanomgt.nanopore_variantcaller import train_parameters
-
 
 sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + sys.path
+
+from nanomgt.nanopore_variantcaller import train_parameters
 
 # List of folders to process
 # Modify this script with the correct path to the data
