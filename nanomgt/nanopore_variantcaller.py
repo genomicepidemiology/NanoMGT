@@ -144,21 +144,11 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
     minor_mutation_expected = benchmark_analysis_result(sample)
 
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
-    print (minor_mutation_results)
-    print (minor_mutation_expected)
 
-    #precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
+    precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
 
-    #parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
+    parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
 
-    f1 = 0
-    precision = 0
-    recall = 0
-    tp = 0
-    fp = 0
-    fn = 0
-
-    parameter_string = 'test'
 
     return f1, parameter_string, precision, recall, tp, fp, fn
 def initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp):

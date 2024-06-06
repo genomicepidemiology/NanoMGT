@@ -81,6 +81,9 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
     best_params = None
     top_precision = None
     top_recall = None
+    top_tp = None
+    top_fp = None
+    top_fn = None
 
     # Create all combinations of parameters
     all_params = list(product(cor_interval, iteration_increase_interval, pp_interval, np_interval, dp_interval))
