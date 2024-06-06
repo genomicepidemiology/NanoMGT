@@ -124,7 +124,7 @@ def format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bi
                 mutation_depth = mutation[1]
                 majority_base = consensus_dict[allele][1][int(position) - 1]
                 total_depth = sum(consensus_dict[allele][0][int(position) - 1])
-                biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation[0])
+                biological_existence = nvc.check_single_mutation_existence(bio_validation_dict, allele, mutation[0])
                 gene_length = len(consensus_dict[allele][1])
                 if mutation[0] in co_occurrence_tmp_dict[allele]:
                     co_occurrence = 'Yes'
