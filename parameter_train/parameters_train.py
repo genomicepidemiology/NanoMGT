@@ -107,6 +107,42 @@ def load_data(filepath):
     # Added skipinitialspace=True to handle any initial spaces in column names
     return pd.read_csv(filepath, skipinitialspace=True)
 
+def find_highest_percentage_id(batch_id, df):
+    # Filter the DataFrame for the given batch ID
+    batch_data = df[df['Batch'] == batch_id]
+    if batch_data.empty:
+        return "Batch ID not found."
+    # Iterate over the rows and find the ID with the highest percentage
+    highest_percentage = 0
+    highest_percentage_id = ''
+    all = []
+    for index, row in batch_data.iterrows():
+        if 'Percentage3' in df.columns:
+            for i in range(1, 4):
+                # Extracting percentage value correctly after handling potential space issue
+                percentage = int(row[f'Percentage{i}'][:-1])  # Remove the '%' and convert to int
+                if percentage > highest_percentage:
+                    highest_percentage = percentage
+                    highest_percentage_id = row[f'ID{i}']
+                all.append((row[f'ID{i}']))
+        else:
+            for i in range(1, 3):
+                # Extracting percentage value correctly after handling potential space issue
+                percentage = int(row[f'Percentage{i}'][:-1])  # Remove the '%' and convert to int
+                if percentage > highest_percentage:
+                    highest_percentage = percentage
+                    highest_percentage_id = row[f'ID{i}']
+                all.append((row[f'ID{i}']))
+
+    minor = []
+
+    for item in all:
+        if item != highest_percentage_id:
+            minor.append(item)
+
+    return highest_percentage_id, minor
+
+
 def benchmark_analysis_result(sample):
     #batch = sample.split('_')[-2]
     #print (sample)
