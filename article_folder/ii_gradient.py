@@ -4,10 +4,10 @@ from scipy.interpolate import UnivariateSpline
 
 def process_data(csv_file):
     data = pd.read_csv(csv_file)
-    grouped = data.groupby(['mrd', 'batch'])
+    grouped = data.groupby(['maf', 'batch'])
     results = []
 
-    for (mrd, batch), group in grouped:
+    for (maf, batch), group in grouped:
         ii_values = group['ii'].values
         f1_scores = group['average_f1'].values
 
@@ -34,7 +34,7 @@ def process_data(csv_file):
                 valid_ii_value = ii_values.min() + ii_dense_normalized[idx] * (ii_values.max() - ii_values.min())
                 valid_ii_values.append(valid_ii_value)
 
-        results.append((mrd, batch, valid_ii_values))
+        results.append((maf, batch, valid_ii_values))
 
     return results
 
@@ -42,11 +42,11 @@ def main():
     csv_file = 'ii_f1_scores.csv'  # Ensure the CSV file is correctly named
     results = process_data(csv_file)
     for result in results:
-        mrd, batch, peak_values = result
+        maf, batch, peak_values = result
         if peak_values:
-            print(f"Batch {batch} for MRD {mrd:.2f} has valid ii values at slopes of 30 degrees: {peak_values}")
+            print(f"Batch {batch} for MAF {maf:.2f} has valid ii values at slopes of 30 degrees: {peak_values}")
         else:
-            print(f"No valid ii values found for MRD {mrd:.2f}, Batch {batch}")
+            print(f"No valid ii values found for MAF {maf:.2f}, Batch {batch}")
 
 if __name__ == "__main__":
     main()

@@ -101,11 +101,11 @@ def main(results_folder):
     all_results = []
 
     for bf_folder in bf_folders:
-        mrd_path = os.path.join(results_folder, bf_folder)
-        experiments = os.listdir(mrd_path)
+        maf_path = os.path.join(results_folder, bf_folder)
+        experiments = os.listdir(maf_path)
 
         for experiment in experiments:
-            exp_path = os.path.join(mrd_path, experiment)
+            exp_path = os.path.join(maf_path, experiment)
             depth = experiment.split('_')[0].replace('depth', '')  # Extract depth from experiment name
             species = experiment.split('_')[1]
             batch = int(experiment.split('batch')[-1].split('_')[0])
@@ -135,7 +135,7 @@ def main(results_folder):
             all_results.append({
                 'tool': 'Confindr',
                 'specie': species,
-                'mrd': bf_folder.split('_')[1],
+                'maf': bf_folder.split('_')[1],
                 'depth': depth,
                 'batch': batch,
                 'precision': precision,
@@ -146,7 +146,7 @@ def main(results_folder):
             print(f"Completed processing for {experiment}. Metrics: Precision={precision}, Recall={recall}, F1 Score={f1}")
 
     df = pd.DataFrame(all_results)
-    grouped = df.groupby(['tool', 'specie', 'mrd', 'depth', 'batch'])
+    grouped = df.groupby(['tool', 'specie', 'maf', 'depth', 'batch'])
     mean_df = grouped[['precision', 'recall', 'f1score']].mean().reset_index()
     mean_df.to_csv('confindr_final_results.csv', index=False)
 

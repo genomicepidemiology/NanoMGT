@@ -4,8 +4,8 @@ import re
 
 
 def read_and_aggregate_results(base_directory):
-    # Define regex to extract 'mrd', 'pp', and batch number from the folder name and Parameters
-    param_regex = re.compile(r"mrd_(\d+\.\d+)_.*?pp_(\d+\.\d+)_")
+    # Define regex to extract 'maf', 'pp', and batch number from the folder name and Parameters
+    param_regex = re.compile(r"maf_(\d+\.\d+)_.*?pp_(\d+\.\d+)_")
     batch_regex = re.compile(r"batch(\d+)_merged$")
 
     # DataFrame to hold all data
@@ -32,18 +32,18 @@ def read_and_aggregate_results(base_directory):
                         # Read the CSV file
                         df = pd.read_csv(file_path)
 
-                        # Extract 'mrd' and 'pp' values and add them as columns
+                        # Extract 'maf' and 'pp' values and add them as columns
                         params = df['Parameters'].apply(lambda x: param_regex.search(x))
-                        df['mrd'] = params.apply(lambda x: float(x.group(1)) if x else None)
+                        df['maf'] = params.apply(lambda x: float(x.group(1)) if x else None)
                         df['pp'] = params.apply(lambda x: float(x.group(2)) if x else None)
                         df['batch'] = batch_number
 
                         # Append to the all_data DataFrame
                         all_data = pd.concat([all_data, df], ignore_index=True)
 
-    # Group by 'batch', 'mrd', and 'pp' and calculate the mean of F1 Score
-    result = all_data.groupby(['batch', 'mrd', 'pp'])['F1 Score'].mean().reset_index()
-    result.columns = ['batch', 'mrd', 'pp', 'average_f1']
+    # Group by 'batch', 'maf', and 'pp' and calculate the mean of F1 Score
+    result = all_data.groupby(['batch', 'maf', 'pp'])['F1 Score'].mean().reset_index()
+    result.columns = ['batch', 'maf', 'pp', 'average_f1']
 
     return result
 

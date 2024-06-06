@@ -68,7 +68,7 @@ for params in parameters_list:
 
 # Fit splines and store results
 splines = {}
-x_values = np.linspace(0.01, 0.05, 5)  # MRD values from 0.01 to 0.05
+x_values = np.linspace(0.01, 0.05, 5)  # MAF values from 0.01 to 0.05
 fine_x_values = np.linspace(0.01, 0.05, 100)  # Use more points for a smoother plot
 fig, axes = plt.subplots(nrows=1, ncols=5, figsize=(25, 5))
 fig.subplots_adjust(hspace=0.4, wspace=0.4)
@@ -88,11 +88,11 @@ for idx, (name, data) in enumerate(zip(['cor', 'iteration', 'pp', 'np', 'dp'],
     ax.plot(x_values, data, 'o', label='Original Data')
     ax.plot(fine_x_values, spline_fit_fine, label='Spline Fit')
     ax.set_title(f'{name} Spline Fit')
-    ax.set_xlabel('MRD Values')
+    ax.set_xlabel('MAF Values')
     ax.set_ylabel('Parameter Values')
     ax.legend()
 
 # Show all plots at once
 plt.show()
 
-print("Spline coefficients have been saved to individual JSON files with MRD values as keys.")
+print("Spline coefficients have been saved to individual JSON files with MAF values as keys.")

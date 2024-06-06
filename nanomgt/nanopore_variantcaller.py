@@ -26,7 +26,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     """
     # Set up output directory and verify input file
 
-    auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp = load_parameters(arguments.mrd)
+    auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp = load_parameters(arguments.maf)
 
     arguments = initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp)
 
@@ -73,6 +73,8 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     print_majority_alelles(consensus_dict, arguments)
 
+    sys.exit()
+
     if arguments.majority_alleles_only: #End the program if only majority alleles are requested
         sys.exit()
 
@@ -104,6 +106,47 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     sys.exit()
 
+
+def train_parameters(arguments):
+    if not os.path.exists(arguments.output):
+        print (f'Error: Output directory {arguments.output} does not exist. '
+               f'Make sure you have an output folder with the alignments from running NanoMGT. See info.txt for more details.')
+        sys.exit(f'Error: Output directory {arguments.output} does not exist.')
+
+    # Build a consensus dictionary from alignment results
+    consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
+                                          os.path.join(arguments.output, 'rmlst_alignment.mat'))
+
+    confirmed_mutation_dict = derive_mutation_positions(consensus_dict, min_n, maf, cor)
+
+    # Perform biological validation of mutations
+    bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
+    # Co-occurrence analysis until convergence
+    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count = co_occurrence_until_convergence(results_folder,
+                                                                                                       confirmed_mutation_dict,
+                                                                                                       consensus_dict,
+                                                                                                       bio_validation_dict,
+                                                                                                       min_n, maf, cor,
+                                                                                                       new_output_folder,
+                                                                                                       iteration_increase,
+                                                                                                       proxi, dp_window,
+                                                                                                       pp, np, dp)
+
+    # Format and output the results
+    format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
+                  co_occurrence_tmp_dict, np)
+
+    sample = results_folder.split('/')[-1]
+    minor_mutation_expected = benchmark_analysis_result(sample, results_folder)
+
+    # minor_mutation_results = load_mutations(results_folder + '/minor_mutations.csv')
+    minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
+
+    precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
+
+    parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
+
+    return f1, parameter_string, precision, recall, tp, fp, fn
 def initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp):
     if arguments.cor == 'auto':
         arguments.cor = auto_cor
@@ -133,7 +176,7 @@ def initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp,
     return arguments
 
 
-def load_parameters(mrd_value):
+def load_parameters(maf_value):
 
     # Names of the parameters and their corresponding JSON files
     parameters = {
@@ -150,10 +193,10 @@ def load_parameters(mrd_value):
     for param, filename in parameters.items():
         splines[param] = load_spline_from_json(parameters[param])
 
-    # Calculate and print the parameters values for the given MRD
+    # Calculate and print the parameters values for the given MAF
     results = {}
     for param, spline in splines.items():
-        value = calculate_parameter_value(spline, mrd_value)
+        value = calculate_parameter_value(spline, maf_value)
         results[param] = value
 
 
@@ -166,9 +209,9 @@ def load_spline_from_json(data):
     spline = UnivariateSpline(x_values, y_values, s=None)
     return spline
 
-def calculate_parameter_value(spline, mrd):
-    """ Calculate the parameter value for a given mrd using the spline. """
-    value = spline(mrd)
+def calculate_parameter_value(spline, maf):
+    """ Calculate the parameter value for a given maf using the spline. """
+    value = spline(maf)
     # Ensure that the value is non-negative
     return max(value, 0)
 
@@ -668,7 +711,7 @@ def derive_mutation_positions(consensus_dict, arguments):
                         total_depth = sum(positions)
                         relative_depth = positions[t] / total_depth
 
-                        if relative_depth >= arguments.mrd - (arguments.mrd * arguments.cor):
+                        if relative_depth >= arguments.maf - (arguments.maf * arguments.cor):
                             # Only consider mutations with minimum depth >= 2
                             if nucleotide_index[t] != 'N' and nucleotide_index[t] != '-': #We don't consider there SNVs
                                 all_confirmed_mutation_dict[allele][0].append(
@@ -744,9 +787,9 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
 
                 #TBD LOOK INTO THIS
-                mutation_threshold = position_depth * arguments.mrd
+                mutation_threshold = position_depth * arguments.maf
                 co_occurrence_list = check_mutation_co_occurrence(row, mutation_list, mutation,
-                                                                 position_depth, arguments.cor, arguments.pp, arguments.mrd, proxi_mutations, mutation_depth)
+                                                                 position_depth, arguments.cor, arguments.pp, arguments.maf, proxi_mutations, mutation_depth)
                 #if allele == 'BACT000001_1153':
                 #    print (mutation, co_occurrence_list)
                 #    print (mutation_threshold, mutation_depth)
@@ -756,14 +799,14 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                     for item in co_occurrence_list:
                         if item not in co_occurrence_tmp_dict[allele]:
                             co_occurrence_tmp_dict[allele].append(item)
-                    mutation_threshold = mutation_threshold - position_depth * arguments.mrd * arguments.cor
+                    mutation_threshold = mutation_threshold - position_depth * arguments.maf * arguments.cor
 
                 if not biological_existence:
-                    mutation_threshold = mutation_threshold + arguments.np * position_depth * arguments.mrd
+                    mutation_threshold = mutation_threshold + arguments.np * position_depth * arguments.maf
                 if proxi_mutations != []:
-                    mutation_threshold = mutation_threshold + arguments.pp * position_depth * arguments.mrd
+                    mutation_threshold = mutation_threshold + arguments.pp * position_depth * arguments.maf
                 if density_mutations != []:
-                    mutation_threshold = mutation_threshold + arguments.dp * position_depth * arguments.mrd * len(density_mutations)
+                    mutation_threshold = mutation_threshold + arguments.dp * position_depth * arguments.maf * len(density_mutations)
                 if mutation_depth >= mutation_threshold:
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][i])
                     adjusted_mutation_dict[allele][1].append(confirmed_mutation_dict[allele][1][i])
@@ -775,11 +818,11 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                 mutation = confirmed_mutation_dict[allele][0][0]
                 position = int(mutation.split('_')[0])
                 position_depth = sum(consensus_dict[allele][0][position - 1])
-                mutation_threshold = position_depth * arguments.mrd
+                mutation_threshold = position_depth * arguments.maf
                 depth = confirmed_mutation_dict[allele][1][0]
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
                 if not biological_existence:
-                    mutation_threshold = mutation_threshold + (arguments.np-1) * position_depth * arguments.mrd
+                    mutation_threshold = mutation_threshold + (arguments.np-1) * position_depth * arguments.maf
 
                 if depth >= mutation_threshold:
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][0])
@@ -789,7 +832,7 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
 
 
 def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, mutation,
-                                 position_depth, correlation_coefficient, proximity_penalty, mrd, proximity_mutations, mutation_depth):
+                                 position_depth, correlation_coefficient, proximity_penalty, maf, proximity_mutations, mutation_depth):
     """
     Check for co-occurrence of a mutation with other mutations in a list.
 
@@ -800,7 +843,7 @@ def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, 
         position_depth (int): The depth at which the mutation occurs.
         correlation_coefficient (float): The correlation coefficient used for threshold calculation.
         proximity_penalty (float): The penalty factor for mutations within proximity.
-        mrd (float): The mutation rate difference.
+        maf (float): The mutation rate difference.
         proximity_mutations (list): A list of mutations within proximity.
 
     Returns:

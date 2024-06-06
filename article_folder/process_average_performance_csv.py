@@ -3,8 +3,8 @@ import pandas as pd
 # Load the CSV file into a DataFrame
 df = pd.read_csv('csv_files/average_performance_results.csv')
 
-# Define the MRD thresholds and their corresponding minimum batch values
-mrd_thresholds = {
+# Define the MAF thresholds and their corresponding minimum batch values
+maf_thresholds = {
     0.01: 1,
     0.02: 2,
     0.03: 3,
@@ -29,10 +29,10 @@ for short_name, full_name in species_mapping.items():
     # Filter the DataFrame based on the species
     specie_df = df[df['specie'] == short_name]
 
-    # Iterate through each MRD threshold and calculate the average scores
-    for mrd, min_batch in mrd_thresholds.items():
-        # Filter the DataFrame based on MRD and batch values
-        filtered_df = specie_df[(specie_df['mrd'] == mrd) & (specie_df['batch'] >= min_batch)]
+    # Iterate through each MAF threshold and calculate the average scores
+    for maf, min_batch in maf_thresholds.items():
+        # Filter the DataFrame based on MAF and batch values
+        filtered_df = specie_df[(specie_df['maf'] == maf) & (specie_df['batch'] >= min_batch)]
 
         for tool in ['Confindr', 'NanoMGT']:
             # Filter the DataFrame based on the tool
@@ -47,13 +47,13 @@ for short_name, full_name in species_mapping.items():
                 avg_precision = avg_recall = avg_f1score = None
 
             # Store the results in the list
-            results.append([full_name, mrd, tool, avg_precision, avg_recall, avg_f1score])
+            results.append([full_name, maf, tool, avg_precision, avg_recall, avg_f1score])
 
 # Create a DataFrame from the results list
-results_df = pd.DataFrame(results, columns=['Species', 'MRD', 'Tool', 'Precision', 'Recall', 'F1 Score'])
+results_df = pd.DataFrame(results, columns=['Species', 'MAF', 'Tool', 'Precision', 'Recall', 'F1 Score'])
 
 # Print the DataFrame as CSV
 print(results_df.to_csv(index=False))
 
-results_df.to_csv('csv_files/specie_mrd_performance_for_plots.csv', index=False)
+results_df.to_csv('csv_files/specie_maf_performance_for_plots.csv', index=False)
 

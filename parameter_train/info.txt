@@ -1,0 +1,4 @@
+To train parameters on any given set of .fastq isolates, do the following:
+
+1.)
+

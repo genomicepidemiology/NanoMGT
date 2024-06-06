@@ -70,7 +70,7 @@ bac_db.len.b
 ## Usage
 
 ```bash
-nanomgt --nanopore /complete/path/to/input.fastq --o any_output_name --threads <int, default:4> --mrd <float, default:0.05> --db_dir /path/to/database_as_described_above/
+nanomgt --nanopore /complete/path/to/input.fastq --o any_output_name --threads <int, default:4> --maf <float, default:0.05> --db_dir /path/to/database_as_described_above/
 ```
 
 ## License

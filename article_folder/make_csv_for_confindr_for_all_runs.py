@@ -74,11 +74,11 @@ def main(results_folder):
     all_results = []
 
     for bf_folder in bf_folders:
-        mrd_path = os.path.join(results_folder, bf_folder)
-        experiments = os.listdir(mrd_path)
+        maf_path = os.path.join(results_folder, bf_folder)
+        experiments = os.listdir(maf_path)
 
         for experiment in experiments:
-            exp_path = os.path.join(mrd_path, experiment)
+            exp_path = os.path.join(maf_path, experiment)
             print(f"Processing experiment {experiment} in {bf_folder}...")
 
             batch_path = "/home/people/malhal/data/new_nanomgt/simulated_batches"
@@ -104,7 +104,7 @@ def main(results_folder):
                 'tool': 'Confindr',
                 'specie': species,
                 'sequencing_id': sequencing_id,
-                'mrd': bf_folder.split('_')[1],
+                'maf': bf_folder.split('_')[1],
                 'depth': experiment.split('_')[0].replace('depth', ''),
                 'batch': int(experiment.split('batch')[-1].split('_')[0]),
                 'precision': precision,

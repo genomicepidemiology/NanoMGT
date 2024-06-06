@@ -9,9 +9,9 @@ def moving_average(data, window_size):
 
 def process_data(csv_file):
     data = pd.read_csv(csv_file)
-    grouped = data.groupby(['mrd', 'batch'])
+    grouped = data.groupby(['maf', 'batch'])
 
-    for (mrd, batch), group in grouped:
+    for (maf, batch), group in grouped:
         pp_values = group['pp'].values
         f1_scores = group['average_f1'].values
 
@@ -40,7 +40,7 @@ def process_data(csv_file):
                 max_f1 = f1  # Update the maximum f1-score
                 best_pp = pp  # Update the best pp
 
-        print(f"For MRD: {mrd:.2f}, Batch: {batch}, the pp value with the highest significant observed F1-score is {best_pp:.2f}")
+        print(f"For MAF: {maf:.2f}, Batch: {batch}, the pp value with the highest significant observed F1-score is {best_pp:.2f}")
 
 def main():
     csv_file = 'pp_f1_scores.csv'

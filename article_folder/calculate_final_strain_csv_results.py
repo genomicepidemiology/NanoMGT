@@ -19,8 +19,8 @@ species_to_group = {
 # Map the species to the group
 data['group'] = data['specie'].map(species_to_group)
 
-# Group the data by the new groups along with tool, mrd, batch, and depth
-grouped_data = data.groupby(['group', 'tool', 'mrd', 'depth', 'batch']).agg({
+# Group the data by the new groups along with tool, maf, batch, and depth
+grouped_data = data.groupby(['group', 'tool', 'maf', 'depth', 'batch']).agg({
     'precision': 'mean',
     'recall': 'mean',
     'f1score': 'mean'

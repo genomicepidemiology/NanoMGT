@@ -22,7 +22,7 @@ from random_search_functions import create_mutation_vector
 
 
 
-def random_sampling(mrd, results_folder, min_n, cor, new_output_folder,
+def random_sampling(maf, results_folder, min_n, cor, new_output_folder,
                     iteration_increase, proxi, dp_window, pp, np, dp):
     """
     Conducts metagenomics variant calling for Nanopore sequencing data. This function orchestrates
@@ -33,13 +33,13 @@ def random_sampling(mrd, results_folder, min_n, cor, new_output_folder,
         arguments: Parsed command-line arguments containing parameters and file paths.
     """
     os.system(f'mkdir -p {new_output_folder}')
-    print (f"Running random sampling for MRD {mrd}, cor {cor}, pp {pp}, np {np}, dp {dp}, ii {iteration_increase}")
-    parameter_string = f"mrd_{mrd}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
+    print (f"Running random sampling for MAF {maf}, cor {cor}, pp {pp}, np {np}, dp {dp}, ii {iteration_increase}")
+    parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
     # Build a consensus dictionary from alignment results
     consensus_dict = build_consensus_dict(os.path.join(results_folder, 'rmlst_alignment.res'),
                                           os.path.join(results_folder, 'rmlst_alignment.mat'))
 
-    confirmed_mutation_dict = derive_mutation_positions(consensus_dict, min_n, mrd, cor)
+    confirmed_mutation_dict = derive_mutation_positions(consensus_dict, min_n, maf, cor)
 
     # Perform biological validation of mutations
     bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
@@ -48,7 +48,7 @@ def random_sampling(mrd, results_folder, min_n, cor, new_output_folder,
                                                                                                        confirmed_mutation_dict,
                                                                                                        consensus_dict,
                                                                                                        bio_validation_dict,
-                                                                                                       min_n, mrd, cor, new_output_folder,
+                                                                                                       min_n, maf, cor, new_output_folder,
                                                                                                        iteration_increase, proxi, dp_window, pp, np, dp)
 
 
@@ -348,7 +348,7 @@ def highest_scoring_hit(file_path):
 
 
 def co_occurrence_until_convergence(input_folder, confirmed_mutation_dict, consensus_dict,
-                                    bio_validation_dict, min_n, mrd, cor, new_output_folder,
+                                    bio_validation_dict, min_n, maf, cor, new_output_folder,
                                     iteration_increase, proxi, dp_window, pp, np, dp):
     """
     Executes an iterative process to identify co-occurring mutations in reads until convergence is achieved.
@@ -390,7 +390,7 @@ def co_occurrence_until_convergence(input_folder, confirmed_mutation_dict, conse
             confirmed_mutation_dict, co_occurrence_tmp_dict = upper_co_occuring_mutations_in_reads(
                 confirmed_mutation_dict, consensus_dict,
                 bio_validation_dict, reads_mutation_dict, proxi, dp_window,
-                mrd, cor, pp, np, dp
+                maf, cor, pp, np, dp
             )
 
             new_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
@@ -673,7 +673,7 @@ def extract_mapped_rmlst_read(output_directory, nanopore_fastq):
                                                output_directory + '/trimmed_rmlst_reads.fastq'))
 
 
-def derive_mutation_positions(consensus_dict, min_n, mrd, cor):
+def derive_mutation_positions(consensus_dict, min_n, maf, cor):
     """
     Derive mutation positions and their depths from a consensus dictionary.
 
@@ -701,7 +701,7 @@ def derive_mutation_positions(consensus_dict, min_n, mrd, cor):
                         total_depth = sum(positions)
                         relative_depth = positions[t] / total_depth
 
-                        if relative_depth >= - (mrd * cor):
+                        if relative_depth >= - (maf * cor):
                             # Only consider mutations with minimum depth >= 2
                             if nucleotide_index[t] != 'N' and nucleotide_index[
                                 t] != '-':  # We don't consider there SNVs
@@ -714,7 +714,7 @@ def derive_mutation_positions(consensus_dict, min_n, mrd, cor):
 
 def upper_co_occuring_mutations_in_reads(confirmed_mutation_dict, consensus_dict,
                                          bio_validation_dict, reads_mutation_dict, proxi, dp_window,
-                                         mrd, cor, pp, np, dp):
+                                         maf, cor, pp, np, dp):
     """
     Filter and adjust confirmed mutations based on co-occurrence, depth, and biological validation.
 
@@ -778,10 +778,10 @@ def upper_co_occuring_mutations_in_reads(confirmed_mutation_dict, consensus_dict
                                                                                dp_window)
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
 
-                mutation_threshold = position_depth * mrd
+                mutation_threshold = position_depth * maf
                 co_occurrence_list = check_mutation_co_occurrence(row, mutation_list, mutation,
                                                                   position_depth, cor, pp,
-                                                                  mrd, proxi_mutations, mutation_depth)
+                                                                  maf, proxi_mutations, mutation_depth)
                 # if allele == 'BACT000001_1153':
                 #    print (mutation, co_occurrence_list)
                 #    print (mutation_threshold, mutation_depth)
@@ -791,14 +791,14 @@ def upper_co_occuring_mutations_in_reads(confirmed_mutation_dict, consensus_dict
                     for item in co_occurrence_list:
                         if item not in co_occurrence_tmp_dict[allele]:
                             co_occurrence_tmp_dict[allele].append(item)
-                    mutation_threshold = mutation_threshold - position_depth * mrd * cor
+                    mutation_threshold = mutation_threshold - position_depth * maf * cor
 
                 if not biological_existence:
-                    mutation_threshold = mutation_threshold + np * position_depth * mrd
+                    mutation_threshold = mutation_threshold + np * position_depth * maf
                 if proxi_mutations != []:
-                    mutation_threshold = mutation_threshold + pp * position_depth * mrd
+                    mutation_threshold = mutation_threshold + pp * position_depth * maf
                 if density_mutations != []:
-                    mutation_threshold = mutation_threshold + dp * position_depth * mrd * len(
+                    mutation_threshold = mutation_threshold + dp * position_depth * maf * len(
                         density_mutations)
                 if mutation_depth >= mutation_threshold:
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][i])
@@ -811,11 +811,11 @@ def upper_co_occuring_mutations_in_reads(confirmed_mutation_dict, consensus_dict
                 mutation = confirmed_mutation_dict[allele][0][0]
                 position = int(mutation.split('_')[0])
                 position_depth = sum(consensus_dict[allele][0][position - 1])
-                mutation_threshold = position_depth * mrd
+                mutation_threshold = position_depth * maf
                 depth = confirmed_mutation_dict[allele][1][0]
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
                 if not biological_existence:
-                    mutation_threshold = mutation_threshold + (np - 1) * position_depth * mrd
+                    mutation_threshold = mutation_threshold + (np - 1) * position_depth * maf
 
                 if depth >= mutation_threshold:
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][0])
@@ -824,7 +824,7 @@ def upper_co_occuring_mutations_in_reads(confirmed_mutation_dict, consensus_dict
 
 
 def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, mutation,
-                                 position_depth, correlation_coefficient, proximity_penalty, mrd, proximity_mutations,
+                                 position_depth, correlation_coefficient, proximity_penalty, maf, proximity_mutations,
                                  mutation_depth):
     """
     Check for co-occurrence of a mutation with other mutations in a list.
@@ -836,7 +836,7 @@ def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, 
         position_depth (int): The depth at which the mutation occurs.
         correlation_coefficient (float): The correlation coefficient used for threshold calculation.
         proximity_penalty (float): The penalty factor for mutations within proximity.
-        mrd (float): The mutation rate difference.
+        maf (float): The mutation rate difference.
         proximity_mutations (list): A list of mutations within proximity.
 
     Returns:
@@ -1202,12 +1202,12 @@ def set_up_output_and_check_input(arguments):
             sys.exit()
 
 
-def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd, parameters):
+def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, maf, parameters):
     name = results_folder.split('/')[-1]
     new_output_folder = new_output_folder + '/' + name
     os.makedirs(new_output_folder, exist_ok=True)
     # Fixed parameters
-    #mrd = 0.05
+    #maf = 0.05
     min_n = 3
     proxi = 5
     dp_window = 15
@@ -1241,7 +1241,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd, pa
         # Create a future for each parameter combination
         futures_to_params = {
             executor.submit(
-                random_sampling, mrd, results_folder, min_n,
+                random_sampling, maf, results_folder, min_n,
                 combo[0], new_output_folder, combo[1], proxi, dp_window,
                 combo[2], combo[3], combo[4]
             ): combo for combo in all_params
@@ -1278,13 +1278,13 @@ def run_jobs_in_parallel(max_workers, new_output_folder, results_folder, mrd, pa
         writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall'])
         writer.writerow([best_score, best_params, top_precision, top_recall])
 
-def calculate_parameter_value(spline, mrd):
-    """ Calculate the parameter value for a given mrd using the spline. """
-    value = spline(mrd)
+def calculate_parameter_value(spline, maf):
+    """ Calculate the parameter value for a given maf using the spline. """
+    value = spline(maf)
     # Ensure that the value is non-negative
     return max(value, 0)
 
-def load_parameters(mrd_value):
+def load_parameters(maf_value):
     parameters_dir = os.path.join('/home/people/malhal/NanoMGT/nanomgt', 'parameter_functions')
 
     # Names of the parameters and their corresponding JSON files
@@ -1303,10 +1303,10 @@ def load_parameters(mrd_value):
         full_path = os.path.join(parameters_dir, filename)
         splines[param] = load_spline_from_json(full_path)
 
-    # Calculate and print the parameters values for the given MRD
+    # Calculate and print the parameters values for the given MAF
     results = {}
     for param, spline in splines.items():
-        value = calculate_parameter_value(spline, mrd_value)
+        value = calculate_parameter_value(spline, maf_value)
         results[param] = value
 
     return results['cor'], results['iteration'], results['pp'], results['np'], results['dp']
@@ -1322,10 +1322,10 @@ def load_spline_from_json(filename):
     return spline
 
 
-mrd_list = [1, 2, 3, 4, 5]
+maf_list = [1, 2, 3, 4, 5]
 
-for mrd in mrd_list:
-    auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp = load_parameters(mrd/100)
+for maf in maf_list:
+    auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp = load_parameters(maf/100)
     parameters = {
         'cor_interval': [auto_cor],
         'iteration_increase_interval': [auto_iteration_increase],
@@ -1337,9 +1337,9 @@ for mrd in mrd_list:
 
     #DP IS NOT LOADING CORRECTLY
 
-    new_output_folder = '/home/people/malhal/test/new_nanomgt_results/final_nanomgt_performance_output_{}/'.format(mrd)
+    new_output_folder = '/home/people/malhal/test/new_nanomgt_results/final_nanomgt_performance_output_{}/'.format(maf)
     os.makedirs(new_output_folder, exist_ok=True)
     file_list = os.listdir('/home/people/malhal/test/new_nanomgt_results/')
     for folder in file_list:
         if folder.endswith('merged'):
-            run_jobs_in_parallel(1, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, mrd/100, parameters)
+            run_jobs_in_parallel(1, new_output_folder, '/home/people/malhal/test/new_nanomgt_results/' + folder, maf/100, parameters)

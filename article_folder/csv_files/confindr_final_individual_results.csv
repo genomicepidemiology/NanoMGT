@@ -1,4 +1,4 @@
-tool,specie,sequencing_id,mrd,depth,batch,precision,recall,f1score
+tool,specie,sequencing_id,maf,depth,batch,precision,recall,f1score
 Confindr,staph_aureus,ERR8958843,0.01,120,1,0.06818181818181818,0.075,0.07142857142857141
 Confindr,staph_aureus,ERR8958843,0.01,120,2,0.19607843137254902,0.25,0.2197802197802198
 Confindr,staph_aureus,ERR8958843,0.01,120,4,0.2982456140350877,0.425,0.35051546391752575

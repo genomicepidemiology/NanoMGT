@@ -1,4 +1,4 @@
-tool,specie,sequencing_id,mrd,depth,batch,precision,recall,f1score
+tool,specie,sequencing_id,maf,depth,batch,precision,recall,f1score
 Confindr,Staphylococcus aureus,ERR8958843,0.01,220,10,0.2264150943396226,0.9,0.3618090452261306
 Confindr,Staphylococcus aureus,ERR8958843,0.01,220,1,0.0529801324503311,0.2,0.0837696335078534
 Confindr,Staphylococcus aureus,ERR8958843,0.01,220,2,0.1168831168831168,0.45,0.1855670103092783

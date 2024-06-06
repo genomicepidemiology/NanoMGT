@@ -17,7 +17,7 @@ def find_folders_and_files(data_dir):
     return target_folders
 
 def map_reads(folders, reference_dir):
-    mrd_values = [0.01, 0.02, 0.03, 0.04, 0.05]
+    maf_values = [0.01, 0.02, 0.03, 0.04, 0.05]
 
     for folder, fastq_file in folders:
         name = fastq_file.split('.fastq')[0]

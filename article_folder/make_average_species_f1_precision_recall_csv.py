@@ -8,7 +8,7 @@ nanomgt_data = pd.read_csv("csv_files/nanomgt_final_results.csv")
 combined_data = pd.concat([confindr_data, nanomgt_data], ignore_index=True)
 
 # Calculate the averages of precision, recall, and f1score
-average_performance = combined_data.groupby(['tool', 'specie', 'mrd', 'batch']).agg({
+average_performance = combined_data.groupby(['tool', 'specie', 'maf', 'batch']).agg({
     'precision': 'mean',
     'recall': 'mean',
     'f1score': 'mean'

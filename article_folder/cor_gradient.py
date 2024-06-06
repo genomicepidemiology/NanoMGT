@@ -4,10 +4,10 @@ from scipy.interpolate import UnivariateSpline
 
 def process_data(csv_file):
     data = pd.read_csv(csv_file)
-    grouped = data.groupby(['mrd', 'batch'])
+    grouped = data.groupby(['maf', 'batch'])
     results = []
 
-    for (mrd, batch), group in grouped:
+    for (maf, batch), group in grouped:
         pp_values = group['pp'].values  # Changed from cor_values to pp_values
         f1_scores = group['average_f1'].values
 
@@ -43,7 +43,7 @@ def process_data(csv_file):
 
         # Append results
         results.append({
-            'mrd': mrd,
+            'maf': maf,
             'batch': batch,
             'first_f1_score': first_f1_score,
             'last_f1_score': last_f1_score,
@@ -57,7 +57,7 @@ def main():
     csv_file = 'pp_f1_scores.csv'  # Changed to use the correct CSV file for 'pp' values
     results = process_data(csv_file)
     for result in results:
-        print(f"MRD: {result['mrd']:.2f}, Batch: {result['batch']}, First F1 Score: {result['first_f1_score']:.2f}, Last F1 Score: {result['last_f1_score']:.2f}, Lowest Slope Angle: {result['lowest_slope_angle']:.2f} degrees")
+        print(f"MAF: {result['maf']:.2f}, Batch: {result['batch']}, First F1 Score: {result['first_f1_score']:.2f}, Last F1 Score: {result['last_f1_score']:.2f}, Lowest Slope Angle: {result['lowest_slope_angle']:.2f} degrees")
         if result['valid_pp_values']:
             print(f"   Valid pp values at slopes close to 20 degrees: {result['valid_pp_values']}")
         else:

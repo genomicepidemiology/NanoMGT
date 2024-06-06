@@ -1,4 +1,4 @@
-tool,specie,mrd,depth,batch,precision,recall,f1score
+tool,specie,maf,depth,batch,precision,recall,f1score
 Confindr,campylobacter,0.01,120,1,0.14255589430894308,0.1015625,0.11813672438672439
 Confindr,campylobacter,0.01,120,2,0.35997255794943656,0.34375,0.35128205128205126
 Confindr,campylobacter,0.01,120,3,0.4808823245859283,0.5677083333333333,0.5204023167819195

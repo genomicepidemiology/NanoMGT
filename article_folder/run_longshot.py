@@ -17,7 +17,7 @@ def find_folders_and_files(data_dir):
     return target_folders
 
 def map_reads(folders, reference_dir):
-    mrd_values = [0.01, 0.02, 0.03, 0.04, 0.05]
+    maf_values = [0.01, 0.02, 0.03, 0.04, 0.05]
 
     for folder, fastq_file in folders:
         name = fastq_file.split('.fastq')[0]
@@ -39,10 +39,10 @@ def map_reads(folders, reference_dir):
         # Indexing the BAM file
         subprocess.run(['samtools', 'index', bam_output], check=True)
 
-        for mrd in mrd_values:
-            min_cov = math.ceil(depth * mrd)
-            vcf_output = os.path.join(output_dir, f'variants_mrd{int(mrd*100)}.vcf')
-            longshot_cmd = f"longshot --bam {bam_output} --ref {reference_path} --out {vcf_output} -q 14 --min_cov {min_cov} --min_alt_count {min_cov} --min_alt_frac {mrd}"
+        for maf in maf_values:
+            min_cov = math.ceil(depth * maf)
+            vcf_output = os.path.join(output_dir, f'variants_maf{int(maf*100)}.vcf')
+            longshot_cmd = f"longshot --bam {bam_output} --ref {reference_path} --out {vcf_output} -q 14 --min_cov {min_cov} --min_alt_count {min_cov} --min_alt_frac {maf}"
             print(f"Executing Longshot for BAM: {bam_output} with min_cov {min_cov}...")
             subprocess.run(longshot_cmd, shell=True, check=True)
             print(f"Longshot processing completed. VCF Output: {vcf_output}")

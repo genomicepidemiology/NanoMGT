@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 
 def process_data(csv_file, threshold=5):  # threshold in percentage
     data = pd.read_csv(csv_file)
-    grouped = data.groupby(['mrd', 'batch'])
+    grouped = data.groupby(['maf', 'batch'])
 
-    for (mrd, batch), group in grouped:
-        if str(mrd) == "0.04" and batch == 9:
+    for (maf, batch), group in grouped:
+        if str(maf) == "0.04" and batch == 9:
             np_values = group['np'].values
             f1_scores = group['average_f1'].values
 

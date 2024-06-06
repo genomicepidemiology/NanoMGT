@@ -5,7 +5,7 @@ import csv
 base_dir = '/home/people/malhal/test/new_nanomgt_results'
 
 # Header for the new CSV file
-csv_header = ['tool', 'depth', 'specie', 'sequencing_id', 'mrd', 'batch', 'precision', 'recall', 'f1score']
+csv_header = ['tool', 'depth', 'specie', 'sequencing_id', 'maf', 'batch', 'precision', 'recall', 'f1score']
 
 # File to save the consolidated results
 output_file = '/home/people/malhal/test/new_nanomgt_results/nanomgt_final_all_individual_results.csv'
@@ -15,7 +15,7 @@ results = []
 
 for main_folder in range(1, 6):
     folder_path = f"{base_dir}/final_nanomgt_performance_output_{main_folder}"
-    mrd = f"0.0{main_folder}"  # Construct the MRD based on folder index
+    maf = f"0.0{main_folder}"  # Construct the MAF based on folder index
 
     # Check if the directory exists
     if os.path.exists(folder_path):
@@ -54,7 +54,7 @@ for main_folder in range(1, 6):
 
                         # Store each record directly
                         results.append([
-                            'NanoMGT', depth, specie, sequencing_id, mrd, batch,
+                            'NanoMGT', depth, specie, sequencing_id, maf, batch,
                             precision, recall, f1score
                         ])
 

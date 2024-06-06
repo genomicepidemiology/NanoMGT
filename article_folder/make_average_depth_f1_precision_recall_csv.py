@@ -11,8 +11,8 @@ nanomgt_data['tool'] = 'NanoMGT'
 # Combine the data from both tools into one DataFrame
 combined_data = pd.concat([confindr_data, nanomgt_data], ignore_index=True)
 
-# Calculate the averages of precision, recall, and f1score based on mrd, batch, depth, and tool
-average_performance = combined_data.groupby(['tool', 'mrd', 'batch', 'depth']).agg({
+# Calculate the averages of precision, recall, and f1score based on maf, batch, depth, and tool
+average_performance = combined_data.groupby(['tool', 'maf', 'batch', 'depth']).agg({
     'precision': 'mean',
     'recall': 'mean',
     'f1score': 'mean'

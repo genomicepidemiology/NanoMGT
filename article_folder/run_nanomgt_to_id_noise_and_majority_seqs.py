@@ -8,11 +8,11 @@ def construct_command(file_path, output_dir):
     #Adjust these parameters
     # Construct the command with all parameters set to 0
     #command = f"~/NanoMGT/bin/nanomgt --nanopore {file_path} --o {output_dir}/{output_name} --threads 8 --db_dir ~/nanomgt_db/" \
-    #          f" --mrd 0.03 --cor 0 --np 0 --dp 0 --ii 0 --pp 0"
+    #          f" --maf 0.03 --cor 0 --np 0 --dp 0 --ii 0 --pp 0"
 
-    # Type co-occurencing noise at default setting for 0.03 mrd
+    # Type co-occurencing noise at default setting for 0.03 maf
     command = f"~/NanoMGT/bin/nanomgt --nanopore {file_path} --o {output_dir}/{output_name} --threads 8 --db_dir ~/nanomgt_db/" \
-             f" --mrd 0.05"
+             f" --maf 0.05"
     return command
 
 def main():

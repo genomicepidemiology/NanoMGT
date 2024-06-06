@@ -4,10 +4,10 @@ from scipy.interpolate import UnivariateSpline
 
 def process_data(csv_file):
     data = pd.read_csv(csv_file)
-    grouped = data.groupby(['mrd', 'batch'])
+    grouped = data.groupby(['maf', 'batch'])
     results = []
 
-    for (mrd, batch), group in grouped:
+    for (maf, batch), group in grouped:
         pp_values = group['pp'].values  # Changed from cor_values to pp_values
         f1_scores = group['average_f1'].values
 
@@ -44,7 +44,7 @@ def process_data(csv_file):
                 last_valid_index = -1
         # Get the pp value at the last valid index found
         target_pp_value = pp_values.min() + pp_dense_normalized[last_valid_index] * (pp_values.max() - pp_values.min())
-        results.append((mrd, batch, target_pp_value))
+        results.append((maf, batch, target_pp_value))
 
     return results
 
@@ -52,8 +52,8 @@ def main():
     csv_file = 'pp_f1_scores.csv'  # Adjusted to use the correct CSV file
     results = process_data(csv_file)
     for result in results:
-        mrd, batch, peak_value = result
-        print(f"The pp value with a 30-degree slope for MRD: {mrd:.2f}, Batch: {batch} is at pp: {peak_value}")
+        maf, batch, peak_value = result
+        print(f"The pp value with a 30-degree slope for MAF: {maf:.2f}, Batch: {batch} is at pp: {peak_value}")
 
 if __name__ == "__main__":
     main()
