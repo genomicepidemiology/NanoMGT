@@ -105,6 +105,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 def benchmark_analysis_result(sample):
     #batch = sample.split('_')[-2]
     #print (sample)
+    print (sample)
     batch_id = int(sample.split('_')[-2][5:])
     #print (batch_id)
     #print(f"Batch ID: {batch_id}")
