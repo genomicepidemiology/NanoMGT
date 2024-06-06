@@ -133,7 +133,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
     # Co-occurrence analysis until convergence
     #confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count =\
     #    co_occurrence_until_convergence(arguments, confirmed_mutation_dict,
-                                        consensus_dict, {}, bio_validation_dict)
+    #                                    consensus_dict, {}, bio_validation_dict)
 
     # Format and output the results
     #format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
