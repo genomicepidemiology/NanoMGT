@@ -3,6 +3,10 @@ import subprocess
 import multiprocessing
 
 
+sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + sys.path
+
+
+
 # Perhaps this path won't work, if not look into adjusting your path
 from nanomgt.nanopore_variantcaller import train_parameters
 
