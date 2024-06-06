@@ -86,7 +86,6 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
     #precision, recall, f1, tp, fp, fn = nvc.calculate_metrics(minor_mutation_expected, minor_mutation_results)
 
-    print (f"Precision: {precision}, Recall: {recall}, F1: {f1}, TP: {tp}, FP: {fp}, FN: {fn}")
 
     precision = 1
     recall = 1
@@ -94,6 +93,8 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
     tp = 1
     fp = 1
     fn = 1
+    print (f"Precision: {precision}, Recall: {recall}, F1: {f1}, TP: {tp}, FP: {fp}, FN: {fn}")
+
 
     parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
 
