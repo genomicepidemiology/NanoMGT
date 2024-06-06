@@ -122,6 +122,9 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
     arguments.np = np
     arguments.dp_window = dp_window
 
+    print (arguments)
+    sys.exit()
+
     # Build a consensus dictionary from alignment results
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
