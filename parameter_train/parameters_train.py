@@ -321,4 +321,5 @@ for file in fastq_files:
     new_output_folder = output_training_folder + '/' + output_name + '/'
     os.makedirs(new_output_folder, exist_ok=True)
 
-    run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters)
+    #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters)
+    train_parameters(maf / 100, alignment_folder, 3, 0.1, new_output_folder, 1, 5, 0.1, 0.1, 0.1)
