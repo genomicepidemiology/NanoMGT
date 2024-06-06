@@ -78,11 +78,13 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
     format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
                   co_occurrence_tmp_dict)
 
-    #sample = results_folder.split('/')[-1]
+    sample = results_folder.split('/')[-1]
 
-    #minor_mutation_expected = nvc.benchmark_analysis_result(sample)
+    minor_mutation_expected = nvc.benchmark_analysis_result(sample)
 
-    #minor_mutation_results = nvc.convert_mutation_dict_to_object(confirmed_mutation_dict)
+    minor_mutation_results = nvc.convert_mutation_dict_to_object(confirmed_mutation_dict)
+
+    print (len(minor_mutation_expected), len(minor_mutation_results))
 
     #precision, recall, f1, tp, fp, fn = nvc.calculate_metrics(minor_mutation_expected, minor_mutation_results)
 
