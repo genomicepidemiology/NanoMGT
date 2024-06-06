@@ -129,15 +129,15 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
     confirmed_mutation_dict = derive_mutation_positions(consensus_dict, arguments)
 
     # Perform biological validation of mutations
-    bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
+    #bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
     # Co-occurrence analysis until convergence
-    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count =\
-        co_occurrence_until_convergence(arguments, confirmed_mutation_dict,
+    #confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count =\
+    #    co_occurrence_until_convergence(arguments, confirmed_mutation_dict,
                                         consensus_dict, {}, bio_validation_dict)
 
     # Format and output the results
-    format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
-                  co_occurrence_tmp_dict)
+    #format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
+    #              co_occurrence_tmp_dict)
 
     sample = results_folder.split('/')[-1]
 
