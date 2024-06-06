@@ -79,6 +79,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
                   co_occurrence_tmp_dict)
 
     print (arguments.output)
+    print (results_folder)
 
     sample = arguments.output.split('/')[-1]
 
