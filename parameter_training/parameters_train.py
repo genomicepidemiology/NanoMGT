@@ -28,7 +28,7 @@ folders = [f for f in os.listdir(alignment_results_path)]
 
 # Training values
 # Use INT here, they will get divided by 100 later
-maf_interval = [2, 3, 4]
+maf_interval = [2]
 
 # Grid search for initial values prior to fine tuning
 # Adjust these values depening on how many iterations you want to run
