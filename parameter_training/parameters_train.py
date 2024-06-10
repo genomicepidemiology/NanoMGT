@@ -182,12 +182,6 @@ def benchmark_analysis_result(sample, batch_csv_path, maps_path):
 
     return mutation_map
 
-def find_highest_percentage_id(batch_id, data):
-    # Placeholder implementation
-    top_id = "some_top_id"
-    minor = ["minor1", "minor2", "minor3"]  # Example list, should be derived from `data`
-    return top_id, minor
-
 def format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict):
     """
     Format and print the output of confirmed mutations with additional information.
