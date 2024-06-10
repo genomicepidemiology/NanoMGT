@@ -19,7 +19,7 @@ from nanomgt import nanopore_variantcaller as nvc
 
 # List of folders to process
 # Modify this script with the correct path to the data
-alignment_results_path = '/home/people/malhal/test/training_test/'
+alignment_results_path = '/home/people/malhal/test/training_test/subset/'
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
@@ -82,7 +82,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
     # Modify the path to the batch CSVs files here
     # Naming convention might differ, depending on the data.
-    minor_mutation_expected = benchmark_analysis_result(sample, '/home/people/malhal/data/new_nanomgt/simulated_batches/')
+    minor_mutation_expected = benchmark_analysis_result(sample, '/home/people/malhal/test/training_test/data/simulated_batches/', '/home/people/malhal/test/training_test/maps/' )
 
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
 
@@ -159,12 +159,15 @@ def load_mutations_from_files(file_paths):
     return mutations_dict
 
 
-def benchmark_analysis_result(sample, batch_csv_path):
+def benchmark_analysis_result(sample, batch_csv_path, maps_path):
+    print (sample)
     batch_id = int(sample.split('_')[-2][5:])
+    print (batch_id)
     batch_csv = batch_csv_path + "_".join(sample.split('_')[1:-2]) + ".csv"
+    print (batch_csv)
 
     data = load_data(batch_csv)
-
+    """
     top_id, minor = find_highest_percentage_id(batch_id, data)
     # Use names and batch ID to get the correct mutation map
     if 'salmonella_enterica' in sample:
@@ -190,6 +193,7 @@ def benchmark_analysis_result(sample, batch_csv_path):
     #print ('My expected output')
     #for item in mutation_map:
     #    print(item, mutation_map[item])
+    """
 
     return mutation_map
 
@@ -209,7 +213,6 @@ def format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bi
     with open(new_output_folder + '/minor_mutations.csv', 'w') as outfile:
         header = 'Gene,Position,MajorityBase,MutationBase,MutationDepth,TotalDepth,GeneLength,MutationComment,CoOccurrence'
         print(header, file=outfile)
-
         for allele in confirmed_mutation_dict:
             for mutation in zip(confirmed_mutation_dict[allele][0], confirmed_mutation_dict[allele][1]):
                 position = mutation[0].split('_')[0]
@@ -372,4 +375,5 @@ for folder in folders:
         new_output_folder = output_training_folder + '/' + folder
         os.makedirs(new_output_folder, exist_ok=True)
 
-        run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters)
+        #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters)
+        train_parameters(maf / 100, alignment_folder, 3, 0.5, new_output_folder, 0.5, 5, 15, 0.5, 0.5, 0.5)
