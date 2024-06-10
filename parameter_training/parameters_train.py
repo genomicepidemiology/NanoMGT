@@ -352,10 +352,11 @@ def extract_parameters(param_string):
     return dict(re.findall(param_pattern, param_string))
 
 
-def calculate_average_f1_scores(file_name):
+def calculate_best_parameters(file_name):
     df = pd.read_csv(file_name)
 
-    parameters_data = defaultdict(lambda: {'f1_scores': [], 'average_f1_score': 0.0})
+    parameters_data = defaultdict(
+        lambda: {'f1_scores': [], 'average_f1_score': 0.0, 'best_f1_score': float('-inf'), 'best_params': {}})
 
     for index, row in df.iterrows():
         f1_score = row['F1 Score']
@@ -365,11 +366,20 @@ def calculate_average_f1_scores(file_name):
             key = f"{param}_{value}"
             parameters_data[key]['f1_scores'].append(f1_score)
 
-    for key, data in parameters_data.items():
-        data['average_f1_score'] = sum(data['f1_scores']) / len(data['f1_scores'])
+            if f1_score > parameters_data[key]['best_f1_score']:
+                parameters_data[key]['best_f1_score'] = f1_score
+                parameters_data[key]['best_params'] = {param: float(value)}
 
+    best_params_per_file = {}
     for key, data in parameters_data.items():
-        print(f"{key}: Average F1 Score = {data['average_f1_score']:.4f}")
+        param_name, param_value = key.split('_')
+        if param_name not in best_params_per_file:
+            best_params_per_file[param_name] = data['best_params'][param_name]
+        elif data['best_f1_score'] > parameters_data[f"{param_name}_{best_params_per_file[param_name]}"][
+            'best_f1_score']:
+            best_params_per_file[param_name] = data['best_params'][param_name]
+
+    return best_params_per_file
 
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
@@ -397,10 +407,17 @@ for maf in maf_interval:
 
             #train_parameters(maf / 100, alignment_folder, 3, 0.5, new_output_folder,  maps_path, simulated_batches_csv_path, 0.5, 5, 15, 0.5, 0.5, 0.5)
 
+all_best_params = defaultdict(list)
+
 for maf in maf_interval:
-    print (f"maf_{maf}")
+    print(f"maf_{maf}")
     for folder in folders:
         if folder.startswith('depth'):
             new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
             results_filename = new_output_folder + "/all_results.csv"
-            calculate_average_f1_scores(results_filename)
+            best_params = calculate_best_parameters(results_filename)
+            for param, value in best_params.items():
+                all_best_params[param].append(value)
+    for param, values in all_best_params.items():
+        average_value = sum(values) / len(values)
+        print(f"Average of best {param}: {average_value:.4f}")
