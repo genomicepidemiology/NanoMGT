@@ -27,14 +27,14 @@ folders = [f for f in os.listdir(alignment_results_path)]
 
 # Training values
 # Use INT here, they will get divided by 100 later
-maf = 1
+maf = 3
 
 # This represents a gridsearch of the parameters
 cor = [0.1, 0.2, 0.3]
-dp = [0.1]
-np = [0.1]
-pp = [0.1]
-ii = [0.1]
+dp = [0.15]
+np = [1.5]
+pp = [0.4]
+ii = [0.2]
 
 parameters = {
     'cor_interval': cor,
