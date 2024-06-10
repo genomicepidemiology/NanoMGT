@@ -359,5 +359,5 @@ for folder in folders:
         new_output_folder = output_training_folder + '/' + folder
         os.makedirs(new_output_folder, exist_ok=True)
 
-        run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters)
+        run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters, maps_path, simulated_batches_csv_path)
         #train_parameters(maf / 100, alignment_folder, 3, 0.5, new_output_folder, 0.5, 5, 15, 0.5, 0.5, 0.5, maps_path, simulated_batches_csv_path)
