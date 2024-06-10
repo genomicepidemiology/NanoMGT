@@ -5,6 +5,7 @@ import time
 import pandas as pd
 import numpy as np
 import csv
+import re
 import multiprocessing
 
 from Bio import SeqIO
