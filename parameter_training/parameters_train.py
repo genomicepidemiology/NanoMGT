@@ -12,6 +12,7 @@ from itertools import combinations
 import concurrent.futures
 from itertools import product
 import argparse
+from collections import defaultdict
 
 sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + sys.path
 
@@ -344,8 +345,34 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
         writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN'])
         writer.writerow([best_score, best_params, top_precision, top_recall, top_tp, top_fp, top_fn])
 
+
+def extract_parameters(param_string):
+    param_pattern = r'([a-z_]+)_([0-9.]+)'
+    return dict(re.findall(param_pattern, param_string))
+
+
+def calculate_average_f1_scores(file_name):
+    df = pd.read_csv(file_name)
+
+    parameters_data = defaultdict(lambda: {'f1_scores': [], 'average_f1_score': 0.0})
+
+    for index, row in df.iterrows():
+        f1_score = row['F1 Score']
+        parameters = extract_parameters(row['Parameters'])
+
+        for param, value in parameters.items():
+            key = f"{param}_{value}"
+            parameters_data[key]['f1_scores'].append(f1_score)
+
+    for key, data in parameters_data.items():
+        data['average_f1_score'] = sum(data['f1_scores']) / len(data['f1_scores'])
+
+    for key, data in parameters_data.items():
+        print(f"{key}: Average F1 Score = {data['average_f1_score']:.4f}")
+
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
+
 
 # Loop through each folder
 for maf in maf_interval:
@@ -365,6 +392,13 @@ for maf in maf_interval:
             os.makedirs(new_output_folder, exist_ok=True)
 
             # Initial grid search
-            run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters_interval_search, maps_path, simulated_batches_csv_path)
+            #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters_interval_search, maps_path, simulated_batches_csv_path)
 
             #train_parameters(maf / 100, alignment_folder, 3, 0.5, new_output_folder,  maps_path, simulated_batches_csv_path, 0.5, 5, 15, 0.5, 0.5, 0.5)
+
+for maf in maf_interval:
+    for folder in folders:
+        if folder.startswith('depth'):
+            new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
+            results_filename = new_output_folder + "/all_results.csv"
+            calculate_average_f1_scores(results_filename)
