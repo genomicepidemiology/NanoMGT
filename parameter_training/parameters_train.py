@@ -20,6 +20,8 @@ from nanomgt import nanopore_variantcaller as nvc
 # List of folders to process
 # Modify this script with the correct path to the data
 alignment_results_path = '/home/people/malhal/test/training_test/subset/'
+maps_path = '/home/people/malhal/test/training_test/maps/'
+simulated_batches_csv_path = '/home/people/malhal/test/training_test/data/simulated_batches/'
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
@@ -46,7 +48,7 @@ cpus = cpu_count_mp = multiprocessing.cpu_count()
 cpus = int(cpus / 2)  # Use half capacity.
 
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
-                    iteration_increase, proxi, dp_window, pp, np, dp):
+                    iteration_increase, proxi, dp_window, pp, np, dp, maps_path, simulated_batches_csv_path):
     arguments = argparse.Namespace()
     arguments.maf = maf
     arguments.output = results_folder
@@ -82,7 +84,8 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
     # Modify the path to the batch CSVs files here
     # Naming convention might differ, depending on the data.
-    minor_mutation_expected = benchmark_analysis_result(sample, '/home/people/malhal/test/training_test/data/simulated_batches/', '/home/people/malhal/test/training_test/maps/' )
+    # Adjust these to the your path for the
+    minor_mutation_expected = benchmark_analysis_result(sample, maps_path, simulated_batches_csv_path)
 
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
 
@@ -163,47 +166,28 @@ def get_number_of_columns(dataframe):
 
 
 def benchmark_analysis_result(sample, batch_csv_path, maps_path):
-    print (sample)
     batch_id = int(sample.split('_')[-2][5:])
-    print (batch_id)
     batch_csv = batch_csv_path + "_".join(sample.split('_')[1:-2]) + ".csv"
-    print (batch_csv)
-    mutation_map = ''
 
     data = load_data(batch_csv)
-    print (data)
-    num_columns = get_number_of_columns(data)
-    print(f"Number of columns: {num_columns}")
-    """
+    sample_number = int((get_number_of_columns(data) - 1) / 2)
+
     top_id, minor = find_highest_percentage_id(batch_id, data)
-    # Use names and batch ID to get the correct mutation map
-    if 'salmonella_enterica' in sample:
-        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
-            top_id, minor[0])
-        map_file_2 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
-            top_id, minor[1])
-        mutation_map = load_mutations_from_files([map_file_1, map_file_2])
-    if 'ecoli' in sample:
-        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
-            top_id, minor[0])
-        map_file_2 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
-            top_id, minor[1])
-        mutation_map = load_mutations_from_files([map_file_1, map_file_2])
-    if 'staph_aureus' in sample:
-        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
-            top_id, minor[0])
-        mutation_map = load_mutations_from_files([map_file_1])
-    if 'campylobacter_jejuni' in sample:
-        map_file_1 = '/home/people/malhal/data/new_nanomgt/majority_variants/minor_variant_maps/major_{}_minor_{}.txt'.format(
-            top_id, minor[0])
-        mutation_map = load_mutations_from_files([map_file_1])
-    #print ('My expected output')
-    #for item in mutation_map:
-    #    print(item, mutation_map[item])
-    """
+
+    map_files = []
+    for i in range(sample_number):
+        map_file = f'{maps_path}/major_{top_id}_minor_{minor[i]}.txt'
+        map_files.append(map_file)
+
+    mutation_map = load_mutations_from_files(map_files)
 
     return mutation_map
 
+def find_highest_percentage_id(batch_id, data):
+    # Placeholder implementation
+    top_id = "some_top_id"
+    minor = ["minor1", "minor2", "minor3"]  # Example list, should be derived from `data`
+    return top_id, minor
 
 def format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict):
     """
@@ -383,4 +367,4 @@ for folder in folders:
         os.makedirs(new_output_folder, exist_ok=True)
 
         #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters)
-        train_parameters(maf / 100, alignment_folder, 3, 0.5, new_output_folder, 0.5, 5, 15, 0.5, 0.5, 0.5)
+        train_parameters(maf / 100, alignment_folder, 3, 0.5, new_output_folder, 0.5, 5, 15, 0.5, 0.5, 0.5, maps_path, simulated_batches_csv_path)
