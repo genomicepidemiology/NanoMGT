@@ -344,25 +344,27 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
         writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN'])
         writer.writerow([best_score, best_params, top_precision, top_recall, top_tp, top_fp, top_fn])
 
-output_training_folder = 'training_output_{}'.format(maf)
+output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 
 # Loop through each folder
-for folder in folders:
-    #Adjust this is you another naming convention
-    #Assumes a series of folders with the alignment results
-    if folder.startswith('depth'):
+for maf in maf_interval:
+    os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
+    for folder in folders:
+        #Adjust this is you another naming convention
+        #Assumes a series of folders with the alignment results
+        if folder.startswith('depth'):
 
 
-        # Process each file
-        input_file_path = os.path.join(alignment_results_path, folder)
+            # Process each file
+            input_file_path = os.path.join(alignment_results_path, folder)
 
-        # This is folder in which the run_nanomgt_on_sample.py script produced folders with alignments.
-        alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
-        new_output_folder = output_training_folder + '/' + folder
-        os.makedirs(new_output_folder, exist_ok=True)
+            # This is folder in which the run_nanomgt_on_sample.py script produced folders with alignments.
+            alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
+            new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
+            os.makedirs(new_output_folder, exist_ok=True)
 
-        # Initial grid search
-        run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters_interval_search, maps_path, simulated_batches_csv_path)
+            # Initial grid search
+            run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters_interval_search, maps_path, simulated_batches_csv_path)
 
-        #train_parameters(maf / 100, alignment_folder, 3, 0.5, new_output_folder,  maps_path, simulated_batches_csv_path, 0.5, 5, 15, 0.5, 0.5, 0.5)
+            #train_parameters(maf / 100, alignment_folder, 3, 0.5, new_output_folder,  maps_path, simulated_batches_csv_path, 0.5, 5, 15, 0.5, 0.5, 0.5)
