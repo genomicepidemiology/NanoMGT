@@ -49,9 +49,9 @@ parameters_interval_search = {
     'dp_interval': dp_interval_search
 }
 
-cpus = cpu_count_mp = multiprocessing.cpu_count()
-cpus = int(cpus / 2)  # Use half capacity. Modfiy this to use more or less CPU capacity
-
+#cpus = cpu_count_mp = multiprocessing.cpu_count()
+#cpus = int(cpus / 2)  # Use half capacity. Modfiy this to use more or less CPU capacity
+cpus = 60 #Manually sat
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, simulated_batches_csv_path,
                     iteration_increase, proxi, dp_window, pp, np, dp):
     arguments = argparse.Namespace()
