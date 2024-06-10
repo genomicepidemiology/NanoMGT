@@ -355,8 +355,7 @@ def extract_parameters(param_string):
 def calculate_best_parameters(file_name):
     df = pd.read_csv(file_name)
 
-    parameters_data = defaultdict(
-        lambda: {'f1_scores': [], 'average_f1_score': 0.0, 'best_f1_score': float('-inf'), 'best_params': {}})
+    parameters_data = defaultdict(lambda: {'f1_scores': [], 'best_f1_score': float('-inf'), 'best_params': {}})
 
     for index, row in df.iterrows():
         f1_score = row['F1 Score']
@@ -372,14 +371,16 @@ def calculate_best_parameters(file_name):
 
     best_params_per_file = {}
     for key, data in parameters_data.items():
-        param_name, param_value = key.split('_')
-        if param_name not in best_params_per_file:
-            best_params_per_file[param_name] = data['best_params'][param_name]
-        elif data['best_f1_score'] > parameters_data[f"{param_name}_{best_params_per_file[param_name]}"][
-            'best_f1_score']:
-            best_params_per_file[param_name] = data['best_params'][param_name]
+        param_name, param_value = key.rsplit('_', 1)
+        param_value = float(param_value)
 
-    return best_params_per_file
+        if param_name not in best_params_per_file:
+            best_params_per_file[param_name] = (param_value, data['best_f1_score'])
+        elif data['best_f1_score'] > best_params_per_file[param_name][1]:
+            best_params_per_file[param_name] = (param_value, data['best_f1_score'])
+
+    return {param: value for param, (value, _) in best_params_per_file.items()}
+
 
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
