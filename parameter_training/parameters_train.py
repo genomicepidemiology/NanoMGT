@@ -365,7 +365,7 @@ for folder in folders:
 
 
         # Process each file
-        input_file_path = os.path.join(path, file)
+        input_file_path = os.path.join(path, folder)
 
         # This is folder in which the run_nanomgt_on_sample.py script produced folders with alignments.
         alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
