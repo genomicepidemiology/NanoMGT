@@ -20,7 +20,7 @@ from nanomgt import nanopore_variantcaller as nvc
 # List of folders to process
 # Modify this script with the correct path to the data
 alignment_results_path = '/home/people/malhal/test/training_test/'
-files = os.listdir(path)
+files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
 # Training values
