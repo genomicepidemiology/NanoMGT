@@ -173,10 +173,8 @@ def benchmark_analysis_result(sample, batch_csv_path, maps_path):
 
     top_id, minor = find_highest_percentage_id(batch_id, data)
 
-    print (top_id, minor)
-    print (sample_number)
     map_files = []
-    for i in range(sample_number):
+    for i in range(sample_number-1):
         map_file = f'{maps_path}/major_{top_id}_minor_{minor[i]}.txt'
         map_files.append(map_file)
 
