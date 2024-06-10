@@ -158,6 +158,9 @@ def load_mutations_from_files(file_paths):
 
     return mutations_dict
 
+def get_number_of_columns(dataframe):
+    return dataframe.shape[1]
+
 
 def benchmark_analysis_result(sample, batch_csv_path, maps_path):
     print (sample)
