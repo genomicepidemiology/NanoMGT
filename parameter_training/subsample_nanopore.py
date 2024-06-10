@@ -112,7 +112,7 @@ for file_path in file_paths:
             for id, percentage in zip(ids, percentages):
                 num_nucleotides = int(desired_total_nucleotides * percentage)
                 # Adjust to where the fastq files are.
-                input_file = f'/home/people/malhal/data/new_nanomgt/{id.strip()}.fastq'
+                input_file = f'{id.strip()}.fastq'
                 output_file = os.path.join(output_directory, f'{output_prefix}_batch{batch}_{id.strip()}.fastq')
 
                 # Check if input file exists before processing

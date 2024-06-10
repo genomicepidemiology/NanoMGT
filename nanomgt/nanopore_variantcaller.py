@@ -42,6 +42,8 @@ def nanopore_metagenomics_variantcaller(arguments):
     # Identify the highest scoring bacterial template
     highest_scoring_template = highest_scoring_hit(os.path.join(arguments.output, "bacteria_mapping.spa"))
     primary_specie = ' '.join(highest_scoring_template.split()[1:3])
+    print (f"Primary specie: {primary_specie}")
+    print (f"Highest scoring template: {highest_scoring_template}")
 
     # Produce a species-specific KMA database
     produce_specie_specific_kma_db(primary_specie,
