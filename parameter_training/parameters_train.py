@@ -27,25 +27,28 @@ folders = [f for f in os.listdir(alignment_results_path)]
 
 # Training values
 # Use INT here, they will get divided by 100 later
-maf = 3
+maf_interval = [2, 3, 4]
 
-# This represents a gridsearch of the parameters
-cor = [0.1, 0.2, 0.3]
-dp = [0.15]
-np = [1.5]
-pp = [0.4]
-ii = [0.2]
+# Grid search for initial values prior to fine tuning
+# Adjust these values depening on how many iterations you want to run
+# You can modify these lists to include specific values, if you don't want to run a grid search for them
+# An example of this could be np which likely always will overfit and select the highest value if you have a low MAF value and high error reads.
+cor_interval_search = [0.1, 0.3, 0.5, 0.7]
+dp_interval_search = [0.1, 0.2, 0.3, 0.4]
+np_interval_search = [0.5, 1, 1.5, 2, 2.5]
+pp_interval_search = [0.2, 0.4, 0.6, 0.8]
+ii_interval_search = [0.05, 0.1, 0.15, 0.2]
 
-parameters = {
-    'cor_interval': cor,
-    'iteration_increase_interval': ii,
-    'pp_interval': pp,
-    'np_interval': np,
-    'dp_interval': dp
+parameters_interval_search = {
+    'cor_interval': cor_interval_search,
+    'iteration_increase_interval': ii_interval_search,
+    'pp_interval': pp_interval_search,
+    'np_interval': np_interval_search,
+    'dp_interval': dp_interval_search
 }
 
 cpus = cpu_count_mp = multiprocessing.cpu_count()
-cpus = int(cpus / 2)  # Use half capacity.
+cpus = int(cpus / 2)  # Use half capacity. Modfiy this to use more or less CPU capacity
 
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, simulated_batches_csv_path,
                     iteration_increase, proxi, dp_window, pp, np, dp):
@@ -359,5 +362,7 @@ for folder in folders:
         new_output_folder = output_training_folder + '/' + folder
         os.makedirs(new_output_folder, exist_ok=True)
 
-        run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters, maps_path, simulated_batches_csv_path)
+        # Initial grid search
+        run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters_interval_search, maps_path, simulated_batches_csv_path)
+
         #train_parameters(maf / 100, alignment_folder, 3, 0.5, new_output_folder,  maps_path, simulated_batches_csv_path, 0.5, 5, 15, 0.5, 0.5, 0.5)

@@ -1,5 +1,7 @@
 To train parameters on any given set of .fastq isolates, do the following:
 
+#Comments:
+
 1.) Generate mixed .fastq files for the given species according to the scripts simulate_batches.py and subsample_nanopore.py.
     You will need to modify the script to fit your fastq files. Also this requires SeqTK to be installed.
 2.) Run NanoMGT on each isolate sample to generate the alignments The parameters doesn't matter, only the alignment is of interest.
@@ -8,5 +10,5 @@ To train parameters on any given set of .fastq isolates, do the following:
     This script produces files named like this: major_ERR12533301_minor_SRR25689478.txt.
     Here ERR12533301 is considered the major strain and SRR25689478 is considered the minor strain.
     The output mutations are the variants found in the minority strain.
-4.)
+4.) Adjust the path in the top of the parameters_train.py script and run it.
 
