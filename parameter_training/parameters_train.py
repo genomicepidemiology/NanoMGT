@@ -423,6 +423,6 @@ for maf in maf_interval:
         average_value = sum(values) / len(values)
         print(f"Average of best {param}: {average_value:.4f}")
     # Output the dictionary to a JSON file
-    output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf))
+    output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
