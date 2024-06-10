@@ -29,17 +29,17 @@ folders = [f for f in os.listdir(alignment_results_path)]
 
 # Training values
 # Use INT here, they will get divided by 100 later
-maf_interval = [2]
+maf_interval = [1, 2, 3, 4, 5]
 
 # Grid search for initial values prior to fine tuning
 # Adjust these values depening on how many iterations you want to run
 # You can modify these lists to include specific values, if you don't want to run a grid search for them
 # An example of this could be np which likely always will overfit and select the highest value if you have a low MAF value and high error reads.
 cor_interval_search = [0.1, 0.3, 0.5, 0.7]
-dp_interval_search = [0.1, 0.2, 0.3, 0.4]
-np_interval_search = [0.5, 1, 1.5, 2, 2.5]
-pp_interval_search = [0.2, 0.4, 0.6, 0.8]
-ii_interval_search = [0.05, 0.1, 0.15, 0.2]
+dp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
+np_interval_search = [0.5, 1, 1.5, 2, 2.5, 3, 3.5]
+pp_interval_search = [0.05, 0.2, 0.4, 0.6, 0.8]
+ii_interval_search = [0.01, 0.1, 0.2, 0.40, 0.60]
 
 parameters_interval_search = {
     'cor_interval': cor_interval_search,
@@ -404,7 +404,7 @@ for maf in maf_interval:
             os.makedirs(new_output_folder, exist_ok=True)
 
             # Initial grid search
-            #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters_interval_search, maps_path, simulated_batches_csv_path)
+            run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters_interval_search, maps_path, simulated_batches_csv_path)
 
             #train_parameters(maf / 100, alignment_folder, 3, 0.5, new_output_folder,  maps_path, simulated_batches_csv_path, 0.5, 5, 15, 0.5, 0.5, 0.5)
 
@@ -419,7 +419,10 @@ for maf in maf_interval:
             best_params = calculate_best_parameters(results_filename)
             for param, value in best_params.items():
                 all_best_params[param].append(value)
-    print (all_best_params)
     for param, values in all_best_params.items():
         average_value = sum(values) / len(values)
         print(f"Average of best {param}: {average_value:.4f}")
+    # Output the dictionary to a JSON file
+    output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf))
+    with open(output_file_path, 'w') as json_file:
+        json.dump(average_best_params, json_file, indent=4)
