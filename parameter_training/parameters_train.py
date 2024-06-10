@@ -169,6 +169,8 @@ def benchmark_analysis_result(sample, batch_csv_path, maps_path):
 
     data = load_data(batch_csv)
     print (data)
+    num_columns = get_number_of_columns(data)
+    print(f"Number of columns: {num_columns}")
     """
     top_id, minor = find_highest_percentage_id(batch_id, data)
     # Use names and batch ID to get the correct mutation map
