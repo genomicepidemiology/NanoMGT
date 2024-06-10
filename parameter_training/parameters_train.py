@@ -85,7 +85,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
     # Modify the path to the batch CSVs files here
     # Naming convention might differ, depending on the data.
     # Adjust these to the your path for the
-    minor_mutation_expected = benchmark_analysis_result(sample, maps_path, simulated_batches_csv_path)
+    minor_mutation_expected = benchmark_analysis_result(sample, simulated_batches_csv_path, maps_path)
 
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
 
@@ -168,7 +168,6 @@ def get_number_of_columns(dataframe):
 def benchmark_analysis_result(sample, batch_csv_path, maps_path):
     batch_id = int(sample.split('_')[-2][5:])
     batch_csv = batch_csv_path + "_".join(sample.split('_')[1:-2]) + ".csv"
-
     data = load_data(batch_csv)
     sample_number = int((get_number_of_columns(data) - 1) / 2)
 
