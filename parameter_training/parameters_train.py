@@ -47,8 +47,8 @@ parameters = {
 cpus = cpu_count_mp = multiprocessing.cpu_count()
 cpus = int(cpus / 2)  # Use half capacity.
 
-def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
-                    iteration_increase, proxi, dp_window, pp, np, dp, maps_path, simulated_batches_csv_path):
+def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, simulated_batches_csv_path,
+                    iteration_increase, proxi, dp_window, pp, np, dp):
     arguments = argparse.Namespace()
     arguments.maf = maf
     arguments.output = results_folder
@@ -262,7 +262,7 @@ def calculate_metrics(expected_mutations, actual_mutations):
     return precision, recall, f1, total_tp, total_fp, total_fn
 
 
-def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, parameters):
+def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, parameters, maps_path, simulated_batches_csv_path):
     # Fixed parameters
     min_n = 3
     proxi = 5
@@ -301,7 +301,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
         futures_to_params = {
             executor.submit(
                 train_parameters, maf, alignment_folder, min_n,
-                combo[0], new_output_folder, combo[1], proxi, dp_window,
+                combo[0], new_output_folder, maps_path, simulated_batches_csv_path, combo[1], proxi, dp_window,
                 combo[2], combo[3], combo[4]
             ): combo for combo in all_params
         }
@@ -360,4 +360,4 @@ for folder in folders:
         os.makedirs(new_output_folder, exist_ok=True)
 
         run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters, maps_path, simulated_batches_csv_path)
-        #train_parameters(maf / 100, alignment_folder, 3, 0.5, new_output_folder, 0.5, 5, 15, 0.5, 0.5, 0.5, maps_path, simulated_batches_csv_path)
+        #train_parameters(maf / 100, alignment_folder, 3, 0.5, new_output_folder,  maps_path, simulated_batches_csv_path, 0.5, 5, 15, 0.5, 0.5, 0.5)
