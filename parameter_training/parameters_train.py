@@ -21,7 +21,7 @@ from nanomgt import nanopore_variantcaller as nvc
 # Modify this script with the correct path to the data
 path = '/home/people/malhal/test/training_data_set/'
 files = os.listdir(path)
-fastq_files = [f for f in os.listdir(path) if f.endswith('.fastq')]
+folders = [f for f in os.listdir(path) if f.endswith('.fastq')]
 
 # Training values
 # Use INT here, they will get divided by 100 later
@@ -358,7 +358,7 @@ output_training_folder = 'training_output_{}'.format(maf)
 os.makedirs(output_training_folder, exist_ok=True)
 
 # Loop through each folder
-for file in fastq_files:
+for folder in folders:
     #Adjust this is you another naming convention
     #Assumes a series of folders with the alignment results
     if folder.startswith('depth'):
