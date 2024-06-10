@@ -17,7 +17,6 @@ SRR28370694	Staphylococcus aureus ~200x depth
 ERR8958843 Staphylococcus aureus >2000x depth
 
 
-
 Escherichia coli approx. genome size for depth simulation: 5000000
 Staphylococcus aureus approx. genome size for depth simulation: 3000000
 Campylobacter jejuni approx. genome size for depth simulation: 1700000

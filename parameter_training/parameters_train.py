@@ -80,7 +80,9 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder,
 
     sample = arguments.output.split('/')[-1]
 
-    minor_mutation_expected = benchmark_analysis_result(sample)
+    # Modify the path to the batch CSVs files here
+    # Naming convention might differ, depending on the data.
+    minor_mutation_expected = benchmark_analysis_result(sample, '/home/people/malhal/data/new_nanomgt/simulated_batches/')
 
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
 
@@ -157,19 +159,11 @@ def load_mutations_from_files(file_paths):
     return mutations_dict
 
 
-def benchmark_analysis_result(sample):
-    #batch = sample.split('_')[-2]
-    #print (sample)
-    print (sample)
+def benchmark_analysis_result(sample, batch_csv_path):
     batch_id = int(sample.split('_')[-2][5:])
-    #print (batch_id)
-    #print(f"Batch ID: {batch_id}")
-    specie = sample.split('_')[1:-5]
-    batch_csv = "_".join(sample.split('_')[1:-2]) + ".csv"
-    data = load_data('/home/people/malhal/data/new_nanomgt/simulated_batches/' + batch_csv)
-    # Change this batch_id to test different batches
-    # batch_id = 10
-    #print(f"Highest percentage ID for batch {batch_id}: {find_highest_percentage_id(batch_id, data)}")
+    batch_csv = batch_csv_path + "_".join(sample.split('_')[1:-2]) + ".csv"
+
+    data = load_data(batch_csv)
 
     top_id, minor = find_highest_percentage_id(batch_id, data)
     # Use names and batch ID to get the correct mutation map
@@ -348,7 +342,6 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
                 print(f"Generated an exception: {exc}")
 
     # Write all results to a CSV
-    print (all_results)
 
     with open(results_filename, 'w', newline='') as file:
         writer = csv.writer(file)
@@ -366,16 +359,17 @@ os.makedirs(output_training_folder, exist_ok=True)
 
 # Loop through each folder
 for file in fastq_files:
-    # Get all 'merged.fastq' files in the folder
+    #Adjust this is you another naming convention
+    #Assumes a series of folders with the alignment results
+    if folder.startswith('depth'):
 
-    # Process each file
-    output_name = file[:-6]  # Removes the '.fastq' part from the file name for the output directory
-    input_file_path = os.path.join(path, file)
 
-    # This is folder in which the run_nanomgt_on_sample.py script produced folders with alignments.
-    alignment_folder = '/home/people/malhal/test/training_test/{}'.format(output_name)
-    new_output_folder = output_training_folder + '/' + output_name
-    os.makedirs(new_output_folder, exist_ok=True)
+        # Process each file
+        input_file_path = os.path.join(path, file)
 
-    run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters)
-    #train_parameters(maf / 100, alignment_folder, 3, 0.1, new_output_folder, 1, 5, 0.1, 0.1, 0.1, 0.1)
+        # This is folder in which the run_nanomgt_on_sample.py script produced folders with alignments.
+        alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
+        new_output_folder = output_training_folder + '/' + folder
+        os.makedirs(new_output_folder, exist_ok=True)
+
+        run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters)
