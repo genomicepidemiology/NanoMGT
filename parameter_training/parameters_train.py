@@ -19,9 +19,9 @@ from nanomgt import nanopore_variantcaller as nvc
 
 # List of folders to process
 # Modify this script with the correct path to the data
-path = '/home/people/malhal/test/training_data_set/'
+alignment_results_path = '/home/people/malhal/test/training_test/'
 files = os.listdir(path)
-folders = [f for f in os.listdir(path) if f.endswith('.fastq')]
+folders = [f for f in os.listdir(alignment_results_path)]
 
 # Training values
 # Use INT here, they will get divided by 100 later
