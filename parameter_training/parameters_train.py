@@ -397,6 +397,7 @@ for maf in maf_interval:
             #train_parameters(maf / 100, alignment_folder, 3, 0.5, new_output_folder,  maps_path, simulated_batches_csv_path, 0.5, 5, 15, 0.5, 0.5, 0.5)
 
 for maf in maf_interval:
+    print (f"maf_{maf}")
     for folder in folders:
         if folder.startswith('depth'):
             new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
