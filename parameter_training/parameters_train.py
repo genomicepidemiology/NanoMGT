@@ -419,6 +419,7 @@ for maf in maf_interval:
             best_params = calculate_best_parameters(results_filename)
             for param, value in best_params.items():
                 all_best_params[param].append(value)
+    print (all_best_params)
     for param, values in all_best_params.items():
         average_value = sum(values) / len(values)
         print(f"Average of best {param}: {average_value:.4f}")
