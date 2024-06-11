@@ -407,7 +407,7 @@ for maf in maf_interval:
     for folder in folders:
         if folder.startswith('depth'):
             batch_id = int(folder.split('_')[-2][5:])
-            if maf >= batch_id:
+            if batch_id >= maf:
                 new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
                 results_filename = new_output_folder + "/all_results.csv"
                 best_params = calculate_best_parameters(results_filename)
@@ -435,7 +435,7 @@ for maf in maf_interval:
         for folder in folders:
             if folder.startswith('depth'):
                 batch_id = int(folder.split('_')[-2][5:])
-                if maf >= batch_id:
+                if batch_id >= maf:
                     new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param + '_' + folder
                     input_file_path = os.path.join(alignment_results_path, folder)
                     alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
@@ -464,17 +464,29 @@ for maf in maf_interval:
         for folder in folders:
             if folder.startswith('depth'):
                 batch_id = int(folder.split('_')[-2][5:])
-                if maf >= batch_id:
+                if batch_id >= maf:
                     new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param + '_' + folder
                     results_filename = new_output_folder + "/top_result.csv"
-                    print (results_filename)
                     f1_score, param_value = load_top_hit(results_filename, param)
                     total_parameter_dict[maf][param][batch_id] = [f1_score, param_value]
 
 for maf in total_parameter_dict:
     for param in total_parameter_dict[maf]:
-        for batch_id in total_parameter_dict[maf][param]:
-            print (maf, batch_id, total_parameter_dict[maf][param][batch_id][0], total_parameter_dict[maf][param][batch_id][1])
+        output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param, maf))
+
+        # Open the CSV file for writing
+        with open(output_file_csv, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            # Write the header
+            writer.writerow(['MAF', 'Batch ID', 'F1 Score', 'Parameter Value'])
+
+            # Write the data
+            for batch_id in total_parameter_dict[maf][param]:
+                maf_value = maf
+                batch_id_value = batch_id
+                f1_score = total_parameter_dict[maf][param][batch_id][0]
+                param_value = total_parameter_dict[maf][param][batch_id][1]
+                writer.writerow([maf_value, batch_id_value, f1_score, param_value])
 
 
 
