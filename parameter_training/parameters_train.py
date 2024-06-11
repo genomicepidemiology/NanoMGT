@@ -355,6 +355,24 @@ def create_test_object(default_params, param_to_test, test_values):
 
     return test_object
 
+
+def load_top_hit(file_path, param_to_fetch):
+    df = pd.read_csv(file_path)
+    top_hit = df.iloc[0]  # Assuming the top hit is the first row
+    f1_score = top_hit['F1 Score']
+    parameters = top_hit['Parameters']
+
+    # Extracting the specific parameter value
+    param_pattern = r'{}_([0-9.]+)'.format(param_to_fetch)
+    match = re.search(param_pattern, parameters)
+    if match:
+        param_value = float(match.group(1))
+    else:
+        raise ValueError(f"Parameter {param_to_fetch} not found in the parameters string.")
+
+    return f1_score, param_value
+
+
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 """
@@ -393,8 +411,8 @@ for maf in maf_interval:
         json.dump(average_best_params, json_file, indent=4)
 
     print(f"Averages saved to {output_file_path}")
-"""
 
+#Test individual parameters
 for maf in maf_interval:
     output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
     default_params = load_default_parameters(output_file_path)
@@ -415,6 +433,36 @@ for maf in maf_interval:
                         cpus = 40
                     run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                          test_object, maps_path, simulated_batches_csv_path)
+
+"""
+
+#Eval each parameter value
+
+total_parameter_dict = {}
+
+for maf in maf_interval:
+    total_parameter_dict[maf] = {}
+    output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
+    default_params = load_default_parameters(output_file_path)
+
+    for param, default_value in default_params.items():
+        total_parameter_dict[maf][param] = {}
+        test_values = generate_test_values(default_value)
+        test_object = create_test_object(default_params, param, test_values)
+
+        for folder in folders:
+            if folder.startswith('depth'):
+                batch_id = int(folder.split('_')[-2][5:])
+                if maf >= batch_id:
+                    new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param + '_' + folder
+                    results_filename = new_output_folder + "/top_result.csv"
+                    f1_score, param_value = load_top_hit(results_filename, para)
+                    print (f1_score, param_value)
+                    sys.exit()
+
+
+
+
 
 
 
