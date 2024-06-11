@@ -367,4 +367,14 @@ for maf in maf_interval:
 for maf in maf_interval:
     output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
     default_params = load_default_parameters(output_file_path, maf)
-    print (default_params)
+
+    parameters_interval_search = {
+        'cor_interval': default_params['_cor'],
+        'iteration_increase_interval': default_params['_iteration_increase'],
+        'pp_interval': default_params['_pp'],
+        'np_interval': default_params['_np'],
+        'dp_interval': default_params['_dp']
+    }
+
+    print parameters_interval_search
+
