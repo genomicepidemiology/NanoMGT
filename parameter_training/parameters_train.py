@@ -324,9 +324,18 @@ def load_default_parameters(file_path, maf):
     with open(file_path, 'r') as json_file:
         return json.load(json_file)
 
-def generate_test_values(default_value, num_values=20, increment=0.1):
+def generate_test_values(default_value, num_values=20, increment=0.05):
     increments = np.linspace(-num_values // 2, num_values // 2, num_values) * increment
     return default_value * (1 + increments)
+
+def create_test_object(default_params, param_to_test, test_values):
+    test_object = {}
+    for param, default_value in default_params.items():
+        if param == param_to_test:
+            test_object[param] = test_values
+        else:
+            test_object[param] = [default_value] * len(test_values)
+    return test_object
 
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
@@ -374,12 +383,9 @@ for maf in maf_interval:
 
     for param, default_value in default_params.items():
         test_values = generate_test_values(default_value)
+        test_object = create_test_object(default_params, param, test_values)
 
-        for test_value in test_values:
-            parameters_interval_search = default_params.copy()
-            parameters_interval_search[param] = test_value
-
-            print (parameters_interval_search)
+        print(test_object)
 
 
 
