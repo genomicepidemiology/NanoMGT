@@ -403,7 +403,7 @@ for maf in maf_interval:
             if folder.startswith('depth'):
                 batch_id = int(folder.split('_')[-2][5:])
                 if maf >= batch_id:
-                    new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param + '_' folder
+                    new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param + '_' + folder
                     input_file_path = os.path.join(alignment_results_path, folder)
                     alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
                     os.makedirs(new_output_folder, exist_ok=True)
