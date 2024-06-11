@@ -457,8 +457,14 @@ for maf in maf_interval:
                     new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param + '_' + folder
                     results_filename = new_output_folder + "/top_result.csv"
                     f1_score, param_value = load_top_hit(results_filename, param)
-                    print (f1_score, param_value)
-                    sys.exit()
+                    total_parameter_dict[maf][param][batch_id] = [f1_score, param_value]
+
+for maf in total_parameter_dict:
+    for param in total_parameter_dict[maf]:
+        for batch_id in total_parameter_dict[maf][param]:
+            print (maf, batch_id, total_parameter_dict[maf][param][batch_id][0], total_parameter_dict[maf][param][batch_id][1])
+
+
 
 
 
