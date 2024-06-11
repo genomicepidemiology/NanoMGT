@@ -399,7 +399,23 @@ for maf in maf_interval:
         test_values = generate_test_values(default_value)
         test_object = create_test_object(default_params, param, test_values)
 
-        print (test_object)
+        for folder in folders:
+            if folder.startswith('depth'):
+                batch_id = int(folder.split('_')[-2][5:])
+                if maf >= batch_id:
+                    new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param + '_' folder
+                    input_file_path = os.path.join(alignment_results_path, folder)
+                    alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
+                    os.makedirs(new_output_folder, exist_ok=True)
+                    if cpus > 21: #Only training 20 values
+                        cpus = 21
+                    run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
+                                         test_object, maps_path, simulated_batches_csv_path)
+
+
+
+
+
 
 
 
