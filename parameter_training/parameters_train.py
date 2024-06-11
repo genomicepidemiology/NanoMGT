@@ -351,7 +351,7 @@ def create_test_object(default_params, param_to_test, test_values):
         if param == param_to_test:
             test_object[mapped_param] = test_values
         else:
-            test_object[mapped_param] = default_value
+            test_object[mapped_param] = [default_value]
 
     return test_object
 
@@ -402,6 +402,8 @@ for maf in maf_interval:
     for param, default_value in default_params.items():
         test_values = generate_test_values(default_value)
         test_object = create_test_object(default_params, param, test_values)
+        print (test_object)
+        sys.exit()
         for folder in folders:
             if folder.startswith('depth'):
                 batch_id = int(folder.split('_')[-2][5:])
