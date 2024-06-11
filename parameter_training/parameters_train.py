@@ -456,7 +456,7 @@ for maf in maf_interval:
                 if maf >= batch_id:
                     new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param + '_' + folder
                     results_filename = new_output_folder + "/top_result.csv"
-                    f1_score, param_value = load_top_hit(results_filename, para)
+                    f1_score, param_value = load_top_hit(results_filename, param)
                     print (f1_score, param_value)
                     sys.exit()
 
