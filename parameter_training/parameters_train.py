@@ -328,13 +328,23 @@ def generate_test_values(default_value, num_values=20, increment=0.05):
     increments = np.linspace(-num_values // 2, num_values // 2, num_values) * increment
     return default_value * (1 + increments)
 
+
 def create_test_object(default_params, param_to_test, test_values):
+    param_mapping = {
+        '_cor': 'cor_interval',
+        '_iteration_increase': 'iteration_increase_interval',
+        '_pp': 'pp_interval',
+        '_np': 'np_interval',
+        '_dp': 'dp_interval'
+    }
+
     test_object = {}
     for param, default_value in default_params.items():
+        param_key = param_mapping.get(param, param)
         if param == param_to_test:
-            test_object[param] = test_values
+            test_object[param_key] = test_values
         else:
-            test_object[param] = [default_value] * len(test_values)
+            test_object[param_key] = [default_value] * len(test_values)
     return test_object
 
 output_training_folder = 'nanomgt_training_output'
@@ -385,7 +395,7 @@ for maf in maf_interval:
         test_values = generate_test_values(default_value)
         test_object = create_test_object(default_params, param, test_values)
 
-        print(test_object)
+        print (test_object)
 
 
 
