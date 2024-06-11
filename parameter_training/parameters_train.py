@@ -399,6 +399,7 @@ for maf in maf_interval:
         test_values = generate_test_values(default_value)
         test_object = create_test_object(default_params, param, test_values)
 
+        sys.exit()
         for folder in folders:
             if folder.startswith('depth'):
                 batch_id = int(folder.split('_')[-2][5:])
