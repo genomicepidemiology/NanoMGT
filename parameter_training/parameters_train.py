@@ -386,7 +386,8 @@ def load_top_hit(file_path, param_to_fetch):
 
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
-"""
+
+
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -489,6 +490,7 @@ for maf in total_parameter_dict:
                 writer.writerow([maf_value, batch_id_value, f1_score, param_value])
 
 
+"""
 
 
 
