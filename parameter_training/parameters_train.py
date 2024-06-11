@@ -328,7 +328,7 @@ def load_default_parameters(file_path):
         del params['maf']
     return params
 
-def generate_test_values(default_value, num_values=20, increment=0.05):
+def generate_test_values(default_value, num_values=40, increment=0.025):
     increments = np.linspace(-num_values // 2, num_values // 2, num_values) * increment
     return default_value * (1 + increments)
 
@@ -411,8 +411,8 @@ for maf in maf_interval:
                     input_file_path = os.path.join(alignment_results_path, folder)
                     alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
                     os.makedirs(new_output_folder, exist_ok=True)
-                    if cpus > 21: #Only training 20 values
-                        cpus = 21
+                    if cpus > 41: #Only training 20 values
+                        cpus = 40
                     run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                          test_object, maps_path, simulated_batches_csv_path)
 
