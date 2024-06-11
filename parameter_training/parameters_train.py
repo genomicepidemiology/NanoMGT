@@ -358,6 +358,11 @@ def create_test_object(default_params, param_to_test, test_values):
 
 def load_top_hit(file_path, param_to_fetch):
     df = pd.read_csv(file_path)
+
+    # Check if the DataFrame is empty or has incomplete data
+    if df.isnull().values.any() or df.empty:
+        return None, None
+
     top_hit = df.iloc[0]  # Assuming the top hit is the first row
     f1_score = top_hit['F1 Score']
     parameters = top_hit['Parameters']
@@ -365,6 +370,8 @@ def load_top_hit(file_path, param_to_fetch):
     # Ensure parameters is a string
     if isinstance(parameters, bytes):
         parameters = parameters.decode('utf-8')
+    elif not isinstance(parameters, str):
+        parameters = str(parameters)
 
     # Extracting the specific parameter value
     param_pattern = r'{}_([0-9.]+)'.format(param_to_fetch)
