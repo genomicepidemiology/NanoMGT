@@ -387,18 +387,18 @@ def load_top_hit(file_path, param_to_fetch):
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 
-
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
         if folder.startswith('depth'):
             batch_id = int(folder.split('_')[-2][5:])
-            if maf >= batch_id:
+            if batch_id >= maf:
                 input_file_path = os.path.join(alignment_results_path, folder)
                 alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
                 new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
                 os.makedirs(new_output_folder, exist_ok=True)
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters_interval_search, maps_path, simulated_batches_csv_path)
+
 
 all_best_params = defaultdict(list)
 
