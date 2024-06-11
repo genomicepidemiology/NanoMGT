@@ -320,9 +320,13 @@ def calculate_best_parameters(file_name):
 
     return {param: value for param, (value, _) in best_params_per_file.items()}
 
-def load_default_parameters(file_path, maf):
+def load_default_parameters(file_path):
     with open(file_path, 'r') as json_file:
-        return json.load(json_file)
+        params = json.load(json_file)
+    # Exclude the 'maf' parameter
+    if 'maf' in params:
+        del params['maf']
+    return params
 
 def generate_test_values(default_value, num_values=20, increment=0.05):
     increments = np.linspace(-num_values // 2, num_values // 2, num_values) * increment
@@ -389,7 +393,7 @@ for maf in maf_interval:
 
 for maf in maf_interval:
     output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
-    default_params = load_default_parameters(output_file_path, maf)
+    default_params = load_default_parameters(output_file_path)
 
     for param, default_value in default_params.items():
         test_values = generate_test_values(default_value)
