@@ -320,9 +320,13 @@ def calculate_best_parameters(file_name):
 
     return {param: value for param, (value, _) in best_params_per_file.items()}
 
+def load_default_parameters(file_path, maf):
+    with open(file_path, 'r') as json_file:
+        return json.load(json_file)
+
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
-
+"""
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -358,3 +362,9 @@ for maf in maf_interval:
         json.dump(average_best_params, json_file, indent=4)
 
     print(f"Averages saved to {output_file_path}")
+"""
+
+for maf in maf_interval:
+    output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
+    default_params = load_default_parameters(output_file_path, maf)
+    print (default_params)

@@ -1,0 +1,135 @@
+Sample_ID,Species,Basecalling_Model
+SRR28789463,ecoli,unspecificed
+SRR28789469,ecoli,unspecificed
+SRR28800569,ecoli,unspecificed
+SRR28800580,ecoli,unspecificed
+SRR28789754,ecoli,unspecificed
+"Sample_ID,Basecalling_Model",data.csv,samples
+"SRR28789463,unspecificed",data.csv,samples
+"SRR28789469,unspecificed",data.csv,samples
+"SRR28800569,unspecificed",data.csv,samples
+"SRR28800580,unspecificed",data.csv,samples
+"SRR28789754,unspecificed",data.csv,samples
+"SRR26899118,hac",data.csv,samples
+"SRR26353490,hac",data.csv,samples
+"SRR27755679,sup",data.csv,samples
+"SRR27755684,sup",data.csv,samples
+"SRR26899146,sup",data.csv,samples
+"SRR27136090,sup",data.csv,samples
+"SRR28399428,sup",data.csv,samples
+"SRR27136088,sup",data.csv,samples
+"SRR27755678,sup",data.csv,samples
+"SRR27638397,sup",data.csv,samples
+"SRR27710526,sup",data.csv,samples
+"SRR28415513,unspecificed",data.csv,samples
+"SRR28415520,unspecificed",data.csv,samples
+"SRR28370638,unspecificed",data.csv,samples
+"SRR25890190,unspecificed",data.csv,samples
+"SRR25865495,unspecificed",data.csv,samples
+"SRR18117846,unspecificed",data.csv,samples
+"SRR28370668,hac",data.csv,samples
+"SRX22593284,hac",data.csv,samples
+"SRR24837710,hac",data.csv,samples
+"SRR24837712,hac",data.csv,samples
+"SRR24834173,hac",data.csv,samples
+"ERR8958848,hac",data.csv,samples
+"SRR24833090,unspecificed",data.csv,samples
+"SRR23796595,unspecificed",data.csv,samples
+"SRR23796601,unspecificed",data.csv,samples
+"SRR23796525,unspecificed",data.csv,samples
+"SRR27710532,unspecificed",data.csv,samples
+"SRR23796604,unspecificed",data.csv,samples
+"SRR25689478,sup",data.csv,samples
+"SRR26036455,sup",data.csv,samples
+"ERR12533301,sup",data.csv,samples
+"import os,t.py",data.csv,samples
+"import pandas as pd,t.py",data.csv,samples
+",t.py",data.csv,samples
+"# Define the folder containing the files,t.py",data.csv,samples
+"folder_path = './species_lists',t.py",data.csv,samples
+",t.py",data.csv,samples
+"# List of files to exclude,t.py",data.csv,samples
+"exclude_files = ['all_ont_samples.txt'],t.py",data.csv,samples
+",t.py",data.csv,samples
+"# Initialize a list to store the data,t.py",data.csv,samples
+"data = [],t.py",data.csv,samples
+",t.py",data.csv,samples
+"# Loop through each file in the folder,t.py",data.csv,samples
+"for file_name in os.listdir(folder_path):,t.py",data.csv,samples
+"if file_name not in exclude_files:,t.py",data.csv,samples
+"""file_path = os.path.join(folder_path, file_name)"",t.py",data.csv,samples
+",t.py",data.csv,samples
+"# Extract the basecalling model from the file name,t.py",data.csv,samples
+"model = file_name.split('_')[0],t.py",data.csv,samples
+",t.py",data.csv,samples
+"# Read the file and store the data,t.py",data.csv,samples
+"""with open(file_path, 'r') as file:"",t.py",data.csv,samples
+"for line in file:,t.py",data.csv,samples
+"sample_id = line.strip(),t.py",data.csv,samples
+"""data.append([sample_id, model])"",t.py",data.csv,samples
+",t.py",data.csv,samples
+"# Convert the data to a pandas DataFrame,t.py",data.csv,samples
+"""df = pd.DataFrame(data, columns=['Sample_ID', 'Basecalling_Model'])"",t.py",data.csv,samples
+",t.py",data.csv,samples
+"# Save the DataFrame to a CSV file,t.py",data.csv,samples
+"""output_csv_path = os.path.join(folder_path, 'samples_data.csv')"",t.py",data.csv,samples
+"""df.to_csv(output_csv_path, index=False)"",t.py",data.csv,samples
+",t.py",data.csv,samples
+"""print(f""""Data has been saved to {output_csv_path}"""")"",t.py",data.csv,samples
+",t.py",data.csv,samples
+"SRR28370653,hac",data.csv,samples
+"SRR28370694,sup",data.csv,samples
+"ERR8958843,sup",data.csv,samples
+"SRR29213739,unspecificed",data.csv,samples
+"SRR29213745,unspecificed",data.csv,samples
+"SRR24833081,unspecificed",data.csv,samples
+"SRR18117859,unspecificed",data.csv,samples
+"SRR18117864,unspecificed",data.csv,samples
+"SRR28370696,hac",data.csv,samples
+"ERR8958810,hac",data.csv,samples
+"ERR8958737,sup",data.csv,samples
+"SRR27348733,sup",data.csv,samples
+SRR26899118,cjejuni,hac
+SRR26353490,cjejuni,hac
+SRR27755679,senterica,sup
+SRR27755684,senterica,sup
+SRR26899146,senterica,sup
+SRR27136090,senterica,sup
+SRR28399428,senterica,sup
+SRR27136088,senterica,sup
+SRR27755678,senterica,sup
+SRR27638397,cjejuni,sup
+SRR27710526,cjejuni,sup
+SRR28415513,saureus,unspecificed
+SRR28415520,saureus,unspecificed
+SRR28370638,saureus,unspecificed
+SRR25890190,saureus,unspecificed
+SRR25865495,saureus,unspecificed
+SRR18117846,saureus,unspecificed
+SRR28370668,ecoli,hac
+SRX22593284,ecoli,hac
+SRR24837710,ecoli,hac
+SRR24837712,ecoli,hac
+SRR24834173,ecoli,hac
+ERR8958848,saureus,hac
+SRR24833090,senterica,unspecificed
+SRR23796595,cjejuni,unspecificed
+SRR23796601,cjejuni,unspecificed
+SRR23796525,cjejuni,unspecificed
+SRR27710532,cjejuni,unspecificed
+SRR23796604,cjejuni,unspecificed
+SRR25689478,ecoli,sup
+SRR26036455,ecoli,sup
+ERR12533301,ecoli,sup
+SRR28370653,senterica,hac
+SRR28370694,saureus,sup
+ERR8958843,saureus,sup
+SRR29213739,kpneumoniae,unspecificed
+SRR29213745,kpneumoniae,unspecificed
+SRR24833081,kpneumoniae,unspecificed
+SRR18117859,kpneumoniae,unspecificed
+SRR18117864,kpneumoniae,unspecificed
+SRR28370696,kpneumoniae,hac
+ERR8958810,kpneumoniae,hac
+ERR8958737,kpneumoniae,sup
+SRR27348733,kpneumoniae,sup

@@ -1,3 +1,4 @@
+SUP basecalled:
 
 SRR25689478 Escherichia coli ~580 depth
 SRR26036455 Escherichia coli ~220 depth
@@ -15,6 +16,10 @@ SRR27755678	Salmonella enterica ~400x depth
 
 SRR28370694	Staphylococcus aureus ~200x depth
 ERR8958843 Staphylococcus aureus >2000x depth
+
+HAC Basecalled:
+
+
 
 
 Escherichia coli approx. genome size for depth simulation: 5000000
