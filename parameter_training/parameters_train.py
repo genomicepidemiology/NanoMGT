@@ -382,6 +382,11 @@ def process_data(df, param):
         param_values_normalized = (param_values - np.min(param_values)) / param_values_range
         f1_scores_normalized = (f1_scores - np.min(f1_scores)) / f1_scores_range
 
+        # Ensure param_values_normalized is in increasing order
+        sorted_indices = np.argsort(param_values_normalized)
+        param_values_normalized = param_values_normalized[sorted_indices]
+        f1_scores_normalized = f1_scores_normalized[sorted_indices]
+
         # Fit a spline to the normalized data points
         spline = UnivariateSpline(param_values_normalized, f1_scores_normalized, s=None)
         derivative = spline.derivative()
@@ -426,6 +431,7 @@ def process_data(df, param):
         })
 
     return results
+
 def process_directory(directory):
     result_dict = {}
 
