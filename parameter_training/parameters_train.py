@@ -15,6 +15,8 @@ import concurrent.futures
 from itertools import product
 import argparse
 from collections import defaultdict
+from scipy.interpolate import UnivariateSpline
+
 
 sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + sys.path
 
@@ -356,7 +358,70 @@ def create_test_object(default_params, param_to_test, test_values):
     return test_object
 
 
-def get_highest_f1_scores(directory):
+def process_data(df, param):
+    results = []
+
+    # Group by 'MAF' and 'Batch ID'
+    grouped = df.groupby(['MAF', 'Batch ID'])
+
+    for (maf, batch), group in grouped:
+        param_values = group['Parameter Value'].values
+        f1_scores = group['F1 Score'].values
+
+        # Normalize param_values and f1_scores to range [0, 1]
+        param_values_normalized = (param_values - np.min(param_values)) / (np.max(param_values) - np.min(param_values))
+        f1_scores_normalized = (f1_scores - np.min(f1_scores)) / (np.max(f1_scores) - np.min(f1_scores))
+
+        # Fit a spline to the normalized data points
+        spline = UnivariateSpline(param_values_normalized, f1_scores_normalized, s=None)
+        derivative = spline.derivative()
+
+        # Generate dense param values for a finer analysis in the normalized range
+        param_dense_normalized = np.linspace(0, 1, 450)
+        f1_dense_normalized = spline(param_dense_normalized)
+        derivative_values_normalized = derivative(param_dense_normalized)
+
+        # Calculate the target derivative for a 20-degree angle
+        target_slope = np.tan(np.radians(20))
+
+        # Collect all param values where the derivative is close to the 20-degree slope
+        valid_param_values = []
+        for idx in range(len(derivative_values_normalized)):
+            if abs(derivative_values_normalized[idx] - target_slope) < 0.02 and f1_dense_normalized[idx] > \
+                    f1_dense_normalized[0]:
+                valid_param_value = param_values.min() + param_dense_normalized[idx] * (
+                            param_values.max() - param_values.min())
+                valid_param_values.append(valid_param_value)
+
+        # Calculate the lowest gradient slope angle in degrees
+        min_slope_angle = np.degrees(np.arctan(np.min(derivative_values_normalized)))
+
+        # Get the first and last F1 score from the normalized data
+        first_f1_score = f1_dense_normalized[0]
+        last_f1_score = f1_dense_normalized[-1]
+
+        # Determine the parameter value to return
+        if valid_param_values:
+            param_value_to_return = valid_param_values[-1]  # Return the last valid value
+        else:
+            param_value_to_return = param_values[0]  # Return the first value if no valid values found
+
+        # Append results
+        results.append({
+            'maf': maf,
+            'batch': batch,
+            'param': param,
+            'param_value_to_return': param_value_to_return,
+            'first_f1_score': first_f1_score,
+            'last_f1_score': last_f1_score,
+            'lowest_slope_angle': min_slope_angle,
+            'valid_param_values': valid_param_values
+        })
+
+    return results
+
+
+def process_directory(directory):
     result_dict = {}
 
     # List all files in the directory
@@ -371,18 +436,18 @@ def get_highest_f1_scores(directory):
             file_path = os.path.join(directory, filename)
             df = pd.read_csv(file_path)
 
-            # Find the highest F1 score in the file
-            highest_f1_score = df['F1 Score'].max()
+            # Process the data and get the parameter value to return
+            processed_results = process_data(df, param)
 
             # Initialize the maf dictionary if not present
             if maf not in result_dict:
                 result_dict[maf] = {}
 
-            # Store the result in the dictionary
-            result_dict[maf][param] = highest_f1_score
+            # Store the result
+            for result in processed_results:
+                result_dict[maf][param] = result['param_value_to_return']
 
     return result_dict
-
 
 def load_top_hit(file_path, param_to_fetch):
     df = pd.read_csv(file_path)
@@ -522,8 +587,8 @@ for maf in total_parameter_dict:
 """
 
 
-highest_f1_scores = get_highest_f1_scores(output_training_folder)
-print (highest_f1_scores)
+processed_results = process_directory(output_training_folder)
+print (processed_results)
 
 
 
