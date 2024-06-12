@@ -439,12 +439,10 @@ def process_directory(directory):
             # Read the CSV file
             file_path = os.path.join(directory, filename)
             df = pd.read_csv(file_path)
-            print (param)
-            print (df)
 
             # Process the data and get the parameter value to return
             processed_results = process_data(df, param)
-
+            print (processed_results)
             # Initialize the maf dictionary if not present
             if maf not in result_dict:
                 result_dict[maf] = {}
