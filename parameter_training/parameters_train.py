@@ -468,11 +468,13 @@ for maf in maf_interval:
             if folder.startswith('depth'):
                 batch_id = int(folder.split('_')[-2][5:])
                 if batch_id >= maf:
+                    print (folder, maf, param)
                     new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param + '_' + folder
                     results_filename = new_output_folder + "/top_result.csv"
                     f1_score, param_value = load_top_hit(results_filename, param)
                     total_parameter_dict[maf][param][batch_id] = [f1_score, param_value]
 
+print ("Done with fine tuning")
 for maf in total_parameter_dict:
     for param in total_parameter_dict[maf]:
         output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param, maf))
