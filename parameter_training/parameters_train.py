@@ -362,6 +362,8 @@ def process_data(df, param):
     # Group by 'MAF' and 'Batch ID'
     grouped = df.groupby(['MAF', 'Batch ID'])
 
+    print (grouped)
+
     for (maf, batch), group in grouped:
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
