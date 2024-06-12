@@ -459,6 +459,7 @@ for maf in maf_interval:
     default_params = load_default_parameters(output_file_path)
 
     for param, default_value in default_params.items():
+        print ('{}_{}'.format(maf, param))
         total_parameter_dict[maf][param] = {}
         test_values = generate_test_values(default_value)
         test_object = create_test_object(default_params, param, test_values)
