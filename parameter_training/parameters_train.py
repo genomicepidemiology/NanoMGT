@@ -459,7 +459,6 @@ for maf in maf_interval:
     default_params = load_default_parameters(output_file_path)
 
     for param, default_value in default_params.items():
-        print ('{}_{}'.format(maf, param))
         total_parameter_dict[maf][param] = {}
         test_values = generate_test_values(default_value)
         test_object = create_test_object(default_params, param, test_values)
@@ -468,7 +467,6 @@ for maf in maf_interval:
             if folder.startswith('depth'):
                 batch_id = int(folder.split('_')[-2][5:])
                 if batch_id >= maf:
-                    print (folder, maf, param)
                     new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param + '_' + folder
                     results_filename = new_output_folder + "/top_result.csv"
                     f1_score, param_value = load_top_hit(results_filename, param)
@@ -477,6 +475,7 @@ for maf in maf_interval:
 print ("Done with fine tuning")
 for maf in total_parameter_dict:
     for param in total_parameter_dict[maf]:
+        param = param[1:]
         output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param, maf))
 
         # Open the CSV file for writing
