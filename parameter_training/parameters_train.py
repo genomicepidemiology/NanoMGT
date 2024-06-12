@@ -475,8 +475,7 @@ for maf in maf_interval:
 print ("Done with fine tuning")
 for maf in total_parameter_dict:
     for param in total_parameter_dict[maf]:
-        param = param[1:]
-        output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param, maf))
+        output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param[1:], maf))
 
         # Open the CSV file for writing
         with open(output_file_csv, mode='w', newline='') as file:
