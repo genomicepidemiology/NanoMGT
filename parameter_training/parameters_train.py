@@ -359,16 +359,15 @@ def create_test_object(default_params, param_to_test, test_values):
 def process_data(df, param):
     results = []
 
-    print (df)
-    # Group by 'MAF' and 'Batch ID'
-    grouped = df.groupby(['MAF', 'Batch ID'])
+    # Group by 'MAF' and 'Parameter Value'
+    grouped = df.groupby('MAF')
 
-
-    for (maf, batch), group in grouped:
+    for maf, group in grouped:
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
 
-        print (param_values, f1_scores)
+        print(f"Processing MAF: {maf}, Parameter: {param}")
+        print(param_values, f1_scores)
 
         if len(param_values) < 2 or len(f1_scores) < 2:
             continue
@@ -418,7 +417,6 @@ def process_data(df, param):
         # Append results
         results.append({
             'maf': maf,
-            'batch': batch,
             'param': param,
             'param_value_to_return': param_value_to_return,
             'first_f1_score': first_f1_score,
@@ -428,7 +426,6 @@ def process_data(df, param):
         })
 
     return results
-
 def process_directory(directory):
     result_dict = {}
 
