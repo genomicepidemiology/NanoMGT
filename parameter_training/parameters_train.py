@@ -8,7 +8,6 @@ import csv
 import re
 import multiprocessing
 import json
-
 from Bio import SeqIO
 from itertools import combinations
 import concurrent.futures
@@ -357,7 +356,6 @@ def create_test_object(default_params, param_to_test, test_values):
 
     return test_object
 
-
 def process_data(df, param):
     results = []
 
@@ -368,9 +366,18 @@ def process_data(df, param):
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
 
+        if len(param_values) < 2 or len(f1_scores) < 2:
+            continue
+
         # Normalize param_values and f1_scores to range [0, 1]
-        param_values_normalized = (param_values - np.min(param_values)) / (np.max(param_values) - np.min(param_values))
-        f1_scores_normalized = (f1_scores - np.min(f1_scores)) / (np.max(f1_scores) - np.min(f1_scores))
+        param_values_range = np.max(param_values) - np.min(param_values)
+        f1_scores_range = np.max(f1_scores) - np.min(f1_scores)
+
+        if param_values_range == 0 or f1_scores_range == 0:
+            continue
+
+        param_values_normalized = (param_values - np.min(param_values)) / param_values_range
+        f1_scores_normalized = (f1_scores - np.min(f1_scores)) / f1_scores_range
 
         # Fit a spline to the normalized data points
         spline = UnivariateSpline(param_values_normalized, f1_scores_normalized, s=None)
@@ -387,10 +394,8 @@ def process_data(df, param):
         # Collect all param values where the derivative is close to the 20-degree slope
         valid_param_values = []
         for idx in range(len(derivative_values_normalized)):
-            if abs(derivative_values_normalized[idx] - target_slope) < 0.02 and f1_dense_normalized[idx] > \
-                    f1_dense_normalized[0]:
-                valid_param_value = param_values.min() + param_dense_normalized[idx] * (
-                            param_values.max() - param_values.min())
+            if abs(derivative_values_normalized[idx] - target_slope) < 0.02 and f1_dense_normalized[idx] > f1_dense_normalized[0]:
+                valid_param_value = param_values.min() + param_dense_normalized[idx] * (param_values.max() - param_values.min())
                 valid_param_values.append(valid_param_value)
 
         # Calculate the lowest gradient slope angle in degrees
@@ -419,7 +424,6 @@ def process_data(df, param):
         })
 
     return results
-
 
 def process_directory(directory):
     result_dict = {}
@@ -475,7 +479,6 @@ def load_top_hit(file_path, param_to_fetch):
         raise ValueError(f"Parameter {param_to_fetch} not found in the parameters string.")
 
     return f1_score, param_value
-
 
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
@@ -586,14 +589,5 @@ for maf in total_parameter_dict:
 
 """
 
-
 processed_results = process_directory(output_training_folder)
-print (processed_results)
-
-
-
-
-
-
-
-
+print(processed_results)
