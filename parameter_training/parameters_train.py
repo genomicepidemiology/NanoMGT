@@ -36,7 +36,7 @@ ii_interval_search = [0.01, 0.2, 0.40, 0.60]
 
 parameters_interval_search = {
     'cor_interval': cor_interval_search,
-    'iteration_increase_interval': ii_interval_search,
+    'ii_interval': ii_interval_search,
     'pp_interval': pp_interval_search,
     'np_interval': np_interval_search,
     'dp_interval': dp_interval_search
@@ -45,14 +45,14 @@ parameters_interval_search = {
 cpus = 40
 
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, simulated_batches_csv_path,
-                    iteration_increase, proxi, dp_window, pp, np, dp):
+                    ii, proxi, dp_window, pp, np, dp):
     arguments = argparse.Namespace()
     arguments.maf = maf
     arguments.output = results_folder
     arguments.min_n = min_n
     arguments.cor = cor
     arguments.new_output = new_output_folder
-    arguments.iteration_increase = iteration_increase
+    arguments.ii = ii
     arguments.proxi = proxi
     arguments.dp = dp
     arguments.pp = pp
@@ -83,7 +83,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
 
     precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
 
-    parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_iteration_increase_{iteration_increase}"
+    parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_ii_{ii}"
 
     return f1, parameter_string, precision, recall, tp, fp, fn
 
@@ -224,7 +224,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
     dp_window = 15
 
     cor_interval = parameters['cor_interval']
-    iteration_increase_interval = parameters['iteration_increase_interval']
+    ii_interval = parameters['ii_interval']
     pp_interval = parameters['pp_interval']
     np_interval = parameters['np_interval']
     dp_interval = parameters['dp_interval']
@@ -237,7 +237,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
     top_fp = None
     top_fn = None
 
-    all_params = list(product(cor_interval, iteration_increase_interval, pp_interval, np_interval, dp_interval))
+    all_params = list(product(cor_interval, ii_interval, pp_interval, np_interval, dp_interval))
     total_combinations = len(all_params)
     print(f"Total number of parameter combinations: {total_combinations}")
 
@@ -336,7 +336,7 @@ def generate_test_values(default_value, num_values=40, increment=0.025):
 def create_test_object(default_params, param_to_test, test_values):
     param_mapping = {
         '_cor': 'cor_interval',
-        '_iteration_increase': 'iteration_increase_interval',
+        '_ii': 'ii_interval',
         '_pp': 'pp_interval',
         '_np': 'np_interval',
         '_dp': 'dp_interval'
@@ -354,6 +354,34 @@ def create_test_object(default_params, param_to_test, test_values):
             test_object[mapped_param] = [default_value]
 
     return test_object
+
+
+def get_highest_f1_scores(directory):
+    result_dict = {}
+
+    # List all files in the directory
+    for filename in os.listdir(directory):
+        if filename.endswith(".csv"):
+            # Extract the parameter name and MAF value from the filename
+            parts = filename.split('_')
+            param = parts[0]
+            maf = parts[1]
+
+            # Read the CSV file
+            file_path = os.path.join(directory, filename)
+            df = pd.read_csv(file_path)
+
+            # Find the highest F1 score in the file
+            highest_f1_score = df['F1 Score'].max()
+
+            # Initialize the maf dictionary if not present
+            if maf not in result_dict:
+                result_dict[maf] = {}
+
+            # Store the result in the dictionary
+            result_dict[maf][param] = highest_f1_score
+
+    return result_dict
 
 
 def load_top_hit(file_path, param_to_fetch):
@@ -447,7 +475,6 @@ for maf in maf_interval:
                     run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                          test_object, maps_path, simulated_batches_csv_path)
 
-"""
 
 #Eval each parameter value
 
@@ -475,25 +502,28 @@ for maf in maf_interval:
 print ("Done with fine tuning")
 for maf in total_parameter_dict:
     for param in total_parameter_dict[maf]:
-        output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param[1:], maf))
+        if 'maf' not in param:
+            output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param[1:], maf))
 
-        # Open the CSV file for writing
-        with open(output_file_csv, mode='w', newline='') as file:
-            writer = csv.writer(file)
-            # Write the header
-            writer.writerow(['MAF', 'Batch ID', 'F1 Score', 'Parameter Value'])
+            # Open the CSV file for writing
+            with open(output_file_csv, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                # Write the header
+                writer.writerow(['MAF', 'Batch ID', 'F1 Score', 'Parameter Value'])
 
-            # Write the data
-            for batch_id in total_parameter_dict[maf][param]:
-                maf_value = maf
-                batch_id_value = batch_id
-                f1_score = total_parameter_dict[maf][param][batch_id][0]
-                param_value = total_parameter_dict[maf][param][batch_id][1]
-                writer.writerow([maf_value, batch_id_value, f1_score, param_value])
+                # Write the data
+                for batch_id in total_parameter_dict[maf][param]:
+                    maf_value = maf
+                    batch_id_value = batch_id
+                    f1_score = total_parameter_dict[maf][param][batch_id][0]
+                    param_value = total_parameter_dict[maf][param][batch_id][1]
+                    writer.writerow([maf_value, batch_id_value, f1_score, param_value])
+
+"""
 
 
-
-
+highest_f1_scores = get_highest_f1_scores(output_training_folder)
+print (highest_f1_scores)
 
 
 
