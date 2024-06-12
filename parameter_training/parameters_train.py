@@ -366,6 +366,8 @@ def process_data(df, param):
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
 
+        print (param_values, f1_scores)
+
         if len(param_values) < 2 or len(f1_scores) < 2:
             continue
 
@@ -442,7 +444,7 @@ def process_directory(directory):
 
             # Process the data and get the parameter value to return
             processed_results = process_data(df, param)
-            print (processed_results)
+
             # Initialize the maf dictionary if not present
             if maf not in result_dict:
                 result_dict[maf] = {}
