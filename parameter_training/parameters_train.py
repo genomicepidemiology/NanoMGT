@@ -359,10 +359,10 @@ def create_test_object(default_params, param_to_test, test_values):
 def process_data(df, param):
     results = []
 
+    print (df)
     # Group by 'MAF' and 'Batch ID'
     grouped = df.groupby(['MAF', 'Batch ID'])
 
-    print (grouped)
 
     for (maf, batch), group in grouped:
         param_values = group['Parameter Value'].values
