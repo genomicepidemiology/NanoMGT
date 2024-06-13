@@ -561,7 +561,7 @@ for param in param_list:
     for maf in maf_interval:
         total_parameter_results[param][maf] = {}
         print (os.path.join(output_training_folder, "{}".format('maf_' + str(maf))))
-        for folder in os.path.join(output_training_folder, "{}".format('maf_' + str(maf))):
+        for folder in os.listdir(os.path.join(output_training_folder, "{}".format('maf_' + str(maf)))):
             print (folder)
             if folder.startswith(param):
                 batch_id = int(folder.split('_')[-2][5:])
