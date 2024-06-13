@@ -27,9 +27,9 @@ def nanopore_metagenomics_variantcaller(arguments):
     """
     # Set up output directory and verify input file
 
-    auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp = load_parameters(arguments.maf)
+    auto_cor, auto_ii, auto_pp, auto_np, auto_dp = load_parameters(arguments.maf)
 
-    arguments = initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp)
+    arguments = initialize_parameters(arguments, auto_cor, auto_ii, auto_pp, auto_np, auto_dp)
 
     set_up_output_and_check_input(arguments)
 
@@ -107,16 +107,16 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     sys.exit()
 
-def initialize_parameters(arguments, auto_cor, auto_iteration_increase, auto_pp, auto_np, auto_dp):
+def initialize_parameters(arguments, auto_cor, auto_ii, auto_pp, auto_np, auto_dp):
     if arguments.cor == 'auto':
         arguments.cor = auto_cor
     else:
         arguments.cor = float(arguments.cor)
 
-    if arguments.iteration_increase == 'auto':
-        arguments.iteration_increase = auto_iteration_increase
+    if arguments.ii == 'auto':
+        arguments.ii = auto_ii
     else:
-        arguments.iteration_increase = float(arguments.iteration_increase)
+        arguments.ii = float(arguments.ii)
 
     if arguments.pp == 'auto':
         arguments.pp = auto_pp
@@ -321,12 +321,12 @@ def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensu
 
 
     with open(arguments.output + '/convergence_results.txt', 'w') as convergence_file:
-        print('Interations,Mutations', file=convergence_file)
+        print('Iterations,Mutations', file=convergence_file)
 
         while True:
             # Adjust the correlation and density penalty parameters for each iteration
-            arguments.cor += original_cor * arguments.iteration_increase # Increase of 20% per iteration
-            arguments.dp += original_dp * arguments.iteration_increase  # Increase of 20% per iteration
+            arguments.cor += original_cor * arguments.ii # Increase of 20% per iteration
+            arguments.dp += original_dp * arguments.ii  # Increase of 20% per iteration
 
             # Perform upper co-occurring mutations analysis
             confirmed_mutation_dict, co_occurrence_tmp_dict = upper_co_occuring_mutations_in_reads(
