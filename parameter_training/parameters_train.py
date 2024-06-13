@@ -336,11 +336,11 @@ def generate_test_values(default_value, num_values=40, increment=0.025):
 
 def create_test_object(default_params, param_to_test, test_values):
     param_mapping = {
-        '_cor': 'cor_interval',
-        '_ii': 'ii_interval',
-        '_pp': 'pp_interval',
-        '_np': 'np_interval',
-        '_dp': 'dp_interval'
+        'cor': 'cor_interval',
+        'ii': 'ii_interval',
+        'pp': 'pp_interval',
+        'np': 'np_interval',
+        'dp': 'dp_interval'
     }
 
     test_object = {}
