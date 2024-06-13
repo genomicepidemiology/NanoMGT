@@ -490,6 +490,7 @@ def load_top_hit(file_path, param_to_fetch):
 
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
+param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 """
 #Initial grid search
 for maf in maf_interval:
@@ -527,7 +528,6 @@ for maf in maf_interval:
         json.dump(average_best_params, json_file, indent=4)
 
     print(f"Averages saved to {output_file_path}")
-"""
 
 #Test individual parameters
 for maf in maf_interval:
@@ -553,10 +553,22 @@ for maf in maf_interval:
 
 
 #Eval each parameter value
+"""
+
+total_parameter_results = {}
+for param in param_list:
+    total_parameter_results[param] = {}
+    for maf in maf_interval:
+        total_parameter_results[param][maf] = {}
+        for folder in os.path.join(output_training_folder, "{}".format('maf_' + str(maf))):
+            if folder.startswith(param):
+                batch_id = int(folder.split('_')[-2][5:])
+                results_file = os.path.join(output_training_folder, "{}".format('maf_' + str(maf)), folder, 'all_results.csv')
+                print (results_file)
+
 
 """
 
-total_parameter_dict = {}
 
 for maf in maf_interval:
     total_parameter_dict[maf] = {}
