@@ -454,9 +454,9 @@ def load_results(param_list, maf_interval, output_training_folder):
                             parameter_value = extract_param_value(row['Parameters'], param)
                             f1_score = float(row['F1 Score'])
 
-                            # Append to the corresponding lists
-                            total_parameter_results[param][maf][batch_id][0].append(parameter_value)
-                            total_parameter_results[param][maf][batch_id][1].append(f1_score)
+                            if parameter_value is not None:  # Only append if a valid parameter value was found
+                                total_parameter_results[param][maf][batch_id][0].append(parameter_value)
+                                total_parameter_results[param][maf][batch_id][1].append(f1_score)
 
     return total_parameter_results
 
@@ -464,10 +464,14 @@ def load_results(param_list, maf_interval, output_training_folder):
 def extract_param_value(parameter_string, param):
     # Split the parameter string and find the value for the specific param
     param_list = parameter_string.split('_')
-    for p in param_list:
-        if p.startswith(param):
-            return float(p.split('_')[1])
+    for i, p in enumerate(param_list):
+        if p == param and i + 1 < len(param_list):
+            try:
+                return float(param_list[i + 1])
+            except ValueError:
+                return None
     return None
+
 
 def process_directory(directory):
     result_dict = {}
