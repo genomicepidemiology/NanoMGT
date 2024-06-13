@@ -29,11 +29,11 @@ folders = [f for f in os.listdir(alignment_results_path)]
 
 maf_interval = [4, 5]
 
-cor_interval_search = [0.1, 0.3, 0.5, 0.7]
+cor_interval_search = [0.3, 0.5, 0.7]
 dp_interval_search = [0.1, 0.3, 0.5]
 np_interval_search = [1.5, 2.5, 3.5]
-pp_interval_search = [0.01, 0.3, 0.5, 0.7]
-ii_interval_search = [0.01, 0.2, 0.40, 0.60]
+pp_interval_search = [0.3, 0.5, 0.7]
+ii_interval_search = [0.01, 0.2, 0.40]
 
 parameters_interval_search = {
     'cor_interval': cor_interval_search,
@@ -490,7 +490,6 @@ def load_top_hit(file_path, param_to_fetch):
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 
-"""
 #Initial grid search
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
@@ -504,7 +503,6 @@ for maf in maf_interval:
                 os.makedirs(new_output_folder, exist_ok=True)
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters_interval_search, maps_path, simulated_batches_csv_path)
 
-"""
 all_best_params = defaultdict(list)
 
 for maf in maf_interval:
@@ -518,7 +516,7 @@ for maf in maf_interval:
                 results_filename = new_output_folder + "/all_results.csv"
                 best_params = calculate_best_parameters(results_filename)
                 for param, value in best_params.items():
-                    all_best_params[param].append(value)
+                    all_best_params[param[1:]].append(value)
     for param, values in all_best_params.items():
         average_value = sum(values) / len(values)
         average_best_params[param] = average_value
