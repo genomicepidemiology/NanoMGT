@@ -535,8 +535,6 @@ for maf in maf_interval:
 
     for param, default_value in default_params.items():
         test_values = generate_test_values(default_value)
-        print (test_values)
-        sys.exit()
         test_object = create_test_object(default_params, param, test_values)
 
         for folder in folders:
