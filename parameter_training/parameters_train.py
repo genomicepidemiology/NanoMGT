@@ -491,6 +491,7 @@ output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 
 """
+#Initial grid search
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -527,6 +528,8 @@ for maf in maf_interval:
         json.dump(average_best_params, json_file, indent=4)
 
     print(f"Averages saved to {output_file_path}")
+    
+"""
 
 #Test individual parameters
 for maf in maf_interval:
@@ -541,7 +544,7 @@ for maf in maf_interval:
             if folder.startswith('depth'):
                 batch_id = int(folder.split('_')[-2][5:])
                 if batch_id >= maf:
-                    new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param + '_' + folder
+                    new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param[1:] + '_' + folder
                     input_file_path = os.path.join(alignment_results_path, folder)
                     alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
                     os.makedirs(new_output_folder, exist_ok=True)
@@ -552,6 +555,8 @@ for maf in maf_interval:
 
 
 #Eval each parameter value
+
+"""
 
 total_parameter_dict = {}
 
@@ -594,7 +599,6 @@ for maf in total_parameter_dict:
                     param_value = total_parameter_dict[maf][param][batch_id][1]
                     writer.writerow([maf_value, batch_id_value, f1_score, param_value])
 
-"""
-
 processed_results = process_directory(output_training_folder)
 print(processed_results)
+"""
