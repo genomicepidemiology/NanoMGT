@@ -504,7 +504,7 @@ for maf in maf_interval:
                 os.makedirs(new_output_folder, exist_ok=True)
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters_interval_search, maps_path, simulated_batches_csv_path)
 
-
+"""
 all_best_params = defaultdict(list)
 
 for maf in maf_interval:
@@ -528,8 +528,7 @@ for maf in maf_interval:
         json.dump(average_best_params, json_file, indent=4)
 
     print(f"Averages saved to {output_file_path}")
-    
-"""
+
 
 #Test individual parameters
 for maf in maf_interval:
