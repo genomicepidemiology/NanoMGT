@@ -335,6 +335,7 @@ def generate_test_values(default_value, num_values=40, increment=0.025):
 
 
 def create_test_object(default_params, param_to_test, test_values):
+    print (param_to_test, test_values)
     param_mapping = {
         'cor': 'cor_interval',
         'ii': 'ii_interval',
@@ -345,6 +346,7 @@ def create_test_object(default_params, param_to_test, test_values):
 
     test_object = {}
     for param, default_value in default_params.items():
+        print (param)
         mapped_param = param_mapping.get(param)
         if mapped_param is None:
             continue
@@ -532,8 +534,6 @@ for maf in maf_interval:
 for maf in maf_interval:
     output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
     default_params = load_default_parameters(output_file_path)
-    print (default_params)
-    sys.exit()
     for param, default_value in default_params.items():
         test_values = generate_test_values(default_value)
         test_object = create_test_object(default_params, param, test_values)
