@@ -335,7 +335,6 @@ def generate_test_values(default_value, num_values=40, increment=0.025):
 
 
 def create_test_object(default_params, param_to_test, test_values):
-    print (param_to_test, test_values)
     param_mapping = {
         'cor': 'cor_interval',
         'ii': 'ii_interval',
@@ -538,8 +537,7 @@ for maf in maf_interval:
         if param != 'af': #Remove this later when maf is not saved
             test_values = generate_test_values(default_value)
             test_object = create_test_object(default_params, param, test_values)
-            print (test_object)
-            sys.exit()
+
             for folder in folders:
                 if folder.startswith('depth'):
                     batch_id = int(folder.split('_')[-2][5:])
