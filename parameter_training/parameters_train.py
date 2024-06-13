@@ -489,7 +489,7 @@ def load_top_hit(file_path, param_to_fetch):
 
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
-
+"""
 #Initial grid search
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
@@ -526,7 +526,7 @@ for maf in maf_interval:
         json.dump(average_best_params, json_file, indent=4)
 
     print(f"Averages saved to {output_file_path}")
-
+"""
 
 #Test individual parameters
 for maf in maf_interval:
@@ -537,6 +537,8 @@ for maf in maf_interval:
         test_values = generate_test_values(default_value)
         test_object = create_test_object(default_params, param, test_values)
 
+        print (test_object)
+        sys.exit()
         for folder in folders:
             if folder.startswith('depth'):
                 batch_id = int(folder.split('_')[-2][5:])
