@@ -433,6 +433,42 @@ def process_data(df, param):
 
     return results
 
+
+def load_results(param_list, maf_interval, output_training_folder):
+    total_parameter_results = {}
+    for param in param_list:
+        total_parameter_results[param] = {}
+        for maf in maf_interval:
+            total_parameter_results[param][maf] = {}
+            print(os.path.join(output_training_folder, "maf_{}".format(maf)))
+            for folder in os.listdir(os.path.join(output_training_folder, "maf_{}".format(maf))):
+                if folder.startswith(param):
+                    batch_id = int(folder.split('_')[-2][5:])
+                    total_parameter_results[param][maf][batch_id] = [[], []]
+                    results_file = os.path.join(output_training_folder, "maf_{}".format(maf), folder, 'all_results.csv')
+
+                    with open(results_file, 'r') as csvfile:
+                        reader = csv.DictReader(csvfile)
+                        for row in reader:
+                            # Extract the parameter value for the specific param and the F1 score
+                            parameter_value = extract_param_value(row['Parameters'], param)
+                            f1_score = float(row['F1 Score'])
+
+                            # Append to the corresponding lists
+                            total_parameter_results[param][maf][batch_id][0].append(parameter_value)
+                            total_parameter_results[param][maf][batch_id][1].append(f1_score)
+
+    return total_parameter_results
+
+
+def extract_param_value(parameter_string, param):
+    # Split the parameter string and find the value for the specific param
+    param_list = parameter_string.split('_')
+    for p in param_list:
+        if p.startswith(param):
+            return float(p.split('_')[1])
+    return None
+
 def process_directory(directory):
     result_dict = {}
 
@@ -555,20 +591,20 @@ for maf in maf_interval:
 #Eval each parameter value
 """
 
-total_parameter_results = {}
-for param in param_list:
-    total_parameter_results[param] = {}
-    for maf in maf_interval:
-        total_parameter_results[param][maf] = {}
-        print (os.path.join(output_training_folder, "{}".format('maf_' + str(maf))))
-        for folder in os.listdir(os.path.join(output_training_folder, "{}".format('maf_' + str(maf)))):
-            print (folder)
-            if folder.startswith(param):
-                batch_id = int(folder.split('_')[-2][5:])
-                results_file = os.path.join(output_training_folder, "{}".format('maf_' + str(maf)), folder, 'all_results.csv')
-                print (results_file)
-
-
+#total_parameter_results = {}
+#for param in param_list:
+#    total_parameter_results[param] = {}
+#    for maf in maf_interval:
+#        total_parameter_results[param][maf] = {}
+#        print (os.path.join(output_training_folder, "{}".format('maf_' + str(maf))))
+#        for folder in os.listdir(os.path.join(output_training_folder, "{}".format('maf_' + str(maf)))):
+#            batch_id = int(folder.split('_')[-2][5:])
+#            if folder.startswith(param):
+#                total_parameter_results[param][maf][batch_id] = [[],[]]
+#                results_file = os.path.join(output_training_folder, "{}".format('maf_' + str(maf)), folder, 'all_results.csv')
+#                total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
+total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
+print (total_parameter_results)
 """
 
 
