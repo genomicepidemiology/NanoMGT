@@ -330,7 +330,7 @@ def snv_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_pos
             arguments.dp += original_dp * arguments.ii  # Increase of 20% per iteration
 
             # Perform upper co-occurring mutations analysis
-            confirmed_mutation_dict, co_occurrence_tmp_dict = upper_co_occuring_mutations_in_reads(
+            adjusted_mutation_dict, co_occurrence_tmp_dict, mutation_threshold_dict = convergence_threshold(
                 arguments,
                 confirmed_mutation_dict,
                 consensus_dict,
@@ -338,6 +338,8 @@ def snv_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_pos
                 bio_validation_dict,
                 reads_mutation_dict
             )
+
+            print (mutation_threshold_dict)
 
             new_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
             iteration_count += 1
@@ -680,10 +682,8 @@ def derive_mutation_positions(consensus_dict, arguments):
 
     return all_confirmed_mutation_dict
 
-
-
-def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, consensus_dict,
-                                         read_positions_blacklisted_dict, bio_validation_dict, reads_mutation_dict):
+def convergence_threshold(arguments, confirmed_mutation_dict, consensus_dict,
+                          read_positions_blacklisted_dict, bio_validation_dict, reads_mutation_dict):
     """
     Filter and adjust confirmed mutations based on co-occurrence, depth, and biological validation.
 
@@ -700,6 +700,8 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
 
     co_occurrence_tmp_dict = {}
     co_occurrence_matrix_dict = {}
+    mutation_threshold_dict = {}  # New dictionary to store mutation thresholds
+
     for allele in confirmed_mutation_dict:
         mutation_list = confirmed_mutation_dict[allele][0]
         num_mutations = len(mutation_list)
@@ -710,12 +712,6 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                 if read_allele == allele:
                     read_mutations = reads_mutation_dict[read]
                     valid_mutations = [mutation for mutation in read_mutations if mutation in mutation_list]
-                    #if allele == 'BACT000001_1153':
-                    #    if 'SRR27755678.258255' in read:
-                    #        print (read)
-                    #        print (valid_mutations)
-                    #        print (read_mutations)
-                    #        print (mutation_list)
                     if len(valid_mutations) > 1:
                         for i in range(len(valid_mutations)):
                             for j in range(i + 1, len(valid_mutations)):
@@ -724,13 +720,12 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                                 co_occurrence_matrix[mutation1][mutation2] += 1
                                 co_occurrence_matrix[mutation2][mutation1] += 1
             co_occurrence_matrix_dict[allele] = [co_occurrence_matrix, mutation_list]
-            #if allele == 'BACT000001_1153':
-            #    print (allele)
-            #    for i in range(len(co_occurrence_matrix)):
-            #        print (mutation_list[i], co_occurrence_matrix[i])
+
     adjusted_mutation_dict = {}
     for allele in confirmed_mutation_dict:
         co_occurrence_tmp_dict[allele] = []
+        mutation_threshold_dict[allele] = {}  # Initialize the dictionary for the allele
+
         if allele in co_occurrence_matrix_dict:
             adjusted_mutation_dict[allele] = [[], []]
             matrix = co_occurrence_matrix_dict[allele][0]
@@ -746,13 +741,9 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                 density_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation, arguments.dp_window)
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
 
-                #TBD LOOK INTO THIS
                 mutation_threshold = position_depth * arguments.maf
                 co_occurrence_list = check_mutation_co_occurrence(row, mutation_list, mutation,
                                                                  position_depth, arguments.cor, arguments.pp, arguments.maf, proxi_mutations, mutation_depth)
-                #if allele == 'BACT000001_1153':
-                #    print (mutation, co_occurrence_list)
-                #    print (mutation_threshold, mutation_depth)
                 if co_occurrence_list != []:
                     if mutation not in co_occurrence_tmp_dict[allele]:
                         co_occurrence_tmp_dict[allele].append(mutation)
@@ -767,10 +758,12 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                     mutation_threshold = mutation_threshold + arguments.pp * position_depth * arguments.maf
                 if density_mutations != []:
                     mutation_threshold = mutation_threshold + arguments.dp * position_depth * arguments.maf * len(density_mutations)
+
+                mutation_threshold_dict[allele][mutation] = mutation_threshold  # Store the threshold
+
                 if mutation_depth >= mutation_threshold:
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][i])
                     adjusted_mutation_dict[allele][1].append(confirmed_mutation_dict[allele][1][i])
-
 
         else:
             adjusted_mutation_dict[allele] = [[], []]
@@ -782,13 +775,15 @@ def upper_co_occuring_mutations_in_reads(arguments, confirmed_mutation_dict, con
                 depth = confirmed_mutation_dict[allele][1][0]
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
                 if not biological_existence:
-                    mutation_threshold = mutation_threshold + (arguments.np-1) * position_depth * arguments.maf
+                    mutation_threshold = mutation_threshold + (arguments.np - 1) * position_depth * arguments.maf
+
+                mutation_threshold_dict[allele][mutation] = mutation_threshold  # Store the threshold
 
                 if depth >= mutation_threshold:
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][0])
                     adjusted_mutation_dict[allele][1].append(confirmed_mutation_dict[allele][1][0])
-    return adjusted_mutation_dict, co_occurrence_tmp_dict
 
+    return adjusted_mutation_dict, co_occurrence_tmp_dict, mutation_threshold_dict
 
 
 def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, mutation,
