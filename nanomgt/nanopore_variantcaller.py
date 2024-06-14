@@ -16,6 +16,7 @@ from nanomgt.nanopore_mutations import extract_alignment
 from nanomgt.nanopore_mutations import create_mutation_vector
 import nanomgt.curve_functions as cf
 
+
 def nanopore_metagenomics_variantcaller(arguments):
     """
     Conducts metagenomics variant calling for Nanopore sequencing data. This function orchestrates
@@ -42,8 +43,8 @@ def nanopore_metagenomics_variantcaller(arguments):
     # Identify the highest scoring bacterial template
     highest_scoring_template = highest_scoring_hit(os.path.join(arguments.output, "bacteria_mapping.spa"))
     primary_specie = ' '.join(highest_scoring_template.split()[1:3])
-    print (f"Primary specie: {primary_specie}")
-    print (f"Highest scoring template: {highest_scoring_template}")
+    print(f"Primary specie: {primary_specie}")
+    print(f"Highest scoring template: {highest_scoring_template}")
 
     # Produce a species-specific KMA database
     produce_specie_specific_kma_db(primary_specie,
@@ -60,44 +61,51 @@ def nanopore_metagenomics_variantcaller(arguments):
     # Index top hits from the initial RMLST alignment
     index_top_hits_db(arguments.output)
 
-
     # Run KMA alignment for rMLST
     kma.KMARunner(arguments.nanopore,
                   os.path.join(arguments.output, "rmlst_alignment"),
                   os.path.join(arguments.output, 'top_hits_db'),
                   f"-t {arguments.threads} -ID 10 -ont -md 1.5 -eq {arguments.q_score} -matrix -mct 0.75 -sam 2096 > {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
 
-    
     os.system(f'gunzip {os.path.join(arguments.output, "rmlst_alignment.mat.gz")}')
 
     # Build a consensus dictionary from alignment results
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
 
-    print_majority_alelles(consensus_dict, arguments)
+    print_majority_alelles(consensus_dict, arguments.output)
 
-    if arguments.majority_alleles_only: #End the program if only majority alleles are requested
+    if arguments.majority_alleles_only:  # End the program if only majority alleles are requested
         sys.exit()
 
     # Adjust the consensus dictionary based on individual quality scores
     # Currently not doing anything.
-    consensus_dict, read_positions_blacklisted_dict = adjust_consensus_dict_for_individual_qscores(consensus_dict, os.path.join(arguments.output, 'rmlst_alignment.sam'), arguments.nanopore, arguments.q_score)
+    consensus_dict, read_positions_blacklisted_dict = adjust_consensus_dict_for_individual_qscores(consensus_dict,
+                                                                                                   os.path.join(
+                                                                                                       arguments.output,
+                                                                                                       'rmlst_alignment.sam'),
+                                                                                                   arguments.nanopore,
+                                                                                                   arguments.q_score)
 
     # Derive mutation positions from consensus data
-    confirmed_mutation_dict = derive_mutation_positions(consensus_dict, arguments)
+    confirmed_mutation_dict = derive_mutation_positions(consensus_dict, arguments.min_n, arguments.maf, arguments.cor)
 
     # Perform biological validation of mutations
     bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(arguments.output, 'specie.fsa'))
 
     # Co-occurrence analysis until convergence
-    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count, mutation_threshold_dict = snv_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict, bio_validation_dict)
+    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count, mutation_threshold_dict = snv_convergence(
+        arguments.output, arguments.maf, arguments.cor, arguments.np, arguments.pp, arguments.dp, arguments.proxi,
+        arguments.dp_window, arguments.ii, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict,
+        bio_validation_dict)
 
     for item in confirmed_mutation_dict:
         print(item, confirmed_mutation_dict[item])
 
     print_minor_variants(confirmed_mutation_dict, consensus_dict, arguments.output)
     ## Format and output the results
-    format_output(arguments.output, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict, mutation_threshold_dict)
+    format_output(arguments.output, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
+                  co_occurrence_tmp_dict, mutation_threshold_dict)
 
     # Write majority sequences to file
     with open(os.path.join(arguments.output, 'majority_seqs.fasta'), 'w') as f:
@@ -106,6 +114,7 @@ def nanopore_metagenomics_variantcaller(arguments):
             print(consensus_dict[allele][1], file=f)
 
     sys.exit()
+
 
 def initialize_parameters(arguments, auto_cor, auto_ii, auto_pp, auto_np, auto_dp):
     if arguments.cor == 'auto':
@@ -137,7 +146,6 @@ def initialize_parameters(arguments, auto_cor, auto_ii, auto_pp, auto_np, auto_d
 
 
 def load_parameters(maf_value):
-
     # Names of the parameters and their corresponding JSON files
     parameters = {
         'cor': cf.load_cor(),
@@ -159,8 +167,8 @@ def load_parameters(maf_value):
         value = calculate_parameter_value(spline, maf_value)
         results[param] = value
 
-
     return results['cor'], results['iteration'], results['pp'], results['np'], results['dp']
+
 
 def load_spline_from_json(data):
     # Convert keys back to floats and sort by keys
@@ -169,6 +177,7 @@ def load_spline_from_json(data):
     spline = UnivariateSpline(x_values, y_values, s=None)
     return spline
 
+
 def calculate_parameter_value(spline, maf):
     """ Calculate the parameter value for a given maf using the spline. """
     value = spline(maf)
@@ -176,11 +185,11 @@ def calculate_parameter_value(spline, maf):
     return max(value, 0)
 
 
-def print_majority_alelles(consensus_dict, arguments):
+def print_majority_alelles(consensus_dict, output_path):
     nucleotides = ['A', 'C', 'G', 'T']
 
-    #TBD Change this maybe, not really a vcf output. Maybe simply to a fasta file?
-    with open(arguments.output + '/majority_variants.vcf', 'w') as file:
+    # TBD Change this maybe, not really a vcf output. Maybe simply to a fasta file?
+    with open(output_path + '/majority_variants.vcf', 'w') as file:
         # Print header lines for VCF format and describe the INFO field contents
         print("##fileformat=VCFv4.2", file=file)
         print("##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total Depth\">", file=file)
@@ -248,9 +257,9 @@ def print_minor_variants(confirmed_mutation_dict, consensus_dict, output_path):
                 filter_status = "PASS"
                 info = f"DP={total_depth};MD={depth}"
 
-
                 # Printing the line with the INFO field included
                 print(f"{chrom}\t{pos}\t{allele}\t{ref}\t{alt}\t{qual}\t{filter_status}\t{info}", file=file)
+
 
 def highest_scoring_hit(file_path):
     """
@@ -287,26 +296,36 @@ def highest_scoring_hit(file_path):
 
     return highest_scoring_template
 
-def snv_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict, bio_validation_dict):
+
+def snv_convergence(output_path, maf, cor, np, pp, dp, proxi, dp_window, ii,
+                    confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict, bio_validation_dict):
     """
     Executes an iterative process to identify co-occurring mutations in reads until convergence is achieved.
     The process adjusts the parameters for correlation and density penalty in each iteration and checks for
     the stabilization of the number of mutations, indicating convergence.
 
     Args:
-        arguments (object): An object containing various parameters for the function, including output path and penalty adjustments.
+        output_path (str): Path to the output directory.
+        maf (float): Minor allele frequency threshold.
+        cor (float): Co-occurrence correction factor.
+        np (float): Novel mutation penalty.
+        pp (float): Proximity penalty.
+        dp (float): Density penalty.
+        proxi (int): Proximity window.
+        dp_window (int): Density window.
+        ii (float): Increment factor for iteration adjustments.
         confirmed_mutation_dict (dict): A dictionary of confirmed mutations.
         consensus_dict (dict): A dictionary containing consensus data.
         read_positions_blacklisted_dict (dict): A dictionary with blacklisted read positions.
         bio_validation_dict (dict): A dictionary used for biological validation.
 
     Returns:
-        tuple: A tuple containing the updated dictionary of confirmed mutations, temporary co-occurrence data, and iteration count.
+        tuple: A tuple containing the updated dictionary of confirmed mutations, temporary co-occurrence data, iteration count, and mutation threshold dictionary.
     """
 
     print('loading reads_mutation_dict...')
 
-    reads_mutation_dict = parse_sam_and_find_mutations(arguments.output + '/rmlst_alignment.sam',
+    reads_mutation_dict = parse_sam_and_find_mutations(output_path + '/rmlst_alignment.sam',
                                                        confirmed_mutation_dict,
                                                        consensus_dict,
                                                        read_positions_blacklisted_dict)
@@ -314,29 +333,24 @@ def snv_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_pos
     print('reads_mutation_dict loaded')
 
     current_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
-    print ('Current count: {}'.format(current_count))
+    print('Current count: {}'.format(current_count))
     iteration_count = 0
-    original_cor = arguments.cor
-    original_dp = arguments.dp
+    original_cor = cor
+    original_dp = dp
     start_time = time.time()
 
-
-    with open(arguments.output + '/convergence_results.txt', 'w') as convergence_file:
+    with open(output_path + '/convergence_results.txt', 'w') as convergence_file:
         print('Iterations,Mutations', file=convergence_file)
 
         while True:
             # Adjust the correlation and density penalty parameters for each iteration
-            arguments.cor += original_cor * arguments.ii # Increase of 20% per iteration
-            arguments.dp += original_dp * arguments.ii  # Increase of 20% per iteration
+            cor += original_cor * ii  # Increase of 20% per iteration
+            dp += original_dp * ii  # Increase of 20% per iteration
 
             # Perform upper co-occurring mutations analysis
             confirmed_mutation_dict, co_occurrence_tmp_dict, mutation_threshold_dict = convergence_threshold(
-                arguments,
-                confirmed_mutation_dict,
-                consensus_dict,
-                read_positions_blacklisted_dict,
-                bio_validation_dict,
-                reads_mutation_dict
+                maf, cor, np, pp, dp, proxi, dp_window, confirmed_mutation_dict, consensus_dict,
+                read_positions_blacklisted_dict, bio_validation_dict, reads_mutation_dict
             )
 
             new_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
@@ -353,7 +367,6 @@ def snv_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_pos
     print(f'Time taken for all iterations: {end_time - start_time} seconds', file=sys.stderr)
 
     return confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count, mutation_threshold_dict
-
 
 
 def count_mutations_in_mutations_dict(mutation_dict):
@@ -397,7 +410,6 @@ def bio_validation_mutations(consensus_dict, fsa_file):
         mutation_dict[gene] = mutation_set
 
     return mutation_dict
-
 
 
 def index_top_hits_db(output_directory):
@@ -448,6 +460,7 @@ def index_top_hits_db(output_directory):
     top_hits_db = os.path.join(output_directory, 'top_hits_db')
     os.system(f'kma index -i {fasta_file} -o {top_hits_db} 2>/dev/null')
 
+
 def adjust_consensus_dict_for_individual_qscores(consensus_dict, sam_file, fastq_file, q_score):
     """
     Adjusts the consensus dictionary based on individual quality scores derived from SAM and FASTQ files.
@@ -464,8 +477,9 @@ def adjust_consensus_dict_for_individual_qscores(consensus_dict, sam_file, fastq
     """
 
     # Blacklist low-quality positions based on quality scores from the FASTQ file
-    #black_listed_positions = blacklist_positions(fastq_file, quality_threshold=q_score)
-    black_listed_positions = blacklist_positions(fastq_file, quality_threshold=1) #Decided not to use quality threshold. Revisit another time. Invidivial positions are not being blacklisted due to their respective quality scores.
+    # black_listed_positions = blacklist_positions(fastq_file, quality_threshold=q_score)
+    black_listed_positions = blacklist_positions(fastq_file,
+                                                 quality_threshold=1)  # Decided not to use quality threshold. Revisit another time. Individual positions are not being blacklisted due to their respective quality scores.
 
     # Initialize the adjusted consensus dictionary
     adjusted_consensus_dict = {}
@@ -499,6 +513,7 @@ def adjust_consensus_dict_for_individual_qscores(consensus_dict, sam_file, fastq
 
     return adjusted_consensus_dict, black_listed_positions
 
+
 def mutation_to_index(mutation):
     """
     Converts a mutation character to its corresponding index.
@@ -512,7 +527,7 @@ def mutation_to_index(mutation):
     nucleotide_list = ['A', 'C', 'G', 'T', 'N', '-']
     return nucleotide_list.index(mutation)
 
-#Here
+
 def blacklist_positions(fastq_file, quality_threshold):
     """
     Generates a dictionary of low-quality positions for each read in a FASTQ file.
@@ -529,7 +544,8 @@ def blacklist_positions(fastq_file, quality_threshold):
     # Parsing each read in the FASTQ file
     for record in SeqIO.parse(fastq_file, "fastq"):
         # Identifying positions with quality scores below the threshold
-        blacklist = [pos for pos, score in enumerate(record.letter_annotations["phred_quality"]) if score < quality_threshold]
+        blacklist = [pos for pos, score in enumerate(record.letter_annotations["phred_quality"]) if
+                     score < quality_threshold]
 
         # Adding identified positions to the blacklist dictionary
         blacklist_dict[record.id] = blacklist
@@ -539,7 +555,20 @@ def blacklist_positions(fastq_file, quality_threshold):
 
 def format_output(output, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict,
                   mutation_threshold_dict):
+    """
+    Format and print the output of confirmed mutations with additional information.
 
+    Args:
+        output (str): Path to the output directory.
+        confirmed_mutation_dict (dict): A dictionary containing confirmed mutations for alleles.
+        consensus_dict (dict): A dictionary containing consensus information for alleles.
+        bio_validation_dict (dict): A dictionary containing biological validation data for genes.
+        co_occurrence_tmp_dict (dict): A dictionary containing temporary co-occurrence data.
+        mutation_threshold_dict (dict): A dictionary containing mutation thresholds.
+
+    Returns:
+        None
+    """
     with open(output + '/minor_mutations.csv', 'w') as outfile:
         header = 'Gene,Position,MajorityBase,MutationBase,MutationDepth,TotalDepth,GeneLength,MutationComment,CoOccurrence,Threshold'
         print(header, file=outfile)
@@ -597,21 +626,23 @@ def extract_mapped_rmlst_read(output_directory, nanopore_fastq):
         for item in read_set:
             f.write(item + '\n')
 
-    print ('Number of reads extracted: ', len(read_set))
-    print ('Total number of alignments in sam file: ', total)
+    print('Number of reads extracted: ', len(read_set))
+    print('Total number of alignments in sam file: ', total)
 
     # Use seqtk to extract the corresponding reads from the nanopore FASTQ file
     os.system('seqtk subseq {} {} > {}'.format(nanopore_fastq, output_directory + '/rmlst_reads.txt',
                                                output_directory + '/trimmed_rmlst_reads.fastq'))
 
 
-def derive_mutation_positions(consensus_dict, arguments):
+def derive_mutation_positions(consensus_dict, min_n, maf, cor):
     """
     Derive mutation positions and their depths from a consensus dictionary.
 
     Args:
         consensus_dict (dict): A dictionary containing consensus information for alleles.
-        arguments: Arguments containing parameters for mutation derivation.
+        min_n (int): Minimum number of reads supporting a mutation.
+        maf (float): Minor allele frequency threshold.
+        cor (float): Co-occurrence correction factor.
 
     Returns:
         dict: A dictionary containing derived mutation positions and depths for each allele.
@@ -629,33 +660,42 @@ def derive_mutation_positions(consensus_dict, arguments):
 
             for t in range(len(positions)):
                 if t != index_of_max:
-                    if positions[t] >= arguments.min_n:
+                    if positions[t] >= min_n:
                         total_depth = sum(positions)
                         relative_depth = positions[t] / total_depth
 
-                        if relative_depth >= arguments.maf - (arguments.maf * arguments.cor):
+                        if relative_depth >= maf - (maf * cor):
                             # Only consider mutations with minimum depth >= 2
-                            if nucleotide_index[t] != 'N' and nucleotide_index[t] != '-': #We don't consider there SNVs
+                            if nucleotide_index[t] != 'N' and nucleotide_index[
+                                t] != '-':  # We don't consider there SNVs
                                 all_confirmed_mutation_dict[allele][0].append(
                                     '{}_{}'.format(i + 1, nucleotide_index[t]))
                                 all_confirmed_mutation_dict[allele][1].append(positions[t])
 
     return all_confirmed_mutation_dict
 
-def convergence_threshold(arguments, confirmed_mutation_dict, consensus_dict,
+
+def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_mutation_dict, consensus_dict,
                           read_positions_blacklisted_dict, bio_validation_dict, reads_mutation_dict):
     """
     Filter and adjust confirmed mutations based on co-occurrence, depth, and biological validation.
 
     Args:
-        arguments: Arguments containing parameters for filtering.
+        maf (float): Minor allele frequency threshold.
+        cor (float): Co-occurrence correction factor.
+        np (float): Novel mutation penalty.
+        pp (float): Proximity penalty.
+        dp (float): Density penalty.
+        proxi (int): Proximity window.
+        dp_window (int): Density window.
         confirmed_mutation_dict (dict): A dictionary containing confirmed mutations for alleles.
         consensus_dict (dict): A dictionary containing consensus information for alleles.
         read_positions_blacklisted_dict (dict): A dictionary of blacklisted positions.
         bio_validation_dict (dict): A dictionary containing biological validation data for genes.
+        reads_mutation_dict (dict): A dictionary containing mutations for reads.
 
     Returns:
-        dict: A filtered and adjusted mutation dictionary for alleles.
+        tuple: A filtered and adjusted mutation dictionary for alleles, a co-occurrence dictionary, and a threshold dictionary.
     """
 
     co_occurrence_tmp_dict = {}
@@ -697,27 +737,28 @@ def convergence_threshold(arguments, confirmed_mutation_dict, consensus_dict,
                 position = int(mutation.split('_')[0])
                 position_depth = sum(consensus_dict[allele][0][position - 1])
                 mutation_depth = depth_list[i]
-                proxi_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation, arguments.proxi)
-                density_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation, arguments.dp_window)
+                proxi_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation, proxi)
+                density_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation, dp_window)
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
 
-                mutation_threshold = position_depth * arguments.maf
+                mutation_threshold = position_depth * maf
                 co_occurrence_list = check_mutation_co_occurrence(row, mutation_list, mutation,
-                                                                 position_depth, arguments.cor, arguments.pp, arguments.maf, proxi_mutations, mutation_depth)
+                                                                  position_depth, cor, pp, maf, proxi_mutations,
+                                                                  mutation_depth)
                 if co_occurrence_list != []:
                     if mutation not in co_occurrence_tmp_dict[allele]:
                         co_occurrence_tmp_dict[allele].append(mutation)
                     for item in co_occurrence_list:
                         if item not in co_occurrence_tmp_dict[allele]:
                             co_occurrence_tmp_dict[allele].append(item)
-                    mutation_threshold -= position_depth * arguments.maf * arguments.cor
+                    mutation_threshold -= position_depth * maf * cor
 
                 if not biological_existence:
-                    mutation_threshold += arguments.np * position_depth * arguments.maf
+                    mutation_threshold += np * position_depth * maf
                 if proxi_mutations != []:
-                    mutation_threshold += arguments.pp * position_depth * arguments.maf
+                    mutation_threshold += pp * position_depth * maf
                 if density_mutations != []:
-                    mutation_threshold += arguments.dp * position_depth * arguments.maf * len(density_mutations)
+                    mutation_threshold += dp * position_depth * maf * len(density_mutations)
 
                 mutation_threshold_dict[allele][mutation] = mutation_threshold  # Store the threshold
 
@@ -731,11 +772,11 @@ def convergence_threshold(arguments, confirmed_mutation_dict, consensus_dict,
                 mutation = confirmed_mutation_dict[allele][0][0]
                 position = int(mutation.split('_')[0])
                 position_depth = sum(consensus_dict[allele][0][position - 1])
-                mutation_threshold = position_depth * arguments.maf
+                mutation_threshold = position_depth * maf
                 depth = confirmed_mutation_dict[allele][1][0]
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
                 if not biological_existence:
-                    mutation_threshold += (arguments.np - 1) * position_depth * arguments.maf
+                    mutation_threshold += (np - 1) * position_depth * maf
 
                 mutation_threshold_dict[allele][mutation] = mutation_threshold  # Store the threshold
 
@@ -746,9 +787,9 @@ def convergence_threshold(arguments, confirmed_mutation_dict, consensus_dict,
     return adjusted_mutation_dict, co_occurrence_tmp_dict, mutation_threshold_dict
 
 
-
 def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, mutation,
-                                 position_depth, correlation_coefficient, proximity_penalty, maf, proximity_mutations, mutation_depth):
+                                 position_depth, correlation_coefficient, proximity_penalty, maf, proximity_mutations,
+                                 mutation_depth):
     """
     Check for co-occurrence of a mutation with other mutations in a list.
 
@@ -769,7 +810,7 @@ def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, 
         # Should never happen
         return []  # No co-occurrence and not in proximity
 
-    co_threshold = mutation_depth * (1/2)
+    co_threshold = mutation_depth * (1 / 2)
     if co_threshold < 3:
         co_threshold = 3
 
@@ -787,6 +828,7 @@ def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, 
             co_occurrence_list.append(mutation_list[i])
 
     return co_occurrence_list
+
 
 def check_single_mutation_existence(bio_validation_dict, allele, specific_mutation):
     """
@@ -806,6 +848,7 @@ def check_single_mutation_existence(bio_validation_dict, allele, specific_mutati
         return True
 
     return False
+
 
 def find_mutations_proximity_specific_mutation(mutations, specific_mutation, proximity):
     """
@@ -832,6 +875,7 @@ def find_mutations_proximity_specific_mutation(mutations, specific_mutation, pro
                 proximity_mutations.append(mutation)
 
     return proximity_mutations
+
 
 def derive_correct_length_headers(consensus_dict, fsa_file):
     """
@@ -873,6 +917,7 @@ def derive_correct_length_headers(consensus_dict, fsa_file):
                 correct_length_dict[gene][1].append(sequence)
 
     return correct_length_dict
+
 
 def produce_specie_specific_kma_db(specie, fsa_file, scheme_file, output_directory):
     """
@@ -935,7 +980,7 @@ def produce_specie_fsa_file(fsa_file, gene_set, output_directory):
                 if write_sequence:
                     outfile.write(line)
 
-#Here
+
 def build_consensus_dict(res_file, mat_file):
     """
     Build a consensus dictionary from result and matrix files.
@@ -983,7 +1028,6 @@ def build_consensus_dict(res_file, mat_file):
     return consensus_dict
 
 
-
 def number_of_bases_in_file(filename):
     """
     Calculate the total number of bases in a FASTA or FASTQ file.
@@ -1016,6 +1060,7 @@ def number_of_bases_in_file(filename):
                     line_count = 1
         return total_bases
 
+
 def eval_bacteria_results(results, total_bacteria_aligning_bases):
     """
     Evaluate bacterial alignment results to determine primary and candidate results.
@@ -1045,8 +1090,6 @@ def eval_bacteria_results(results, total_bacteria_aligning_bases):
             candidate_dict[item['#Template']] = [relative_template_depth, int(item['Template_length'])]
 
     return primary, candidate_dict
-
-
 
 
 def determine_file_type(file):
@@ -1104,8 +1147,6 @@ def sort_lines_by_score(filename):
     return sorted_data
 
 
-
-
 def set_up_output_and_check_input(arguments):
     """
     Set up the output directory and check the existence of input files.
@@ -1122,3 +1163,27 @@ def set_up_output_and_check_input(arguments):
         if not os.path.isfile(arguments.nanopore):
             print('Input file does not exist')
             sys.exit()
+
+
+# Entry point
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Nanopore Metagenomics Variant Caller")
+    parser.add_argument("--nanopore", required=True, help="Path to nanopore FASTQ file")
+    parser.add_argument("--db_dir", required=True, help="Path to database directory")
+    parser.add_argument("--output", required=True, help="Output directory")
+    parser.add_argument("--threads", type=int, default=1, help="Number of threads to use")
+    parser.add_argument("--q_score", type=int, default=10, help="Quality score threshold")
+    parser.add_argument("--maf", type=float, required=True, help="Minor allele frequency threshold")
+    parser.add_argument("--min_n", type=int, default=2, help="Minimum number of reads supporting a mutation")
+    parser.add_argument("--cor", type=float, default=0.2, help="Co-occurrence correction factor")
+    parser.add_argument("--ii", type=float, default=0.2, help="Increment factor for iteration adjustments")
+    parser.add_argument("--pp", type=float, default=0.2, help="Proximity penalty")
+    parser.add_argument("--np", type=float, default=0.2, help="Novel mutation penalty")
+    parser.add_argument("--dp", type=float, default=0.2, help="Density penalty")
+    parser.add_argument("--proxi", type=int, default=10, help="Proximity window")
+    parser.add_argument("--dp_window", type=int, default=10, help="Density window")
+    parser.add_argument("--majority_alleles_only", action="store_true", help="Output only majority alleles")
+
+    args = parser.parse_args()
+
+    nanopore_metagenomics_variantcaller(args)

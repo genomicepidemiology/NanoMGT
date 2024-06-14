@@ -16,7 +16,6 @@ import argparse
 from collections import defaultdict
 from scipy.interpolate import UnivariateSpline
 
-
 sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + sys.path
 
 from nanomgt import nanopore_variantcaller as nvc
@@ -28,15 +27,6 @@ files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
 maf_interval = [2]
-
-#Consider how many parameters you want you search here depending on runtime.
-#Use only one value for each list, if you don't wanna do the initial grid search but already have starting
-#values for the fine tuning.
-#cor_interval_search = [0.3, 0.4, 0.5, 0.6]
-#dp_interval_search = [0.1, 0.3, 0.5]
-#np_interval_search = [0.1, 1, 2, 3, 4]
-#pp_interval_search = [0.1, 0.,2, 0.3, 0.4, 0.5]
-#ii_interval_search = [0.01, 0.1, 0.3, 0.5]
 
 cor_interval_search = [0.4]
 dp_interval_search = [0.14]
@@ -56,41 +46,27 @@ cpus = 35
 
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, simulated_batches_csv_path,
                     ii, proxi, dp_window, pp, np, dp):
-    arguments = argparse.Namespace()
-    arguments.maf = maf
-    arguments.output = results_folder
-    arguments.min_n = min_n
-    arguments.cor = cor
-    arguments.new_output = new_output_folder
-    arguments.ii = ii
-    arguments.proxi = proxi
-    arguments.dp = dp
-    arguments.pp = pp
-    arguments.np = np
-    arguments.dp_window = dp_window
+    consensus_dict = nvc.build_consensus_dict(os.path.join(results_folder, 'rmlst_alignment.res'),
+                                          os.path.join(results_folder, 'rmlst_alignment.mat'))
 
-    consensus_dict = nvc.build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
-                                          os.path.join(arguments.output, 'rmlst_alignment.mat'))
-
-    confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, arguments)
+    confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, maf, min_n, cor)
 
     bio_validation_dict = nvc.bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
 
     confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count, mutation_threshold_dict =\
-        nvc.snv_convergence(arguments, confirmed_mutation_dict,
-                                        consensus_dict, {}, bio_validation_dict)
-
+        nvc.snv_convergence(new_output_folder, maf, cor, np, pp, dp, proxi, dp_window, ii,
+                            confirmed_mutation_dict, consensus_dict, {}, bio_validation_dict)
 
     nvc.format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
                   co_occurrence_tmp_dict, mutation_threshold_dict)
 
-    sample = arguments.output.split('/')[-1]
+    sample = results_folder.split('/')[-1]
 
     minor_mutation_expected = benchmark_analysis_result(sample, simulated_batches_csv_path, maps_path)
 
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
 
-    print (len(minor_mutation_expected), len(minor_mutation_results))
+    print(len(minor_mutation_expected), len(minor_mutation_results))
 
     precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
 
@@ -160,7 +136,7 @@ def benchmark_analysis_result(sample, batch_csv_path, maps_path):
     top_id, minor = find_highest_percentage_id(batch_id, data)
 
     map_files = []
-    for i in range(sample_number-1):
+    for i in range(sample_number - 1):
         map_file = f'{maps_path}/major_{top_id}_minor_{minor[i]}.txt'
         map_files.append(map_file)
 
@@ -172,15 +148,13 @@ def convert_mutation_dict_to_object(mutation_dict):
     mutation_object = {}
     for allele in mutation_dict:
         gene = allele.split('_')[0]
-        mutation_object[gene] = set()
+        if gene not in mutation_object:
+            mutation_object[gene] = set()
         for mutation in mutation_dict[allele][0]:
             mutation_object[gene].add(mutation)
     return mutation_object
 
 def calculate_metrics(expected_mutations, actual_mutations):
-    sum_precision, sum_recall, sum_f1 = 0, 0, 0
-    genes_counted = 0
-
     total_tp = 0
     total_fp = 0
     total_fn = 0
@@ -307,7 +281,6 @@ def calculate_best_parameters(file_name):
 def load_default_parameters(file_path):
     with open(file_path, 'r') as json_file:
         params = json.load(json_file)
-    # Exclude the 'maf' parameter
     if 'maf' in params:
         del params['maf']
     return params
@@ -315,8 +288,6 @@ def load_default_parameters(file_path):
 def generate_test_values(default_value, num_values=40, increment=0.025):
     increments = np.linspace(-num_values // 2, num_values // 2, num_values) * increment
     return default_value * (1 + increments)
-
-
 
 def create_test_object(default_params, param_to_test, test_values):
     param_mapping = {
@@ -418,16 +389,14 @@ def load_results(param_list, maf_interval, output_training_folder):
                     with open(results_file, 'r') as csvfile:
                         reader = csv.DictReader(csvfile)
                         for row in reader:
-                            # Extract the parameter value for the specific param and the F1 score
                             parameter_value = extract_param_value(row['Parameters'], param)
                             f1_score = float(row['F1 Score'])
 
-                            if parameter_value is not None:  # Only append if a valid parameter value was found
+                            if parameter_value is not None:
                                 total_parameter_results[param][maf][batch_id][0].append(parameter_value)
                                 total_parameter_results[param][maf][batch_id][1].append(f1_score)
 
     return total_parameter_results
-
 
 def extract_param_value(parameter_string, param):
     param_list = parameter_string.split('_')
@@ -439,30 +408,23 @@ def extract_param_value(parameter_string, param):
                 return None
     return None
 
-
 def process_directory(directory):
     result_dict = {}
 
-    # List all files in the directory
     for filename in os.listdir(directory):
         if filename.endswith(".csv"):
-            # Extract the parameter name and MAF value from the filename
             parts = filename.split('_')
             param = parts[0]
             maf = parts[1]
 
-            # Read the CSV file
             file_path = os.path.join(directory, filename)
             df = pd.read_csv(file_path)
 
-            # Process the data and get the parameter value to return
             processed_results = process_data(df, param)
 
-            # Initialize the maf dictionary if not present
             if maf not in result_dict:
                 result_dict[maf] = {}
 
-            # Store the result
             for result in processed_results:
                 result_dict[maf][param] = result['param_value_to_return']
 
@@ -471,21 +433,18 @@ def process_directory(directory):
 def load_top_hit(file_path, param_to_fetch):
     df = pd.read_csv(file_path)
 
-    # Check if the DataFrame is empty or has incomplete data
     if df.isnull().values.any() or df.empty:
         return None, None
 
-    top_hit = df.iloc[0]  # Assuming the top hit is the first row
+    top_hit = df.iloc[0]
     f1_score = top_hit['F1 Score']
     parameters = top_hit['Parameters']
 
-    # Ensure parameters is a string
     if isinstance(parameters, bytes):
         parameters = parameters.decode('utf-8')
     elif not isinstance(parameters, str):
         parameters = str(parameters)
 
-    # Extracting the specific parameter value
     param_pattern = r'{}_([0-9.]+)'.format(param_to_fetch)
     match = re.search(param_pattern, parameters)
     if match:
@@ -499,11 +458,9 @@ output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
-#Initial grid search
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
-        #if folder.startswith('depth'):
         if folder.startswith('depth220_SRR27755678'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
@@ -511,12 +468,8 @@ for maf in maf_interval:
                 alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
                 new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
                 os.makedirs(new_output_folder, exist_ok=True)
-                #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters_interval_search, maps_path, simulated_batches_csv_path)
                 train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, simulated_batches_csv_path,
                     0.1, 5, 15, 0.44, 5, 0.15)
-                #train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, simulated_batches_csv_path,
-                #    ii, proxi, dp_window, pp, np, dp):
-
 
 all_best_params = defaultdict(list)
 
@@ -524,7 +477,6 @@ for maf in maf_interval:
     print(f"maf_{maf}")
     average_best_params = {}
     for folder in folders:
-        #if folder.startswith('depth'):
         if folder.startswith('depth220_SRR27755678'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
@@ -542,6 +494,7 @@ for maf in maf_interval:
         json.dump(average_best_params, json_file, indent=4)
 
     print(f"Averages saved to {output_file_path}")
+
 
 """
 
