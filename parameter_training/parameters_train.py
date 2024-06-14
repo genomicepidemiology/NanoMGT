@@ -51,7 +51,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
 
     print (maf, min_n, cor)
 
-    confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, maf, min_n, cor)
+    confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, min_n, maf, cor)
 
     print (confirmed_mutation_dict)
     sys.exit()
