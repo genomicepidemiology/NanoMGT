@@ -537,7 +537,8 @@ for maf in maf_interval:
     print(f"maf_{maf}")
     average_best_params = {}
     for folder in folders:
-        if folder.startswith('depth'):
+        #if folder.startswith('depth'):
+        if folder.startswith('depth220_SRR27755678_majority_batches_batch10_merged'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
                 new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
