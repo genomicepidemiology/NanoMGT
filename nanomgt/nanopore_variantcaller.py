@@ -651,7 +651,7 @@ def derive_mutation_positions(consensus_dict, min_n, maf, cor):
 
     for allele, allele_data in consensus_dict.items():
         print (allele)
-        pritn (allele_data)
+        print (allele_data)
         all_confirmed_mutation_dict[allele] = [[], []]
 
         for i in range(len(allele_data[0])):
