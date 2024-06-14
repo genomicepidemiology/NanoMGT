@@ -468,8 +468,12 @@ for maf in maf_interval:
                 alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
                 new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
                 os.makedirs(new_output_folder, exist_ok=True)
+                #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
+                #                     test_object, maps_path, simulated_batches_csv_path)
                 train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, simulated_batches_csv_path,
                     0.1, 5, 15, 0.44, 5, 0.15)
+
+sys.exit()
 
 all_best_params = defaultdict(list)
 
