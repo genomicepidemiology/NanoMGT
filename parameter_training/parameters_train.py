@@ -80,6 +80,10 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
         nvc.co_occurrence_until_convergence(arguments, confirmed_mutation_dict,
                                         consensus_dict, {}, bio_validation_dict)
 
+    print (len(confirmed_mutation_dict))
+    print (co_occurrence_tmp_dict)
+    print (iteration_count)
+
     format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
                   co_occurrence_tmp_dict)
 
