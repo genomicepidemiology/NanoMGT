@@ -27,7 +27,7 @@ simulated_batches_csv_path = '/home/people/malhal/test/training_test/data/simula
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
-maf_interval = [5]
+maf_interval = [2]
 
 #Consider how many parameters you want you search here depending on runtime.
 #Use only one value for each list, if you don't wanna do the initial grid search but already have starting
