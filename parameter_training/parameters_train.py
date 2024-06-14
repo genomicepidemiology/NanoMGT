@@ -26,7 +26,7 @@ simulated_batches_csv_path = '/home/people/malhal/test/training_test/data/simula
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
-maf_interval = [3]
+maf_interval = [2]
 
 #cor_interval_search = [0.3, 0.4, 0.5, 0.6]
 #dp_interval_search = [0.1, 0.3, 0.5]
@@ -467,7 +467,7 @@ param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
-        if folder.startswith('depth220_SRR27755678_majority_batches_batch10_merged'):
+        if folder.startswith('depth220_SRR27755678'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
                 input_file_path = os.path.join(alignment_results_path, folder)
@@ -485,7 +485,7 @@ for maf in maf_interval:
     print(f"maf_{maf}")
     average_best_params = {}
     for folder in folders:
-        if folder.startswith('depth220_SRR27755678_majority_batches_batch10_merged'):
+        if folder.startswith('depth220_SRR27755678'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
                 new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
@@ -504,14 +504,12 @@ for maf in maf_interval:
     print(f"Averages saved to {output_file_path}")
 
 
-"""
-
-#Test individual parameters
+# Test individual parameters
 for maf in maf_interval:
     output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
     default_params = load_default_parameters(output_file_path)
     for param, default_value in default_params.items():
-        if param != 'af': #Remove this later when maf is not saved
+        if param != 'af':  # Remove this later when maf is not saved
             test_values = generate_test_values(default_value)
             test_object = create_test_object(default_params, param, test_values)
 
@@ -523,19 +521,15 @@ for maf in maf_interval:
                         input_file_path = os.path.join(alignment_results_path, folder)
                         alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
                         os.makedirs(new_output_folder, exist_ok=True)
-                        if cpus > 41: #Only training 20 values
+                        if cpus > 41:  # Only training 20 values
                             cpus = 40
                         run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                              test_object, maps_path, simulated_batches_csv_path)
 
-
-#Eval each parameter value
-
-
-#Mightwork
+# Eval each parameter value
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 
-print (total_parameter_results['np'][4][10])
+print(total_parameter_results['np'][1][10])
 
 for maf in maf_interval:
     for param in param_list:
@@ -549,4 +543,3 @@ for maf in maf_interval:
 
 processed_results = process_total_parameter_results(total_parameter_results)
 print(processed_results)
-"""
