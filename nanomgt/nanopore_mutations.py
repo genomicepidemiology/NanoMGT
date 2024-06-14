@@ -109,7 +109,7 @@ def create_mutation_vector(aligned_ref, aligned_query):
     return mutation_vector
 
 
-def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read_id, read_positions_blacklisted_dict):
+def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read_id):
     """
     Identify all mutation positions from a mutation vector compared to the reference.
 
@@ -128,13 +128,11 @@ def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read
         raise ValueError("The mutation vector and reference sequence must have the same length.")
 
     for i in range(len(mutation_vector)):
-        if read_id in read_positions_blacklisted_dict: # If this redundant? Check up.
-            if i+1 not in read_positions_blacklisted_dict[read_id]:
-                if '{}_{}'.format(i+1, mutation_vector[i]) in gene_mutations:
-                    mutations.append('{}_{}'.format(i+1, mutation_vector[i]))
+        if '{}_{}'.format(i+1, mutation_vector[i]) in gene_mutations:
+            mutations.append('{}_{}'.format(i+1, mutation_vector[i]))
 
     return mutations
-def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict):
+def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consensus_dict):
     """
     Parses a SAM file, extracts necessary information and finds mutations in each read.
 
@@ -172,8 +170,7 @@ def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consens
                 #mutations = identify_mutations(aligned_query, aligned_ref)
                 mutation_vector = create_mutation_vector(aligned_ref, aligned_query)
                 mutations = identify_mutations(mutation_vector, majority_seq[pos - 1:pos + tlen],
-                                               confirmed_mutation_dict[rname][0], read_id,
-                                               read_positions_blacklisted_dict)
+                                               confirmed_mutation_dict[rname][0], read_id)
                 # Storing mutations in the dictionary
                 name = read_id + ' ' + rname
                 mutations_dict[name] = mutations
