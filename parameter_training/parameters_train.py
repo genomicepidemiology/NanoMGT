@@ -30,11 +30,19 @@ folders = [f for f in os.listdir(alignment_results_path)]
 maf_interval = [5]
 
 #Consider how many parameters you want you search here depending on runtime.
-cor_interval_search = [0.3, 0.4, 0.5, 0.6]
-dp_interval_search = [0.1, 0.3, 0.5]
-np_interval_search = [1, 2, 3, 4]
-pp_interval_search = [0.1, 0.,2, 0.3, 0.4, 0.5]
-ii_interval_search = [0.01, 0.1, 0.3, 0.5]
+#Use only one value for each list, if you don't wanna do the initial grid search but already have starting
+#values for the fine tuning.
+#cor_interval_search = [0.3, 0.4, 0.5, 0.6]
+#dp_interval_search = [0.1, 0.3, 0.5]
+#np_interval_search = [0.1, 1, 2, 3, 4]
+#pp_interval_search = [0.1, 0.,2, 0.3, 0.4, 0.5]
+#ii_interval_search = [0.01, 0.1, 0.3, 0.5]
+
+cor_interval_search = [0.4]
+dp_interval_search = [0.14]
+np_interval_search = [2]
+pp_interval_search = [0.44]
+ii_interval_search = [0.1]
 
 parameters_interval_search = {
     'cor_interval': cor_interval_search,
