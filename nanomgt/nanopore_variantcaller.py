@@ -97,7 +97,7 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     print_minor_variants(confirmed_mutation_dict, consensus_dict, arguments.output)
     ## Format and output the results
-    format_output(arguments, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict, mutation_threshold_dict)
+    format_output(arguments.output, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict, mutation_threshold_dict)
 
     # Write majority sequences to file
     with open(os.path.join(arguments.output, 'majority_seqs.fasta'), 'w') as f:
@@ -540,23 +540,9 @@ def blacklist_positions(fastq_file, quality_threshold):
     return blacklist_dict
 
 
-def format_output(arguments, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict,
+def format_output(output, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict,
                   mutation_threshold_dict):
-    """
-    Format and print the output of confirmed mutations with additional information.
-
-    Args:
-        arguments: Arguments containing parameters for filtering.
-        confirmed_mutation_dict (dict): A dictionary containing confirmed mutations for alleles.
-        consensus_dict (dict): A dictionary containing consensus information for alleles.
-        bio_validation_dict (dict): A dictionary containing biological validation data for genes.
-        co_occurrence_tmp_dict (dict): A dictionary containing co-occurrence information for mutations.
-        mutation_threshold_dict (dict): A dictionary containing thresholds for mutations.
-
-    Returns:
-        None
-    """
-    with open(arguments.output + '/minor_mutations.csv', 'w') as outfile:
+    with open(output + '/minor_mutations.csv', 'w') as outfile:
         header = 'Gene,Position,MajorityBase,MutationBase,MutationDepth,TotalDepth,GeneLength,MutationComment,CoOccurrence,Threshold'
         print(header, file=outfile)
 
