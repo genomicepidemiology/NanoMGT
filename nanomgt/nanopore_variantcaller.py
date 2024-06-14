@@ -656,7 +656,6 @@ def derive_mutation_positions(consensus_dict, min_n, maf, cor):
 
         for i in range(len(allele_data[0])):
             positions = allele_data[0][i][:4]
-            print (positions)
             max_number = max(positions)
             index_of_max = positions.index(max_number)
             nucleotide_index = ['A', 'C', 'G', 'T']
@@ -666,7 +665,7 @@ def derive_mutation_positions(consensus_dict, min_n, maf, cor):
                     if positions[t] >= min_n:
                         total_depth = sum(positions)
                         relative_depth = positions[t] / total_depth
-
+                        print (relative_depth)
                         if relative_depth >= maf - (maf * cor):
                             # Only consider mutations with minimum depth >= 2
                             if nucleotide_index[t] != 'N' and nucleotide_index[t] != '-':
