@@ -561,7 +561,6 @@ def format_output(output, confirmed_mutation_dict, consensus_dict, bio_validatio
                     co_occurrence = 'No'
 
                 mutation_threshold = mutation_threshold_dict[allele].get(mutation[0], 'N/A')
-                print (mutation_threshold)
 
                 if biological_existence:
                     print('{},{},{},{},{},{},{},{},{},{}'.format(allele, position, majority_base, mutation_base,
