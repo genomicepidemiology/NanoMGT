@@ -48,7 +48,7 @@ parameters_interval_search = {
     'dp_interval': dp_interval_search
 }
 
-cpus = 35
+cpus = 40
 
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, simulated_batches_csv_path,
                     ii, proxi, dp_window, pp, np, dp):
