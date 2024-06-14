@@ -547,6 +547,9 @@ def format_output(output, confirmed_mutation_dict, consensus_dict, bio_validatio
         header = 'Gene,Position,MajorityBase,MutationBase,MutationDepth,TotalDepth,GeneLength,MutationComment,CoOccurrence,Threshold'
         print(header, file=outfile)
         for allele in confirmed_mutation_dict:
+            print (confirmed_mutation_dict)
+            print (allele)
+            print (confirmed_mutation_dict[allele])
             for mutation in zip(confirmed_mutation_dict[allele][0], confirmed_mutation_dict[allele][1]):
                 print (mutation)
                 position = mutation[0].split('_')[0]
