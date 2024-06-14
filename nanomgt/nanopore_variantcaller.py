@@ -666,14 +666,12 @@ def derive_mutation_positions(consensus_dict, min_n, maf, cor):
 
                         if relative_depth >= maf - (maf * cor):
                             # Only consider mutations with minimum depth >= 2
-                            if nucleotide_index[t] != 'N' and nucleotide_index[
-                                t] != '-':  # We don't consider there SNVs
+                            if nucleotide_index[t] != 'N' and nucleotide_index[t] != '-':
                                 all_confirmed_mutation_dict[allele][0].append(
                                     '{}_{}'.format(i + 1, nucleotide_index[t]))
                                 all_confirmed_mutation_dict[allele][1].append(positions[t])
 
     return all_confirmed_mutation_dict
-
 
 def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_mutation_dict, consensus_dict,
                           read_positions_blacklisted_dict, bio_validation_dict, reads_mutation_dict):
