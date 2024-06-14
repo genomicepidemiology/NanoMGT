@@ -599,7 +599,6 @@ def derive_mutation_positions(consensus_dict, min_n, maf, cor):
                         total_depth = sum(positions)
                         relative_depth = positions[t] / total_depth
                         if relative_depth >= maf - (maf * cor):
-                            print ('FOUND')
                             # Only consider mutations with minimum depth >= 2
                             if nucleotide_index[t] != 'N' and nucleotide_index[t] != '-':
                                 all_confirmed_mutation_dict[allele][0].append(
