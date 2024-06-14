@@ -467,7 +467,7 @@ param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
-        if folder.startswith('depth220_SRR27755678'):
+        if folder.startswith('depth220_SRR27755678_majority_batches_batch10_merged'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
                 input_file_path = os.path.join(alignment_results_path, folder)
@@ -485,7 +485,7 @@ for maf in maf_interval:
     print(f"maf_{maf}")
     average_best_params = {}
     for folder in folders:
-        if folder.startswith('depth220_SRR27755678'):
+        if folder.startswith('depth220_SRR27755678_majority_batches_batch10_merged'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
                 new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
