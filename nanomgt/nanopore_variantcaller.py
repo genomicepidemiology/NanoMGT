@@ -546,10 +546,9 @@ def format_output(output, confirmed_mutation_dict, consensus_dict, bio_validatio
     with open(output + '/minor_mutations.csv', 'w') as outfile:
         header = 'Gene,Position,MajorityBase,MutationBase,MutationDepth,TotalDepth,GeneLength,MutationComment,CoOccurrence,Threshold'
         print(header, file=outfile)
-        print (header)
         for allele in confirmed_mutation_dict:
-            print (allele)
             for mutation in zip(confirmed_mutation_dict[allele][0], confirmed_mutation_dict[allele][1]):
+                print (mutation)
                 position = mutation[0].split('_')[0]
                 mutation_base = mutation[0].split('_')[1]
                 mutation_depth = mutation[1]
@@ -563,6 +562,7 @@ def format_output(output, confirmed_mutation_dict, consensus_dict, bio_validatio
                     co_occurrence = 'No'
 
                 mutation_threshold = mutation_threshold_dict[allele].get(mutation[0], 'N/A')
+                print (mutation_threshold)
 
                 if biological_existence:
                     print('{},{},{},{},{},{},{},{},{},{}'.format(allele, position, majority_base, mutation_base,
