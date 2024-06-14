@@ -330,7 +330,7 @@ def snv_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_pos
             arguments.dp += original_dp * arguments.ii  # Increase of 20% per iteration
 
             # Perform upper co-occurring mutations analysis
-            adjusted_mutation_dict, co_occurrence_tmp_dict, mutation_threshold_dict = convergence_threshold(
+            confirmed_mutation_dict, co_occurrence_tmp_dict, mutation_threshold_dict = convergence_threshold(
                 arguments,
                 confirmed_mutation_dict,
                 consensus_dict,
