@@ -542,11 +542,13 @@ def blacklist_positions(fastq_file, quality_threshold):
 
 def format_output(output, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict,
                   mutation_threshold_dict):
+
     with open(output + '/minor_mutations.csv', 'w') as outfile:
         header = 'Gene,Position,MajorityBase,MutationBase,MutationDepth,TotalDepth,GeneLength,MutationComment,CoOccurrence,Threshold'
         print(header, file=outfile)
-
+        print (header)
         for allele in confirmed_mutation_dict:
+            print (allele)
             for mutation in zip(confirmed_mutation_dict[allele][0], confirmed_mutation_dict[allele][1]):
                 position = mutation[0].split('_')[0]
                 mutation_base = mutation[0].split('_')[1]
