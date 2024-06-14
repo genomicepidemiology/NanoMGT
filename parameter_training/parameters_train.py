@@ -50,7 +50,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
                                           os.path.join(results_folder, 'rmlst_alignment.mat'))
 
     t = 1
-    for item in consensus_dict['BACT000001_59']:
+    for item in consensus_dict['BACT000001_59'][0]:
         print (item, t)
         t = t+1
 
