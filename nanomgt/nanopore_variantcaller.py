@@ -656,6 +656,7 @@ def derive_mutation_positions(consensus_dict, min_n, maf, cor):
 
         for i in range(len(allele_data[0])):
             positions = allele_data[0][i][:4]
+            print (positions)
             max_number = max(positions)
             index_of_max = positions.index(max_number)
             nucleotide_index = ['A', 'C', 'G', 'T']
