@@ -582,10 +582,11 @@ for maf in maf_interval:
 
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 
-print (total_parameter_results[4]['np'])
 
 for maf in maf_interval:
+    print (maf)
     for param in param_list:
+        print (param)
         output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param, maf))
         with open(output_file_csv, mode='w', newline='') as file:
             writer = csv.writer(file)
