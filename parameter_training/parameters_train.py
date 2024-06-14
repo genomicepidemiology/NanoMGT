@@ -635,4 +635,3 @@ for maf in total_parameter_results:
 
 processed_results = process_total_parameter_results(total_parameter_results)
 print(processed_results)
-"""
