@@ -76,16 +76,13 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
 
     bio_validation_dict = nvc.bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
 
-    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count =\
+    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count, mutation_threshold_dict =\
         nvc.snv_convergence(arguments, confirmed_mutation_dict,
                                         consensus_dict, {}, bio_validation_dict)
 
-    print (len(confirmed_mutation_dict))
-    print (co_occurrence_tmp_dict)
-    print (iteration_count)
 
-    format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
-                  co_occurrence_tmp_dict)
+    nvc.format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
+                  co_occurrence_tmp_dict, mutation_threshold_dict)
 
     sample = arguments.output.split('/')[-1]
 
@@ -170,33 +167,6 @@ def benchmark_analysis_result(sample, batch_csv_path, maps_path):
     mutation_map = load_mutations_from_files(map_files)
 
     return mutation_map
-
-def format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict):
-    with open(new_output_folder + '/minor_mutations.csv', 'w') as outfile:
-        header = 'Gene,Position,MajorityBase,MutationBase,MutationDepth,TotalDepth,GeneLength,MutationComment,CoOccurrence'
-        print(header, file=outfile)
-        for allele in confirmed_mutation_dict:
-            for mutation in zip(confirmed_mutation_dict[allele][0], confirmed_mutation_dict[allele][1]):
-                position = mutation[0].split('_')[0]
-                mutation_base = mutation[0].split('_')[1]
-                mutation_depth = mutation[1]
-                majority_base = consensus_dict[allele][1][int(position) - 1]
-                total_depth = sum(consensus_dict[allele][0][int(position) - 1])
-                biological_existence = nvc.check_single_mutation_existence(bio_validation_dict, allele, mutation[0])
-                gene_length = len(consensus_dict[allele][1])
-                if mutation[0] in co_occurrence_tmp_dict[allele]:
-                    co_occurrence = 'Yes'
-                else:
-                    co_occurrence = 'No'
-
-                if biological_existence:
-                    print('{},{},{},{},{},{},{},{},{}'.format(allele, position, majority_base, mutation_base,
-                                                              mutation_depth, total_depth, gene_length,
-                                                              'Mutation seen in database', co_occurrence), file=outfile)
-                else:
-                    print('{},{},{},{},{},{},{},{},{}'.format(allele, position, majority_base, mutation_base,
-                                                              mutation_depth, total_depth, gene_length,
-                                                              'Novel mutation', co_occurrence), file=outfile)
 
 def convert_mutation_dict_to_object(mutation_dict):
     mutation_object = {}
