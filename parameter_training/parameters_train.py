@@ -49,9 +49,11 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
     consensus_dict = nvc.build_consensus_dict(os.path.join(results_folder, 'rmlst_alignment.res'),
                                           os.path.join(results_folder, 'rmlst_alignment.mat'))
 
-    print (consensus_dict)
-    sys.exit()
+
     confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, maf, min_n, cor)
+
+    print (confirmed_mutation_dict)
+    sys.exit()
 
     bio_validation_dict = nvc.bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
 
