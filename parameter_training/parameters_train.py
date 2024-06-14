@@ -30,11 +30,11 @@ folders = [f for f in os.listdir(alignment_results_path)]
 maf_interval = [5]
 
 #Consider how many parameters you want you search here depending on runtime.
-cor_interval_search = [0.2, 0.3, 0.4, 0.5, 0.6]
+cor_interval_search = [0.3, 0.4, 0.5, 0.6]
 dp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
 np_interval_search = [1, 1.5, 2, 2.5, 3, 3.5]
 pp_interval_search = [0.1, 0.,2, 0.3, 0.4, 0.5]
-ii_interval_search = [0.01, 0.1, 0.2, 0.3, 0.4, 0.5]
+ii_interval_search = [0.01, 0.1, 0.3, 0.5]
 
 parameters_interval_search = {
     'cor_interval': cor_interval_search,
@@ -44,7 +44,7 @@ parameters_interval_search = {
     'dp_interval': dp_interval_search
 }
 
-cpus = 40
+cpus = 35
 
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, simulated_batches_csv_path,
                     ii, proxi, dp_window, pp, np, dp):
