@@ -28,17 +28,17 @@ folders = [f for f in os.listdir(alignment_results_path)]
 
 maf_interval = [3]
 
-#cor_interval_search = [0.3, 0.4, 0.5, 0.6]
-#dp_interval_search = [0.1, 0.3, 0.5]
-#np_interval_search = [0.1, 1, 2, 3, 4]
-#pp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
-#ii_interval_search = [0.01, 0.1, 0.3, 0.5]
+cor_interval_search = [0.3, 0.4, 0.5, 0.6]
+dp_interval_search = [0.1, 0.3, 0.5]
+np_interval_search = [0.1, 1, 2, 3, 4]
+pp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
+ii_interval_search = [0.01, 0.1, 0.3, 0.5]
 
-cor_interval_search = [0.6]
-dp_interval_search = [0.1]
-np_interval_search = [3]
-pp_interval_search = [0.2]
-ii_interval_search = [0.01]
+#cor_interval_search = [0.6]
+#dp_interval_search = [0.1]
+#np_interval_search = [3]
+#pp_interval_search = [0.2]
+#ii_interval_search = [0.01]
 
 parameters_interval_search = {
     'cor_interval': cor_interval_search,
@@ -467,7 +467,7 @@ param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
-        if folder.startswith('depth220_SRR27755678_majority_batches_batch10_merged'):
+        if folder.startswith('depth220_SRR27755678'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
                 input_file_path = os.path.join(alignment_results_path, folder)
@@ -485,7 +485,7 @@ for maf in maf_interval:
     print(f"maf_{maf}")
     average_best_params = {}
     for folder in folders:
-        if folder.startswith('depth220_SRR27755678_majority_batches_batch10_merged'):
+        if folder.startswith('depth220_SRR27755678'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
                 new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
