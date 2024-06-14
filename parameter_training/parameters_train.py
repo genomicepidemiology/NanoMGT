@@ -583,17 +583,12 @@ for maf in maf_interval:
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 
 
-for maf in total_parameter_results:
-    for param in total_parameter_results[maf]:
+for maf in maf_interval:
+    for param in param_list:
         output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param, maf))
-
-        # Open the CSV file for writing
         with open(output_file_csv, mode='w', newline='') as file:
             writer = csv.writer(file)
-            # Write the header
             writer.writerow(['MAF', 'Batch ID', 'F1 Score', 'Parameter Value'])
-
-            # Write the data
             for batch_id, (param_values, f1_scores) in total_parameter_results[param][maf].items():
                 for param_value, f1_score in zip(param_values, f1_scores):
                     writer.writerow([maf, batch_id, f1_score, param_value])
