@@ -54,7 +54,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
     bio_validation_dict = nvc.bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
 
     confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count, mutation_threshold_dict =\
-        nvc.snv_convergence(new_output_folder, maf, cor, np, pp, dp, proxi, dp_window, ii,
+        nvc.snv_convergence(results_folder, maf, cor, np, pp, dp, proxi, dp_window, ii,
                             confirmed_mutation_dict, consensus_dict, {}, bio_validation_dict)
 
     nvc.format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
