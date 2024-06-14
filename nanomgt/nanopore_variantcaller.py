@@ -593,11 +593,11 @@ def derive_mutation_positions(consensus_dict, min_n, maf, cor):
             positions = allele_data[0][i][:4]
             max_number = max(positions)
             index_of_max = positions.index(max_number)
-            print (index_of_max)
             nucleotide_index = ['A', 'C', 'G', 'T']
             for t in range(len(positions)):
                 if t != index_of_max:
                     print (t, index_of_max)
+                    print (positions)
                     if positions[t] >= min_n:
                         if allele == 'BACT000001_59':
                             print(positions, i + 1)
