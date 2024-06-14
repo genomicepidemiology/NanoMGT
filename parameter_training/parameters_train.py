@@ -329,7 +329,6 @@ def create_test_object(default_params, param_to_test, test_values):
 
     test_object = {}
     for param, default_value in default_params.items():
-        print (param)
         mapped_param = param_mapping.get(param)
         if mapped_param is None:
             continue
