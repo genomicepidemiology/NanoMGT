@@ -334,6 +334,28 @@ def generate_test_values(default_value, num_values=40, increment=0.025):
     return default_value * (1 + increments)
 
 
+def process_total_parameter_results(total_parameter_results):
+    result_dict = {}
+
+    for param, maf_data in total_parameter_results.items():
+        for maf, batch_data in maf_data.items():
+            df_rows = []
+
+            for batch_id, (param_values, f1_scores) in batch_data.items():
+                for param_value, f1_score in zip(param_values, f1_scores):
+                    df_rows.append({'MAF': maf, 'Batch ID': batch_id, 'F1 Score': f1_score, 'Parameter Value': param_value})
+
+            df = pd.DataFrame(df_rows)
+            processed_results = process_data(df, param)
+
+            if maf not in result_dict:
+                result_dict[maf] = {}
+
+            for result in processed_results:
+                result_dict[maf][param] = result['param_value_to_return']
+
+    return result_dict
+
 def create_test_object(default_params, param_to_test, test_values):
     param_mapping = {
         'cor': 'cor_interval',
@@ -404,7 +426,7 @@ def process_data(df, param):
         valid_param_values = []
         for idx in range(len(derivative_values_normalized)):
             if abs(derivative_values_normalized[idx] - target_slope) < 0.02 and f1_dense_normalized[idx] > f1_dense_normalized[0]:
-                valid_param_value = param_values.min() + param_dense_normalized[idx] * (param_values.max() - param_values.min())
+                valid_param_value = param_values.min() + param_dense_normalized[idx] * (param_values.max() - np.min(param_values))
                 valid_param_values.append(valid_param_value)
 
         # Calculate the lowest gradient slope angle in degrees
@@ -432,7 +454,6 @@ def process_data(df, param):
         })
 
     return results
-
 
 def load_results(param_list, maf_interval, output_training_folder):
     total_parameter_results = {}
@@ -595,62 +616,23 @@ for maf in maf_interval:
 #Eval each parameter value
 """
 
-#total_parameter_results = {}
-#for param in param_list:
-#    total_parameter_results[param] = {}
-#    for maf in maf_interval:
-#        total_parameter_results[param][maf] = {}
-#        print (os.path.join(output_training_folder, "{}".format('maf_' + str(maf))))
-#        for folder in os.listdir(os.path.join(output_training_folder, "{}".format('maf_' + str(maf)))):
-#            batch_id = int(folder.split('_')[-2][5:])
-#            if folder.startswith(param):
-#                total_parameter_results[param][maf][batch_id] = [[],[]]
-#                results_file = os.path.join(output_training_folder, "{}".format('maf_' + str(maf)), folder, 'all_results.csv')
-#                total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
-print (total_parameter_results)
-"""
 
+for maf in total_parameter_results:
+    for param in total_parameter_results[maf]:
+        output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param, maf))
 
-for maf in maf_interval:
-    total_parameter_dict[maf] = {}
-    output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
-    default_params = load_default_parameters(output_file_path)
+        # Open the CSV file for writing
+        with open(output_file_csv, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            # Write the header
+            writer.writerow(['MAF', 'Batch ID', 'F1 Score', 'Parameter Value'])
 
-    for param, default_value in default_params.items():
-        total_parameter_dict[maf][param] = {}
-        test_values = generate_test_values(default_value)
-        test_object = create_test_object(default_params, param, test_values)
+            # Write the data
+            for batch_id, (param_values, f1_scores) in total_parameter_results[param][maf].items():
+                for param_value, f1_score in zip(param_values, f1_scores):
+                    writer.writerow([maf, batch_id, f1_score, param_value])
 
-        for folder in folders:
-            if folder.startswith('depth'):
-                batch_id = int(folder.split('_')[-2][5:])
-                if batch_id >= maf:
-                    new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param + '_' + folder
-                    results_filename = new_output_folder + "/top_result.csv"
-                    f1_score, param_value = load_top_hit(results_filename, param)
-                    total_parameter_dict[maf][param][batch_id] = [f1_score, param_value]
-
-print ("Done with fine tuning")
-for maf in total_parameter_dict:
-    for param in total_parameter_dict[maf]:
-        if 'maf' not in param:
-            output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param[1:], maf))
-
-            # Open the CSV file for writing
-            with open(output_file_csv, mode='w', newline='') as file:
-                writer = csv.writer(file)
-                # Write the header
-                writer.writerow(['MAF', 'Batch ID', 'F1 Score', 'Parameter Value'])
-
-                # Write the data
-                for batch_id in total_parameter_dict[maf][param]:
-                    maf_value = maf
-                    batch_id_value = batch_id
-                    f1_score = total_parameter_dict[maf][param][batch_id][0]
-                    param_value = total_parameter_dict[maf][param][batch_id][1]
-                    writer.writerow([maf_value, batch_id_value, f1_score, param_value])
-
-processed_results = process_directory(output_training_folder)
+processed_results = process_total_parameter_results(total_parameter_results)
 print(processed_results)
 """
