@@ -516,12 +516,13 @@ def load_top_hit(file_path, param_to_fetch):
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
-"""
+
 #Initial grid search
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
-        if folder.startswith('depth'):
+        #if folder.startswith('depth'):
+        if folder.startswith('depth220_SRR27755678_majority_batches_batch10_merged'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
                 input_file_path = os.path.join(alignment_results_path, folder)
@@ -554,6 +555,8 @@ for maf in maf_interval:
 
     print(f"Averages saved to {output_file_path}")
 
+"""
+
 #Test individual parameters
 for maf in maf_interval:
     output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
@@ -578,8 +581,9 @@ for maf in maf_interval:
 
 
 #Eval each parameter value
-"""
 
+
+#Mightwork
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 
 print (total_parameter_results['np'][4][10])
@@ -596,3 +600,4 @@ for maf in maf_interval:
 
 processed_results = process_total_parameter_results(total_parameter_results)
 print(processed_results)
+"""
