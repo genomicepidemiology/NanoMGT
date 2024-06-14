@@ -49,7 +49,10 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
     consensus_dict = nvc.build_consensus_dict(os.path.join(results_folder, 'rmlst_alignment.res'),
                                           os.path.join(results_folder, 'rmlst_alignment.mat'))
 
-    print (consensus_dict)
+    t = 1
+    for item in consensus_dict['BACT000001_59']:
+        print (item, t)
+        t = t+1
 
     print (maf, min_n, cor)
 
