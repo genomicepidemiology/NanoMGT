@@ -78,15 +78,6 @@ def nanopore_metagenomics_variantcaller(arguments):
     if arguments.majority_alleles_only:  # End the program if only majority alleles are requested
         sys.exit()
 
-    # Adjust the consensus dictionary based on individual quality scores
-    # Currently not doing anything.
-    consensus_dict, read_positions_blacklisted_dict = adjust_consensus_dict_for_individual_qscores(consensus_dict,
-                                                                                                   os.path.join(
-                                                                                                       arguments.output,
-                                                                                                       'rmlst_alignment.sam'),
-                                                                                                   arguments.nanopore,
-                                                                                                   arguments.q_score)
-
     # Derive mutation positions from consensus data
     confirmed_mutation_dict = derive_mutation_positions(consensus_dict, arguments.min_n, arguments.maf, arguments.cor)
 
@@ -96,7 +87,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     # Co-occurrence analysis until convergence
     confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count, mutation_threshold_dict = snv_convergence(
         arguments.output, arguments.maf, arguments.cor, arguments.np, arguments.pp, arguments.dp, arguments.proxi,
-        arguments.dp_window, arguments.ii, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict,
+        arguments.dp_window, arguments.ii, confirmed_mutation_dict, consensus_dict,
         bio_validation_dict)
 
     for item in confirmed_mutation_dict:
@@ -298,7 +289,7 @@ def highest_scoring_hit(file_path):
 
 
 def snv_convergence(output_path, maf, cor, np, pp, dp, proxi, dp_window, ii,
-                    confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict, bio_validation_dict):
+                    confirmed_mutation_dict, consensus_dict, bio_validation_dict):
     """
     Executes an iterative process to identify co-occurring mutations in reads until convergence is achieved.
     The process adjusts the parameters for correlation and density penalty in each iteration and checks for
@@ -316,7 +307,6 @@ def snv_convergence(output_path, maf, cor, np, pp, dp, proxi, dp_window, ii,
         ii (float): Increment factor for iteration adjustments.
         confirmed_mutation_dict (dict): A dictionary of confirmed mutations.
         consensus_dict (dict): A dictionary containing consensus data.
-        read_positions_blacklisted_dict (dict): A dictionary with blacklisted read positions.
         bio_validation_dict (dict): A dictionary used for biological validation.
 
     Returns:
@@ -327,8 +317,8 @@ def snv_convergence(output_path, maf, cor, np, pp, dp, proxi, dp_window, ii,
 
     reads_mutation_dict = parse_sam_and_find_mutations(output_path + '/rmlst_alignment.sam',
                                                        confirmed_mutation_dict,
-                                                       consensus_dict,
-                                                       read_positions_blacklisted_dict)
+                                                       consensus_dict
+                                                       )
     print(len(reads_mutation_dict))
     print('reads_mutation_dict loaded')
 
@@ -350,7 +340,7 @@ def snv_convergence(output_path, maf, cor, np, pp, dp, proxi, dp_window, ii,
             # Perform upper co-occurring mutations analysis
             confirmed_mutation_dict, co_occurrence_tmp_dict, mutation_threshold_dict = convergence_threshold(
                 maf, cor, np, pp, dp, proxi, dp_window, confirmed_mutation_dict, consensus_dict,
-                read_positions_blacklisted_dict, bio_validation_dict, reads_mutation_dict
+                bio_validation_dict, reads_mutation_dict
             )
 
             new_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
@@ -459,59 +449,6 @@ def index_top_hits_db(output_directory):
     # Index the generated FASTA file
     top_hits_db = os.path.join(output_directory, 'top_hits_db')
     os.system(f'kma index -i {fasta_file} -o {top_hits_db} 2>/dev/null')
-
-
-def adjust_consensus_dict_for_individual_qscores(consensus_dict, sam_file, fastq_file, q_score):
-    """
-    Adjusts the consensus dictionary based on individual quality scores derived from SAM and FASTQ files.
-    This adjustment involves blacklisting positions with low quality scores and updating the consensus
-    dictionary with mutations from high-quality positions.
-
-    Args:
-        consensus_dict (dict): Dictionary containing initial consensus data.
-        sam_file (str): Path to the SAM file containing alignment information.
-        fastq_file (str): Path to the FASTQ file containing sequence data and quality scores.
-
-    Returns:
-        tuple: A tuple containing the adjusted consensus dictionary and a dictionary of blacklisted positions.
-    """
-
-    # Blacklist low-quality positions based on quality scores from the FASTQ file
-    # black_listed_positions = blacklist_positions(fastq_file, quality_threshold=q_score)
-    black_listed_positions = blacklist_positions(fastq_file,
-                                                 quality_threshold=1)  # Decided not to use quality threshold. Revisit another time. Individual positions are not being blacklisted due to their respective quality scores.
-
-    # Initialize the adjusted consensus dictionary
-    adjusted_consensus_dict = {}
-
-    # Setting up the structure of the adjusted consensus dictionary
-    for allele, (positions, allele_seq) in consensus_dict.items():
-        # Initialize nucleotide counts for each position
-        adjusted_consensus_dict[allele] = [[[0, 0, 0, 0, 0, 0] for _ in positions], allele_seq]
-
-    # Process alignments from the SAM file
-    with open(sam_file, 'r') as file:
-        for alignment in file:
-            if alignment.startswith('@'):  # Skip header lines
-                continue
-
-            # Extract relevant data from the alignment
-            qname, _, rname, pos_str, _, cigar_str, _, _, _, seq = alignment.strip().split('\t')[:10]
-            read_id = qname.split(' ')[0]
-            position = int(pos_str)
-            template_seq = adjusted_consensus_dict[rname][1]
-
-            # Process only full-length reads
-            if position == 1 and len(seq) >= len(template_seq):
-                aligned_ref, aligned_query = extract_alignment(template_seq, seq, cigar_str)
-                mutation_vector = create_mutation_vector(aligned_ref, aligned_query)
-
-                # Update the consensus dictionary with mutation data
-                for i, mutation in enumerate(mutation_vector):
-                    if i not in black_listed_positions.get(read_id, []):
-                        adjusted_consensus_dict[rname][0][i][mutation_to_index(mutation)] += 1
-
-    return adjusted_consensus_dict, black_listed_positions
 
 
 def mutation_to_index(mutation):
@@ -674,7 +611,7 @@ def derive_mutation_positions(consensus_dict, min_n, maf, cor):
     return all_confirmed_mutation_dict
 
 def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_mutation_dict, consensus_dict,
-                          read_positions_blacklisted_dict, bio_validation_dict, reads_mutation_dict):
+                          bio_validation_dict, reads_mutation_dict):
     """
     Filter and adjust confirmed mutations based on co-occurrence, depth, and biological validation.
 
@@ -688,7 +625,6 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
         dp_window (int): Density window.
         confirmed_mutation_dict (dict): A dictionary containing confirmed mutations for alleles.
         consensus_dict (dict): A dictionary containing consensus information for alleles.
-        read_positions_blacklisted_dict (dict): A dictionary of blacklisted positions.
         bio_validation_dict (dict): A dictionary containing biological validation data for genes.
         reads_mutation_dict (dict): A dictionary containing mutations for reads.
 
