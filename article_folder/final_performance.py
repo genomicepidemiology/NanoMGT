@@ -44,7 +44,7 @@ def random_sampling(maf, results_folder, min_n, cor, new_output_folder,
     # Perform biological validation of mutations
     bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
     # Co-occurrence analysis until convergence
-    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count = co_occurrence_until_convergence(results_folder,
+    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count = snv_convergence(results_folder,
                                                                                                        confirmed_mutation_dict,
                                                                                                        consensus_dict,
                                                                                                        bio_validation_dict,
@@ -347,7 +347,7 @@ def highest_scoring_hit(file_path):
     return highest_scoring_template
 
 
-def co_occurrence_until_convergence(input_folder, confirmed_mutation_dict, consensus_dict,
+def snv_convergence(input_folder, confirmed_mutation_dict, consensus_dict,
                                     bio_validation_dict, min_n, maf, cor, new_output_folder,
                                     iteration_increase, proxi, dp_window, pp, np, dp):
     """

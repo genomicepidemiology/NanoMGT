@@ -90,7 +90,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     bio_validation_dict = bio_validation_mutations(consensus_dict, os.path.join(arguments.output, 'specie.fsa'))
 
     # Co-occurrence analysis until convergence
-    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count = co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict, bio_validation_dict)
+    confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count = snv_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict, bio_validation_dict)
 
     for item in confirmed_mutation_dict:
         print(item, confirmed_mutation_dict[item])
@@ -287,7 +287,7 @@ def highest_scoring_hit(file_path):
 
     return highest_scoring_template
 
-def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict, bio_validation_dict):
+def snv_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_positions_blacklisted_dict, bio_validation_dict):
     """
     Executes an iterative process to identify co-occurring mutations in reads until convergence is achieved.
     The process adjusts the parameters for correlation and density penalty in each iteration and checks for
@@ -310,10 +310,11 @@ def co_occurrence_until_convergence(arguments, confirmed_mutation_dict, consensu
                                                        confirmed_mutation_dict,
                                                        consensus_dict,
                                                        read_positions_blacklisted_dict)
-    #print (reads_mutation_dict['SRR27755678.258255 BACT000001_1153'])
+    print(len(reads_mutation_dict))
     print('reads_mutation_dict loaded')
 
     current_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
+    print ('Current count: {}'.format(current_count))
     iteration_count = 0
     original_cor = arguments.cor
     original_dp = arguments.dp
