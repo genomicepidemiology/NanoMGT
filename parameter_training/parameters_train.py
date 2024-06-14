@@ -37,7 +37,7 @@ maf_interval = [3]
 cor_interval_search = [0.6]
 dp_interval_search = [0.1]
 np_interval_search = [3]
-pp_interval_search = [0.3]
+pp_interval_search = [3]
 ii_interval_search = [0.01]
 
 parameters_interval_search = {
