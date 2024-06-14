@@ -26,19 +26,19 @@ simulated_batches_csv_path = '/home/people/malhal/test/training_test/data/simula
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
-maf_interval = [3]
+maf_interval = [1]
 
-cor_interval_search = [0.3, 0.4, 0.5, 0.6]
-dp_interval_search = [0.1, 0.3, 0.5]
-np_interval_search = [0.1, 1, 2, 3, 4]
-pp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
-ii_interval_search = [0.01, 0.1, 0.3, 0.5]
+#cor_interval_search = [0.3, 0.4, 0.5, 0.6]
+#dp_interval_search = [0.1, 0.3, 0.5]
+#np_interval_search = [0.1, 1, 2, 3, 4]
+#pp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
+#ii_interval_search = [0.01, 0.1, 0.3, 0.5]
 
-#cor_interval_search = [0.6]
-#dp_interval_search = [0.1]
-#np_interval_search = [3]
-#pp_interval_search = [0.2]
-#ii_interval_search = [0.01]
+cor_interval_search = [0.4]
+dp_interval_search = [0.1]
+np_interval_search = [3]
+pp_interval_search = [0.15]
+ii_interval_search = [0.2]
 
 parameters_interval_search = {
     'cor_interval': cor_interval_search,
