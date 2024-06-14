@@ -34,11 +34,11 @@ maf_interval = [1]
 #pp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
 #ii_interval_search = [0.01, 0.1, 0.3, 0.5]
 
-cor_interval_search = [0.4]
-dp_interval_search = [0.1]
+cor_interval_search = [0.3]
+dp_interval_search = [0.35]
 np_interval_search = [3]
 pp_interval_search = [0.15]
-ii_interval_search = [0.2]
+ii_interval_search = [0.5]
 
 parameters_interval_search = {
     'cor_interval': cor_interval_search,
