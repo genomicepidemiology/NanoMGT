@@ -334,27 +334,6 @@ def generate_test_values(default_value, num_values=40, increment=0.025):
     return default_value * (1 + increments)
 
 
-def process_total_parameter_results(total_parameter_results):
-    result_dict = {}
-
-    for param, maf_data in total_parameter_results.items():
-        for maf, batch_data in maf_data.items():
-            df_rows = []
-
-            for batch_id, (param_values, f1_scores) in batch_data.items():
-                for param_value, f1_score in zip(param_values, f1_scores):
-                    df_rows.append({'MAF': maf, 'Batch ID': batch_id, 'F1 Score': f1_score, 'Parameter Value': param_value})
-
-            df = pd.DataFrame(df_rows)
-            processed_results = process_data(df, param)
-
-            if maf not in result_dict:
-                result_dict[maf] = {}
-
-            for result in processed_results:
-                result_dict[maf][param] = result['param_value_to_return']
-
-    return result_dict
 
 def create_test_object(default_params, param_to_test, test_values):
     param_mapping = {
@@ -381,68 +360,39 @@ def create_test_object(default_params, param_to_test, test_values):
 
 def process_data(df, param):
     results = []
-
-    # Group by 'MAF' and 'Parameter Value'
     grouped = df.groupby('MAF')
-
     for maf, group in grouped:
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
-
-        print(f"Processing MAF: {maf}, Parameter: {param}")
-        print(param_values, f1_scores)
-
         if len(param_values) < 2 or len(f1_scores) < 2:
             continue
-
-        # Normalize param_values and f1_scores to range [0, 1]
         param_values_range = np.max(param_values) - np.min(param_values)
         f1_scores_range = np.max(f1_scores) - np.min(f1_scores)
-
         if param_values_range == 0 or f1_scores_range == 0:
             continue
-
         param_values_normalized = (param_values - np.min(param_values)) / param_values_range
         f1_scores_normalized = (f1_scores - np.min(f1_scores)) / f1_scores_range
-
-        # Ensure param_values_normalized is in increasing order
         sorted_indices = np.argsort(param_values_normalized)
         param_values_normalized = param_values_normalized[sorted_indices]
         f1_scores_normalized = f1_scores_normalized[sorted_indices]
-
-        # Fit a spline to the normalized data points
         spline = UnivariateSpline(param_values_normalized, f1_scores_normalized, s=None)
         derivative = spline.derivative()
-
-        # Generate dense param values for a finer analysis in the normalized range
         param_dense_normalized = np.linspace(0, 1, 450)
         f1_dense_normalized = spline(param_dense_normalized)
         derivative_values_normalized = derivative(param_dense_normalized)
-
-        # Calculate the target derivative for a 20-degree angle
         target_slope = np.tan(np.radians(20))
-
-        # Collect all param values where the derivative is close to the 20-degree slope
         valid_param_values = []
         for idx in range(len(derivative_values_normalized)):
             if abs(derivative_values_normalized[idx] - target_slope) < 0.02 and f1_dense_normalized[idx] > f1_dense_normalized[0]:
                 valid_param_value = param_values.min() + param_dense_normalized[idx] * (param_values.max() - np.min(param_values))
                 valid_param_values.append(valid_param_value)
-
-        # Calculate the lowest gradient slope angle in degrees
         min_slope_angle = np.degrees(np.arctan(np.min(derivative_values_normalized)))
-
-        # Get the first and last F1 score from the normalized data
         first_f1_score = f1_dense_normalized[0]
         last_f1_score = f1_dense_normalized[-1]
-
-        # Determine the parameter value to return
         if valid_param_values:
-            param_value_to_return = valid_param_values[-1]  # Return the last valid value
+            param_value_to_return = valid_param_values[-1]
         else:
-            param_value_to_return = param_values[0]  # Return the first value if no valid values found
-
-        # Append results
+            param_value_to_return = param_values[0]
         results.append({
             'maf': maf,
             'param': param,
@@ -452,8 +402,23 @@ def process_data(df, param):
             'lowest_slope_angle': min_slope_angle,
             'valid_param_values': valid_param_values
         })
-
     return results
+
+def process_total_parameter_results(total_parameter_results):
+    result_dict = {}
+    for param, maf_data in total_parameter_results.items():
+        for maf, batch_data in maf_data.items():
+            df_rows = []
+            for batch_id, (param_values, f1_scores) in batch_data.items():
+                for param_value, f1_score in zip(param_values, f1_scores):
+                    df_rows.append({'MAF': maf, 'Batch ID': batch_id, 'F1 Score': f1_score, 'Parameter Value': param_value})
+            df = pd.DataFrame(df_rows)
+            processed_results = process_data(df, param)
+            if maf not in result_dict:
+                result_dict[maf] = {}
+            for result in processed_results:
+                result_dict[maf][param] = result['param_value_to_return']
+    return result_dict
 
 def load_results(param_list, maf_interval, output_training_folder):
     total_parameter_results = {}
@@ -483,7 +448,6 @@ def load_results(param_list, maf_interval, output_training_folder):
 
 
 def extract_param_value(parameter_string, param):
-    # Split the parameter string and find the value for the specific param
     param_list = parameter_string.split('_')
     for i, p in enumerate(param_list):
         if p == param and i + 1 < len(param_list):
@@ -617,6 +581,7 @@ for maf in maf_interval:
 """
 
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
+
 
 for maf in total_parameter_results:
     for param in total_parameter_results[maf]:
