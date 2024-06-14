@@ -582,6 +582,7 @@ for maf in maf_interval:
 
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 
+print (total_parameter_results[4]['np'])
 
 for maf in maf_interval:
     for param in param_list:
