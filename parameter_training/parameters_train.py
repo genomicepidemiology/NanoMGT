@@ -513,7 +513,9 @@ for maf in maf_interval:
                 os.makedirs(new_output_folder, exist_ok=True)
                 #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100, parameters_interval_search, maps_path, simulated_batches_csv_path)
                 train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, simulated_batches_csv_path,
-                    0.1, 5, 15, 0.44, 2, 0.15)
+                    0.1, 5, 15, 0.44, 5, 0.15)
+                #train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, simulated_batches_csv_path,
+                #    ii, proxi, dp_window, pp, np, dp):
 
 
 all_best_params = defaultdict(list)

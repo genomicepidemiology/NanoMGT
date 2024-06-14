@@ -344,9 +344,6 @@ def snv_convergence(arguments, confirmed_mutation_dict, consensus_dict, read_pos
             print(f'Iteration: {iteration_count}', file=sys.stderr)
             print(f'Mutations: {new_count}', file=sys.stderr)
             print(f'{iteration_count},{new_count}', file=convergence_file)
-            #for item in co_occurrence_tmp_dict:
-            #    print(f'{item},{co_occurrence_tmp_dict[item]}', file=sys.stderr)
-
             # Check for convergence: no change in mutation count
             if new_count == current_count:
                 break
