@@ -600,6 +600,7 @@ def derive_mutation_positions(consensus_dict, min_n, maf, cor):
                     print (positions)
                     if positions[t] >= min_n:
                         if allele == 'BACT000001_59':
+                            print ('FOUND')
                             print(positions, i + 1)
                         total_depth = sum(positions)
                         relative_depth = positions[t] / total_depth
