@@ -710,14 +710,14 @@ def convergence_threshold(arguments, confirmed_mutation_dict, consensus_dict,
                     for item in co_occurrence_list:
                         if item not in co_occurrence_tmp_dict[allele]:
                             co_occurrence_tmp_dict[allele].append(item)
-                    mutation_threshold = mutation_threshold - position_depth * arguments.maf * arguments.cor
+                    mutation_threshold -= position_depth * arguments.maf * arguments.cor
 
                 if not biological_existence:
-                    mutation_threshold = mutation_threshold + arguments.np * position_depth * arguments.maf
+                    mutation_threshold += arguments.np * position_depth * arguments.maf
                 if proxi_mutations != []:
-                    mutation_threshold = mutation_threshold + arguments.pp * position_depth * arguments.maf
+                    mutation_threshold += arguments.pp * position_depth * arguments.maf
                 if density_mutations != []:
-                    mutation_threshold = mutation_threshold + arguments.dp * position_depth * arguments.maf * len(density_mutations)
+                    mutation_threshold += arguments.dp * position_depth * arguments.maf * len(density_mutations)
 
                 mutation_threshold_dict[allele][mutation] = mutation_threshold  # Store the threshold
 
@@ -735,7 +735,7 @@ def convergence_threshold(arguments, confirmed_mutation_dict, consensus_dict,
                 depth = confirmed_mutation_dict[allele][1][0]
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
                 if not biological_existence:
-                    mutation_threshold = mutation_threshold + (arguments.np - 1) * position_depth * arguments.maf
+                    mutation_threshold += (arguments.np - 1) * position_depth * arguments.maf
 
                 mutation_threshold_dict[allele][mutation] = mutation_threshold  # Store the threshold
 
@@ -744,6 +744,7 @@ def convergence_threshold(arguments, confirmed_mutation_dict, consensus_dict,
                     adjusted_mutation_dict[allele][1].append(confirmed_mutation_dict[allele][1][0])
 
     return adjusted_mutation_dict, co_occurrence_tmp_dict, mutation_threshold_dict
+
 
 
 def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, mutation,
