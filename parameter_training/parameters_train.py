@@ -345,7 +345,7 @@ def determine_gradient_value(df, param):
         param_values_normalized = param_values_new - param_values_first_value
         f1_scores_first_value = f1_scores_new[0]
         f1_scores_normalized = f1_scores_new - f1_scores_first_value
-        print (param_values_new)
+        print (param_values_normalized)
         print (f1_scores_normalized)
         sys.exit()
         spline = UnivariateSpline(param_values_new, f1_scores_normalized, s=None)
