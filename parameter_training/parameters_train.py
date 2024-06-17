@@ -333,7 +333,6 @@ def determine_gradient_value(df, param):
         param_values_new = np.array(list(param_f1_map.keys()))
         f1_scores_new = np.array([np.mean(f1_scores) for f1_scores in param_f1_map.values()])
 
-
         if len(param_values_new) < 2 or len(f1_scores_new) < 2:
             continue
         param_values_range = np.max(param_values_new) - np.min(param_values_new)
@@ -341,8 +340,6 @@ def determine_gradient_value(df, param):
         if param_values_range == 0 or f1_scores_range == 0:
             continue
 
-        #param_values_first_value = param_values_new[0]
-        #param_values_normalized = param_values_new - param_values_first_value
         f1_scores_first_value = f1_scores_new[0]
         f1_scores_normalized = f1_scores_new - f1_scores_first_value
         spline = UnivariateSpline(param_values_new, f1_scores_normalized, s=None)
@@ -350,20 +347,23 @@ def determine_gradient_value(df, param):
         param_dense_normalized = np.linspace(min(param_values_new), max(param_values_new), 450)
         f1_dense_normalized = spline(param_dense_normalized)
 
-        print (param_values_new)
-        print (f1_scores_normalized)
+        print(param_values_new)
+        print(f1_scores_normalized)
+        print('param_dense_normalized:')
+        print(param_dense_normalized)
+        print('f1_dense_normalized:')
+        print(f1_dense_normalized)
+        sys.exit()
 
         derivative_values_normalized = derivative(param_dense_normalized)
-        print ('derivative')
-        print (derivative_values_normalized)
+        print('derivative')
+        print(derivative_values_normalized)
         sys.exit()
         target_slope = np.tan(np.radians(20))
         valid_param_values = []
         for idx in range(len(derivative_values_normalized)):
-            if abs(derivative_values_normalized[idx] - target_slope) < 0.02 and f1_dense_normalized[idx] > \
-                    f1_dense_normalized[0]:
-                valid_param_value = param_values_new.min() + param_dense_normalized[idx] * (
-                            param_values_new.max() - np.min(param_values_new))
+            if abs(derivative_values_normalized[idx] - target_slope) < 0.02 and f1_dense_normalized[idx] > f1_dense_normalized[0]:
+                valid_param_value = param_values_new.min() + param_dense_normalized[idx] * (param_values_new.max() - np.min(param_values_new))
                 valid_param_values.append(valid_param_value)
         min_slope_angle = np.degrees(np.arctan(np.min(derivative_values_normalized)))
         first_f1_score = f1_dense_normalized[0]
@@ -383,6 +383,8 @@ def determine_gradient_value(df, param):
         })
     return results
 
+# Usage example with a dummy DataFrame:
+import pandas as pd
 
 def process_total_parameter_results(total_parameter_results):
     result_dict = {}
