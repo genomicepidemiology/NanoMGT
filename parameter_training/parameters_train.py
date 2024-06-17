@@ -340,6 +340,9 @@ def determine_gradient_value(df, param):
         f1_scores_range = np.max(f1_scores_new) - np.min(f1_scores_new)
         if param_values_range == 0 or f1_scores_range == 0:
             continue
+
+        param_values_first_value = param_values_new[0]
+        param_values_normalized = param_values_new - param_values_first_value
         f1_scores_first_value = f1_scores_new[0]
         f1_scores_normalized = f1_scores_new - f1_scores_first_value
         print (param_values_new)
