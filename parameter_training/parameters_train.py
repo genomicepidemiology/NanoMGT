@@ -345,25 +345,40 @@ def determine_gradient_value(df, param):
         spline = UnivariateSpline(param_values_new, f1_scores_normalized, s=None)
         derivative = spline.derivative()
         param_dense = np.linspace(min(param_values_new), max(param_values_new), 450)
-        #f1_dense = spline(param_dense_normalized)
+        f1_dense = spline(param_dense)
 
         derivative_values = derivative(param_dense)
         print('derivative')
         print(derivative_values)
-        sys.exit()
+
         target_slope = np.tan(np.radians(20))
         valid_param_values = []
-        for idx in range(len(derivative_values_normalized)):
-            if abs(derivative_values_normalized[idx] - target_slope) < 0.02 and f1_dense_normalized[idx] > f1_dense_normalized[0]:
-                valid_param_value = param_values_new.min() + param_dense_normalized[idx] * (param_values_new.max() - np.min(param_values_new))
+        for idx in range(len(derivative_values)):
+            if abs(derivative_values[idx] - target_slope) < 0.02 and f1_dense[idx] > f1_dense[0]:
+                valid_param_value = param_dense[idx]
                 valid_param_values.append(valid_param_value)
-        min_slope_angle = np.degrees(np.arctan(np.min(derivative_values_normalized)))
-        first_f1_score = f1_dense_normalized[0]
-        last_f1_score = f1_dense_normalized[-1]
+
         if valid_param_values:
             param_value_to_return = valid_param_values[-1]
         else:
-            param_value_to_return = param_values_new[0]
+            trend = f1_dense[-1] - f1_dense[0]
+            if trend > 0:
+                param_value_to_return = param_dense[-1]
+            else:
+                param_value_to_return = param_dense[0]
+
+        min_slope_angle = np.degrees(np.arctan(np.min(derivative_values)))
+        first_f1_score = f1_dense[0]
+        last_f1_score = f1_dense[-1]
+
+        print ('trend:', trend)
+        print ('valid_param_values:', valid_param_values)
+        print (first_f1_score)
+        print (last_f1_score)
+
+
+
+
         results.append({
             'maf': maf,
             'param': param,
@@ -374,9 +389,6 @@ def determine_gradient_value(df, param):
             'valid_param_values': valid_param_values
         })
     return results
-
-# Usage example with a dummy DataFrame:
-import pandas as pd
 
 def process_total_parameter_results(total_parameter_results):
     result_dict = {}
