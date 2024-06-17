@@ -356,9 +356,9 @@ def determine_gradient_value(df, param):
         print ('fitted y-values')
         print (f1_dense)
         print ('real x-values')
-        print (param_values)
+        print (param_values_new)
         print ('real y-values')
-        print (f1_scores)
+        print (f1_scores_new)
         sys.exit()
 
         target_slope = np.tan(np.radians(20))
