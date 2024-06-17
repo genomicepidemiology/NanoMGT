@@ -338,17 +338,20 @@ def determine_gradient_value(df, param):
         if len(param_values_new) < 2 or len(f1_scores_new) < 2:
             continue
         param_values_range = np.max(param_values_new) - np.min(param_values_new)
-        f1_scores_range = np.max(f1_scores_new) - np.min(f1_scores_new)
-        if param_values_range == 0 or f1_scores_range == 0:
+        if param_values_range == 0:
             continue
+
+        # Normalizing parameter values
         param_values_normalized = (param_values_new - np.min(param_values_new)) / param_values_range
-        f1_scores_normalized = (f1_scores_new - np.min(f1_scores_new)) / f1_scores_range
-        #sorted_indices = np.argsort(param_values_normalized)
-        #param_values_normalized = param_values_normalized[sorted_indices]
-        #f1_scores_normalized = f1_scores_normalized[sorted_indices]
-        print (param_values_normalized)
-        print (f1_scores_normalized)
+
+        # Normalizing F1 scores by subtracting the first value
+        f1_scores_first_value = f1_scores_new[0]
+        f1_scores_normalized = f1_scores_new - f1_scores_first_value
+
+        print(param_values_normalized)
+        print(f1_scores_normalized)
         sys.exit()
+
         spline = UnivariateSpline(param_values_normalized, f1_scores_normalized, s=None)
         derivative = spline.derivative()
         param_dense_normalized = np.linspace(0, 1, 450)
@@ -380,6 +383,20 @@ def determine_gradient_value(df, param):
         })
     return results
 
+
+# Usage example with a dummy DataFrame:
+import pandas as pd
+
+data = {
+    'MAF': ['1', '1', '1', '2', '2', '2'],
+    'Parameter Value': [1.5, 1.5, 1.6, 1.7, 1.8, 1.8],
+    'F1 Score': [0.8, 0.9, 0.85, 0.7, 0.75, 0.65]
+}
+
+df = pd.DataFrame(data)
+
+# Calling the function
+determine_gradient_value(df, 'np')
 
 def process_total_parameter_results(total_parameter_results):
     result_dict = {}
