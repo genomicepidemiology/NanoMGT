@@ -362,6 +362,7 @@ def determine_gradient_value(df, param):
             param_value_to_return = valid_param_values[-1]
         else:
             trend = f1_dense[-1] - f1_dense[0]
+            print('trend:', trend)
             if trend > 0:
                 param_value_to_return = param_dense[-1]
             else:
@@ -371,7 +372,6 @@ def determine_gradient_value(df, param):
         first_f1_score = f1_dense[0]
         last_f1_score = f1_dense[-1]
 
-        print ('trend:', trend)
         print ('valid_param_values:', valid_param_values)
         print (first_f1_score)
         print (last_f1_score)
