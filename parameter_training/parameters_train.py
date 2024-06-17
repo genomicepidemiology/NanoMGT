@@ -564,6 +564,8 @@ for maf in maf_interval:
 # Eval each parameter value
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 
+print (total_parameter_results)
+
 for maf in maf_interval:
     for param in param_list:
         output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param, maf))
