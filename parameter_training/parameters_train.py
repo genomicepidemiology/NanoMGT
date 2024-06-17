@@ -324,10 +324,10 @@ def determine_gradient_value(df, param):
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
         print (param)
-        #print ('raw values')
-        #print (param_values)
-        #print (f1_scores)
-        #sys.exit()
+        print ('raw values')
+        print (param_values)
+        print (f1_scores)
+        sys.exit()
         if len(param_values) < 2 or len(f1_scores) < 2:
             continue
         param_values_range = np.max(param_values) - np.min(param_values)
@@ -339,8 +339,6 @@ def determine_gradient_value(df, param):
         sorted_indices = np.argsort(param_values_normalized)
         param_values_normalized = param_values_normalized[sorted_indices]
         f1_scores_normalized = f1_scores_normalized[sorted_indices]
-        print (param_values_normalized)
-        print (f1_scores_normalized)
         spline = UnivariateSpline(param_values_normalized, f1_scores_normalized, s=None)
         derivative = spline.derivative()
         param_dense_normalized = np.linspace(0, 1, 450)
