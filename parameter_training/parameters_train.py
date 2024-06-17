@@ -386,6 +386,7 @@ def process_total_parameter_results(total_parameter_results):
                 result_dict[maf][param] = result['param_value_to_return']
     return result_dict
 
+
 def load_results(param_list, maf_interval, output_training_folder):
     total_parameter_results = {}
     for param in param_list:
@@ -413,8 +414,29 @@ def load_results(param_list, maf_interval, output_training_folder):
                     total_parameter_results[param][maf][batch_id][0].sort()
                     total_parameter_results[param][maf][batch_id][1].sort()
 
-    return total_parameter_results
+    # Calculate averages and create new object with unique values
+    average_parameter_results = {}
+    for param in param_list:
+        average_parameter_results[param] = {}
+        for maf in maf_interval:
+            average_parameter_results[param][maf] = {}
+            for batch_id, values in total_parameter_results[param][maf].items():
+                param_values = values[0]
+                f1_scores = values[1]
 
+                param_f1_map = defaultdict(list)
+                for param_value, f1_score in zip(param_values, f1_scores):
+                    param_f1_map[param_value].append(f1_score)
+
+                unique_param_values = []
+                average_f1_scores = []
+                for param_value, f1_scores in param_f1_map.items():
+                    unique_param_values.append(param_value)
+                    average_f1_scores.append(sum(f1_scores) / len(f1_scores))
+
+                average_parameter_results[param][maf][batch_id] = [unique_param_values, average_f1_scores]
+
+    return average_parameter_results
 
 def extract_param_value(parameter_string, param):
     param_list = parameter_string.split('_')
