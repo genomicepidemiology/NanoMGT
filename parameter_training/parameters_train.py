@@ -464,6 +464,7 @@ output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
+"""
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -525,11 +526,11 @@ for maf in maf_interval:
                             cpus = 40
                         run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                              test_object, maps_path, simulated_batches_csv_path)
-
+"""
 # Eval each parameter value
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 
-print(total_parameter_results['np'][1][10])
+print(total_parameter_results['np'][2][10])
 
 for maf in maf_interval:
     for param in param_list:
