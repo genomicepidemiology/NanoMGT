@@ -334,19 +334,15 @@ def determine_gradient_value(df, param):
         f1_scores_new = np.array([np.mean(f1_scores) for f1_scores in param_f1_map.values()])
 
 
-        print(param)
-        print (param_values_new)
-        print (f1_scores_new)
-        sys.exit()
-
         if len(param_values_new) < 2 or len(f1_scores_new) < 2:
             continue
         param_values_range = np.max(param_values_new) - np.min(param_values_new)
         f1_scores_range = np.max(f1_scores_new) - np.min(f1_scores_new)
         if param_values_range == 0 or f1_scores_range == 0:
             continue
-        f1_scores_normalized = (f1_scores_new - np.min(f1_scores_new)) / f1_scores_range
-        print (param_values_normalized)
+        f1_scores_first_value = f1_scores_new[0]
+        f1_scores_normalized = f1_scores_new - f1_scores_first_value
+        print (param_values_new)
         print (f1_scores_normalized)
         sys.exit()
         spline = UnivariateSpline(param_values_new, f1_scores_normalized, s=None)
