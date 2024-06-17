@@ -347,9 +347,9 @@ def determine_gradient_value(df, param):
         param_dense = np.linspace(min(param_values_new), max(param_values_new), 450)
         f1_dense = spline(param_dense_normalized)
 
-        derivative_values_normalized = derivative(param_dense)
+        derivative_values = derivative(param_dense)
         print('derivative')
-        print(derivative_values_normalized)
+        print(derivative_values)
         sys.exit()
         target_slope = np.tan(np.radians(20))
         valid_param_values = []
