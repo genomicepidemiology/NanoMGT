@@ -343,8 +343,8 @@ def determine_gradient_value(df, param):
             continue
         param_values_normalized = (param_values_new - np.min(param_values_new)) / param_values_range
         f1_scores_normalized = (f1_scores_new - np.min(f1_scores_new)) / f1_scores_range
-        sorted_indices = np.argsort(param_values_normalized)
-        param_values_normalized = param_values_normalized[sorted_indices]
+        #sorted_indices = np.argsort(param_values_normalized)
+        #param_values_normalized = param_values_normalized[sorted_indices]
         f1_scores_normalized = f1_scores_normalized[sorted_indices]
         print (param_values_normalized)
         print (f1_scores_normalized)
