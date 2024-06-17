@@ -331,8 +331,6 @@ def determine_gradient_value(df, param):
             param_f1_map[param_value].append(f1_score)
 
         param_values_new = np.array(list(param_f1_map.keys()))
-        print (param_values_new)
-        sys.exit()
         f1_scores_new = np.array([np.mean(f1_scores) for f1_scores in param_f1_map.values()])
 
         if len(param_values_new) < 2 or len(f1_scores_new) < 2:
@@ -348,6 +346,8 @@ def determine_gradient_value(df, param):
         spline = UnivariateSpline(param_values_new, f1_scores_normalized, s=None)
         derivative = spline.derivative()
         param_dense = np.linspace(min(param_values_new), max(param_values_new), 450)
+        print (param_dense)
+        sys.exit()
         f1_dense = spline(param_dense)
 
         derivative_values = derivative(param_dense)
