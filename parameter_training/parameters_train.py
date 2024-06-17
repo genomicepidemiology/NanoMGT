@@ -334,10 +334,6 @@ def determine_gradient_value(df, param):
         f1_scores_new = np.array([np.mean(f1_scores) for f1_scores in param_f1_map.values()])
 
         print(param)
-        print('merged values')
-        print(param_values_new)
-        print(f1_scores_new)
-        sys.exit()
 
         if len(param_values_new) < 2 or len(f1_scores_new) < 2:
             continue
@@ -350,6 +346,9 @@ def determine_gradient_value(df, param):
         sorted_indices = np.argsort(param_values_normalized)
         param_values_normalized = param_values_normalized[sorted_indices]
         f1_scores_normalized = f1_scores_normalized[sorted_indices]
+        print (param_values_normalized)
+        print (f1_scores_normalized)
+        sys.exit()
         spline = UnivariateSpline(param_values_normalized, f1_scores_normalized, s=None)
         derivative = spline.derivative()
         param_dense_normalized = np.linspace(0, 1, 450)
