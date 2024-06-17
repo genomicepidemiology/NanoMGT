@@ -317,12 +317,15 @@ def create_test_object(default_params, param_to_test, test_values):
 
     return test_object
 
-def process_data(df, param):
+def determine_gradient_value(df, param):
     results = []
     grouped = df.groupby('MAF')
     for maf, group in grouped:
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
+        print (param_values)
+        print (f1_scores)
+        sys.exit()
         if len(param_values) < 2 or len(f1_scores) < 2:
             continue
         param_values_range = np.max(param_values) - np.min(param_values)
@@ -372,7 +375,7 @@ def process_total_parameter_results(total_parameter_results):
                 for param_value, f1_score in zip(param_values, f1_scores):
                     df_rows.append({'MAF': maf, 'Batch ID': batch_id, 'F1 Score': f1_score, 'Parameter Value': param_value})
             df = pd.DataFrame(df_rows)
-            processed_results = process_data(df, param)
+            processed_results = determine_gradient_value(df, param)
             if maf not in result_dict:
                 result_dict[maf] = {}
             for result in processed_results:
@@ -431,7 +434,7 @@ def process_directory(directory):
             file_path = os.path.join(directory, filename)
             df = pd.read_csv(file_path)
 
-            processed_results = process_data(df, param)
+            processed_results = determine_gradient_value(df, param)
 
             if maf not in result_dict:
                 result_dict[maf] = {}
@@ -534,9 +537,6 @@ for maf in maf_interval:
 """
 # Eval each parameter value
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
-
-print(total_parameter_results['np'][2][7][0])
-print(total_parameter_results['np'][2][7][1])
 
 for maf in maf_interval:
     for param in param_list:
