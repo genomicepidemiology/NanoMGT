@@ -317,25 +317,36 @@ def create_test_object(default_params, param_to_test, test_values):
 
     return test_object
 
+
 def determine_gradient_value(df, param):
     results = []
     grouped = df.groupby('MAF')
     for maf, group in grouped:
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
-        print (param)
-        print ('raw values')
-        print (param_values)
-        print (f1_scores)
+
+        # Merging duplicate parameter values
+        param_f1_map = defaultdict(list)
+        for param_value, f1_score in zip(param_values, f1_scores):
+            param_f1_map[param_value].append(f1_score)
+
+        param_values_new = np.array(list(param_f1_map.keys()))
+        f1_scores_new = np.array([np.mean(f1_scores) for f1_scores in param_f1_map.values()])
+
+        print(param)
+        print('merged values')
+        print(param_values_new)
+        print(f1_scores_new)
         sys.exit()
-        if len(param_values) < 2 or len(f1_scores) < 2:
+
+        if len(param_values_new) < 2 or len(f1_scores_new) < 2:
             continue
-        param_values_range = np.max(param_values) - np.min(param_values)
-        f1_scores_range = np.max(f1_scores) - np.min(f1_scores)
+        param_values_range = np.max(param_values_new) - np.min(param_values_new)
+        f1_scores_range = np.max(f1_scores_new) - np.min(f1_scores_new)
         if param_values_range == 0 or f1_scores_range == 0:
             continue
-        param_values_normalized = (param_values - np.min(param_values)) / param_values_range
-        f1_scores_normalized = (f1_scores - np.min(f1_scores)) / f1_scores_range
+        param_values_normalized = (param_values_new - np.min(param_values_new)) / param_values_range
+        f1_scores_normalized = (f1_scores_new - np.min(f1_scores_new)) / f1_scores_range
         sorted_indices = np.argsort(param_values_normalized)
         param_values_normalized = param_values_normalized[sorted_indices]
         f1_scores_normalized = f1_scores_normalized[sorted_indices]
@@ -347,8 +358,10 @@ def determine_gradient_value(df, param):
         target_slope = np.tan(np.radians(20))
         valid_param_values = []
         for idx in range(len(derivative_values_normalized)):
-            if abs(derivative_values_normalized[idx] - target_slope) < 0.02 and f1_dense_normalized[idx] > f1_dense_normalized[0]:
-                valid_param_value = param_values.min() + param_dense_normalized[idx] * (param_values.max() - np.min(param_values))
+            if abs(derivative_values_normalized[idx] - target_slope) < 0.02 and f1_dense_normalized[idx] > \
+                    f1_dense_normalized[0]:
+                valid_param_value = param_values_new.min() + param_dense_normalized[idx] * (
+                            param_values_new.max() - np.min(param_values_new))
                 valid_param_values.append(valid_param_value)
         min_slope_angle = np.degrees(np.arctan(np.min(derivative_values_normalized)))
         first_f1_score = f1_dense_normalized[0]
@@ -356,7 +369,7 @@ def determine_gradient_value(df, param):
         if valid_param_values:
             param_value_to_return = valid_param_values[-1]
         else:
-            param_value_to_return = param_values[0]
+            param_value_to_return = param_values_new[0]
         results.append({
             'maf': maf,
             'param': param,
@@ -367,6 +380,7 @@ def determine_gradient_value(df, param):
             'valid_param_values': valid_param_values
         })
     return results
+
 
 def process_total_parameter_results(total_parameter_results):
     result_dict = {}
