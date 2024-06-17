@@ -402,7 +402,12 @@ def load_results(param_list, maf_interval, output_training_folder):
                                 total_parameter_results[param][maf][batch_id][0].append(parameter_value)
                                 total_parameter_results[param][maf][batch_id][1].append(f1_score)
 
+                    # Sort the lists
+                    total_parameter_results[param][maf][batch_id][0].sort()
+                    total_parameter_results[param][maf][batch_id][1].sort()
+
     return total_parameter_results
+
 
 def extract_param_value(parameter_string, param):
     param_list = parameter_string.split('_')
@@ -530,11 +535,8 @@ for maf in maf_interval:
 # Eval each parameter value
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 
-total_parameter_results['np'][2][10][0].sort()
-total_parameter_results['np'][2][10][1].sort()
-
-print(total_parameter_results['np'][2][10][0])
-print(total_parameter_results['np'][2][10][1])
+print(total_parameter_results['np'][2][7][0])
+print(total_parameter_results['np'][2][7][1])
 
 for maf in maf_interval:
     for param in param_list:
