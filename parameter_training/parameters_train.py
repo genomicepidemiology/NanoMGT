@@ -350,6 +350,8 @@ def determine_gradient_value(df, param):
         derivative_values = derivative(param_dense)
         print('derivative')
         print(derivative_values)
+        print ('x-values')
+        print (param_dense)
 
         target_slope = np.tan(np.radians(20))
         print (target_slope)
