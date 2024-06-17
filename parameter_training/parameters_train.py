@@ -341,19 +341,19 @@ def determine_gradient_value(df, param):
         if param_values_range == 0 or f1_scores_range == 0:
             continue
 
-        param_values_first_value = param_values_new[0]
-        param_values_normalized = param_values_new - param_values_first_value
+        #param_values_first_value = param_values_new[0]
+        #param_values_normalized = param_values_new - param_values_first_value
         f1_scores_first_value = f1_scores_new[0]
         f1_scores_normalized = f1_scores_new - f1_scores_first_value
         spline = UnivariateSpline(param_values_new, f1_scores_normalized, s=None)
         derivative = spline.derivative()
         param_dense_normalized = np.linspace(min(param_values_new), max(param_values_new), 450)
-        print (param_dense_normalized)
         f1_dense_normalized = spline(param_dense_normalized)
-        print (f1_dense_normalized)
-        sys.exit()
 
         derivative_values_normalized = derivative(param_dense_normalized)
+        print ('derivative')
+        print (derivative_values_normalized)
+        sys.exit()
         target_slope = np.tan(np.radians(20))
         valid_param_values = []
         for idx in range(len(derivative_values_normalized)):
