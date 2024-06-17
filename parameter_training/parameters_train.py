@@ -352,6 +352,7 @@ def determine_gradient_value(df, param):
         print(derivative_values)
 
         target_slope = np.tan(np.radians(20))
+        print (target_slope)
         valid_param_values = []
         for idx in range(len(derivative_values)):
             if abs(derivative_values[idx] - target_slope) < 0.02 and f1_dense[idx] > f1_dense[0]:
