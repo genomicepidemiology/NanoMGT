@@ -326,6 +326,7 @@ def determine_gradient_value(df, param):
         print ('raw values')
         print (param_values)
         print (f1_scores)
+        sys.exit()
         if len(param_values) < 2 or len(f1_scores) < 2:
             continue
         param_values_range = np.max(param_values) - np.min(param_values)
@@ -566,7 +567,6 @@ total_parameter_results = load_results(param_list, maf_interval, output_training
 
 print (total_parameter_results['np'][2][10])
 
-sys.exit()
 for maf in maf_interval:
     for param in param_list:
         output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param, maf))
