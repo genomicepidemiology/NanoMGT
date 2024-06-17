@@ -325,6 +325,7 @@ def determine_gradient_value(df, param):
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
 
+
         # Merging duplicate parameter values
         param_f1_map = defaultdict(list)
         for param_value, f1_score in zip(param_values, f1_scores):
@@ -334,6 +335,10 @@ def determine_gradient_value(df, param):
         f1_scores_new = np.array([np.mean(f1_scores) for f1_scores in param_f1_map.values()])
 
         print(param)
+
+        print (param_values_new)
+        print (f1_scores_new)
+        sys.exit()
 
         if len(param_values_new) < 2 or len(f1_scores_new) < 2:
             continue
