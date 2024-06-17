@@ -324,6 +324,7 @@ def determine_gradient_value(df, param):
     for maf, group in grouped:
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
+        print (param_values)
 
         # Merging duplicate parameter values
         param_f1_map = defaultdict(list)
