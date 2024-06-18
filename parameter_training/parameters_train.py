@@ -369,6 +369,7 @@ def determine_gradient_value(df, param):
         first_f1_score = f1_dense[0]
         last_f1_score = f1_dense[-1]
 
+        print (param, maf)
         print('max_derivative_value:', max_derivative_value)
         print('peak_index:', peak_index)
         print('target_value:', target_value)
