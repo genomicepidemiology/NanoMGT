@@ -353,34 +353,26 @@ def determine_gradient_value(df, param):
         trend = f1_dense[-1] - f1_dense[0]
         print('trend:', trend)
 
-        if trend > 0:
-            param_value_to_return = param_dense[-1]
-        else:
-            param_value_to_return = param_dense[0]
-
-
-        # Analyze the derivative values
+        # Find the peak derivative value and determine the value slightly after the peak
         max_derivative_value = np.max(derivative_values)
-        min_derivative_value = np.min(derivative_values)
+        peak_index = np.argmax(derivative_values)
+        target_value = 0.8 * max_derivative_value
 
-        if max_derivative_value > 0:
-            param_value_max_slope = param_dense[np.argmax(derivative_values)]
-        else:
-            param_value_max_slope = None
+        # Find the first index after the peak where the derivative value drops below the target value
+        param_value_to_return = param_dense[peak_index]
+        for idx in range(peak_index + 1, len(derivative_values)):
+            if derivative_values[idx] <= target_value:
+                param_value_to_return = param_dense[idx]
+                break
 
-        if min_derivative_value < 0:
-            param_value_min_slope = param_dense[np.argmin(derivative_values)]
-        else:
-            param_value_min_slope = None
-
-        min_slope_angle = np.degrees(np.arctan(min_derivative_value))
+        min_slope_angle = np.degrees(np.arctan(np.min(derivative_values)))
         first_f1_score = f1_dense[0]
         last_f1_score = f1_dense[-1]
 
         print('max_derivative_value:', max_derivative_value)
-        print('min_derivative_value:', min_derivative_value)
-        print('param_value_max_slope:', param_value_max_slope)
-        print('param_value_min_slope:', param_value_min_slope)
+        print('peak_index:', peak_index)
+        print('target_value:', target_value)
+        print('param_value_to_return:', param_value_to_return)
         print('first_f1_score:', first_f1_score)
         print('last_f1_score:', last_f1_score)
 
@@ -388,13 +380,12 @@ def determine_gradient_value(df, param):
             'maf': maf,
             'param': param,
             'param_value_to_return': param_value_to_return,
-            'param_value_max_slope': param_value_max_slope,
-            'param_value_min_slope': param_value_min_slope,
             'first_f1_score': first_f1_score,
             'last_f1_score': last_f1_score,
             'lowest_slope_angle': min_slope_angle
         })
     return results
+
 def process_total_parameter_results(total_parameter_results):
     result_dict = {}
     for param, maf_data in total_parameter_results.items():
