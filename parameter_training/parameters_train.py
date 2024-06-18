@@ -594,5 +594,5 @@ for maf in maf_interval:
                     writer.writerow([maf, batch_id, f1_score, param_value])
 
 processed_results = process_total_parameter_results(total_parameter_results)
-with open(output_training_folder + '/', 'w') as json_file:
-    json.dump(processed_results, 'final_parameters.json', indent=4)
+with open(output_training_folder + '/final_parameters.json', 'w') as json_file:
+    json.dump(processed_results, json_file, indent=4)
