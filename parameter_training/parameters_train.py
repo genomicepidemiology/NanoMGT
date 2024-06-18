@@ -342,65 +342,58 @@ def determine_gradient_value(df, param):
 
         f1_scores_first_value = f1_scores_new[0]
         f1_scores_normalized = f1_scores_new - f1_scores_first_value
-        print (param_values_new)
         spline = UnivariateSpline(param_values_new, f1_scores_normalized, s=None)
         derivative = spline.derivative()
         param_dense = np.linspace(min(param_values_new), max(param_values_new), 50)
         f1_dense = spline(param_dense)
 
         derivative_values = derivative(param_dense)
-        print('derivative')
-        print(derivative_values)
-        print ('fitted x-values')
-        print (param_dense)
-        print ('fitted y-values')
-        print (f1_dense)
-        print ('real x-values')
-        print (param_values_new)
-        print ('real y-values')
-        print (f1_scores_new)
-        sys.exit()
 
-        target_slope = np.tan(np.radians(20))
-        print (target_slope)
-        valid_param_values = []
-        for idx in range(len(derivative_values)):
-            if abs(derivative_values[idx] - target_slope) < 0.02 and f1_dense[idx] > f1_dense[0]:
-                valid_param_value = param_dense[idx]
-                valid_param_values.append(valid_param_value)
+        # Establish the trend
+        trend = f1_dense[-1] - f1_dense[0]
+        print('trend:', trend)
 
-        if valid_param_values:
-            param_value_to_return = valid_param_values[-1]
+        if trend > 0:
+            param_value_to_return = param_dense[-1]
         else:
-            trend = f1_dense[-1] - f1_dense[0]
-            print('trend:', trend)
-            if trend > 0:
-                param_value_to_return = param_dense[-1]
-            else:
-                param_value_to_return = param_dense[0]
+            param_value_to_return = param_dense[0]
 
-        min_slope_angle = np.degrees(np.arctan(np.min(derivative_values)))
+        # Analyze the derivative values
+        max_derivative_value = np.max(derivative_values)
+        min_derivative_value = np.min(derivative_values)
+
+        if max_derivative_value > 0:
+            param_value_max_slope = param_dense[np.argmax(derivative_values)]
+        else:
+            param_value_max_slope = None
+
+        if min_derivative_value < 0:
+            param_value_min_slope = param_dense[np.argmin(derivative_values)]
+        else:
+            param_value_min_slope = None
+
+        min_slope_angle = np.degrees(np.arctan(min_derivative_value))
         first_f1_score = f1_dense[0]
         last_f1_score = f1_dense[-1]
 
-        print ('valid_param_values:', valid_param_values)
-        print (first_f1_score)
-        print (last_f1_score)
-
-
-
+        print('max_derivative_value:', max_derivative_value)
+        print('min_derivative_value:', min_derivative_value)
+        print('param_value_max_slope:', param_value_max_slope)
+        print('param_value_min_slope:', param_value_min_slope)
+        print('first_f1_score:', first_f1_score)
+        print('last_f1_score:', last_f1_score)
 
         results.append({
             'maf': maf,
             'param': param,
             'param_value_to_return': param_value_to_return,
+            'param_value_max_slope': param_value_max_slope,
+            'param_value_min_slope': param_value_min_slope,
             'first_f1_score': first_f1_score,
             'last_f1_score': last_f1_score,
-            'lowest_slope_angle': min_slope_angle,
-            'valid_param_values': valid_param_values
+            'lowest_slope_angle': min_slope_angle
         })
     return results
-
 def process_total_parameter_results(total_parameter_results):
     result_dict = {}
     for param, maf_data in total_parameter_results.items():
