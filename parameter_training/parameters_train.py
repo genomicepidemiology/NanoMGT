@@ -358,6 +358,7 @@ def determine_gradient_value(df, param):
         else:
             param_value_to_return = param_dense[0]
 
+
         # Analyze the derivative values
         max_derivative_value = np.max(derivative_values)
         min_derivative_value = np.min(derivative_values)
