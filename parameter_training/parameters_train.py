@@ -26,19 +26,19 @@ simulated_batches_csv_path = '/home/people/malhal/test/training_test/data/simula
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
-maf_interval = [2]
+maf_interval = [1, 2, 3, 4, 5]
 
-#cor_interval_search = [0.3, 0.4, 0.5, 0.6]
-#dp_interval_search = [0.1, 0.3, 0.5]
-#np_interval_search = [0.1, 1, 2, 3, 4]
-#pp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
-#ii_interval_search = [0.01, 0.1, 0.3, 0.5]
+cor_interval_search = [0.3, 0.5, 0.7]
+dp_interval_search = [0.1, 0.3, 0.5]
+np_interval_search = [0.1, 1, 2, 3]
+pp_interval_search = [0.1, 0.3, 0.5]
+ii_interval_search = [0.01, 0.1, 0.3, 0.5]
 
-cor_interval_search = [0.3]
-dp_interval_search = [0.35]
-np_interval_search = [3]
-pp_interval_search = [0.15]
-ii_interval_search = [0.5]
+#cor_interval_search = [0.3]
+#dp_interval_search = [0.35]
+#np_interval_search = [3]
+#pp_interval_search = [0.15]
+#ii_interval_search = [0.5]
 
 parameters_interval_search = {
     'cor_interval': cor_interval_search,
@@ -351,7 +351,7 @@ def determine_gradient_value(df, param):
 
         # Establish the trend
         trend = f1_dense[-1] - f1_dense[0]
-        print('trend:', trend)
+        #print('trend:', trend)
 
         # Find the peak derivative value and determine the value slightly after the peak
         max_derivative_value = np.max(derivative_values)
@@ -369,13 +369,13 @@ def determine_gradient_value(df, param):
         first_f1_score = f1_dense[0]
         last_f1_score = f1_dense[-1]
 
-        print (param, maf)
-        print('max_derivative_value:', max_derivative_value)
-        print('peak_index:', peak_index)
-        print('target_value:', target_value)
-        print('param_value_to_return:', param_value_to_return)
-        print('first_f1_score:', first_f1_score)
-        print('last_f1_score:', last_f1_score)
+        #print (param, maf)
+        #print('max_derivative_value:', max_derivative_value)
+        #print('peak_index:', peak_index)
+        #print('target_value:', target_value)
+        #print('param_value_to_return:', param_value_to_return)
+        #print('first_f1_score:', first_f1_score)
+        #print('last_f1_score:', last_f1_score)
 
         results.append({
             'maf': maf,
@@ -515,7 +515,6 @@ output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
-"""
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -577,11 +576,9 @@ for maf in maf_interval:
                             cpus = 40
                         run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                              test_object, maps_path, simulated_batches_csv_path)
-"""
+
 # Eval each parameter value
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
-
-print (total_parameter_results['np'][2][10])
 
 for maf in maf_interval:
     for param in param_list:
