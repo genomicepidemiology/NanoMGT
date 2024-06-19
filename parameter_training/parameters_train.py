@@ -534,7 +534,7 @@ def load_top_hit(file_path, param_to_fetch):
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
-
+"""
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -549,7 +549,7 @@ for maf in maf_interval:
                                      parameters_interval_search, maps_path, simulated_batches_csv_path)
                 #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, simulated_batches_csv_path,
                 #    0.1, 5, 15, 0.44, 5, 0.15)
-
+"""
 all_best_params = defaultdict(list)
 
 for maf in maf_interval:
@@ -563,16 +563,18 @@ for maf in maf_interval:
                 results_filename = new_output_folder + "/all_results.csv"
                 best_params = calculate_best_parameters(results_filename)
                 for param, value in best_params.items():
-                    all_best_params[param[1:]].append(value)
-    for param, values in all_best_params.items():
-        average_value = sum(values) / len(values)
-        average_best_params[param] = average_value
-        print(f"Average of best {param}: {average_value:.4f}")
+                    param_name = param[1:]
+                    if param_name in param_list:
+                        all_best_params[param_name].append(value)
+    for param in param_list:
+        if param in all_best_params:
+            values = all_best_params[param]
+            average_value = sum(values) / len(values)
+            average_best_params[param] = average_value
+            print(f"Average of best {param}: {average_value:.4f}")
     output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
-
-    print(f"Averages saved to {output_file_path}")
 
 
 #2 round grid search for optimum
@@ -598,7 +600,7 @@ for maf in maf_interval:
                             cpus = 40
                         run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                              test_object, maps_path, simulated_batches_csv_path)
-"""
+
 # Eval each parameter value
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 
@@ -618,3 +620,4 @@ print (processed_results)
 sys.exit()
 with open(output_training_folder + '/final_parameters.json', 'w') as json_file:
     json.dump(processed_results, json_file, indent=4)
+"""
