@@ -1,8 +1,10 @@
 import re
 import sys
+import json
 from Bio import pairwise2
 from Bio.Seq import Seq
 
+alignment_result_path = "/home/people/malhal/test/sup_nanomgt_data"
 
 def calculate_proximity_density(mutations):
     mutation_positions = {int(mut.split('_')[0]): mut for mut in mutations}
@@ -153,14 +155,9 @@ def find_close_mutations(mutations):
     return close_mutations
 
 
-# List of sequence IDs for each species
-species_sequencing_ids = {
-    "Escherichia coli": ['SRR25689478', 'ERR12533301', 'SRR26036455'],
-    "Klebsiella pneumoniae": ['ERR8958737', 'SRR27348733'],
-    "Campylobacter jejuni": ['SRR27638397', 'SRR27710526'],
-    "Salmonella enterica": ['SRR28399428', 'SRR27136088', 'SRR27755678'],
-    "Staphylococcus aureus": ['SRR28370694', 'ERR8958843']
-}
+# Load species sequencing IDs from file
+with open('species_sequencing_ids.json', 'r') as f:
+    species_sequencing_ids = json.load(f)
 
 for species, sequencing_ids in species_sequencing_ids.items():
     for i in range(len(sequencing_ids)):
@@ -178,9 +175,9 @@ for species, sequencing_ids in species_sequencing_ids.items():
                 total_proximity_density = 0
 
                 with open(f'major_{minor_id}_minor_{major_id}.txt', 'w') as write_file:
-                    query_dict = load_majority_seqs_from_fasta_file(f'/home/people/malhal/data/new_nanomgt/majority_variants/{major_id}/majority_seqs.fasta')
-                    ref_dict = load_majority_seqs_from_fasta_file(f'/home/people/malhal/data/new_nanomgt/majority_variants/{minor_id}/majority_seqs.fasta')
-                    bio_validation_dict = bio_validation_mutations(query_dict, f'/home/people/malhal/data/new_nanomgt/majority_variants/{minor_id}/specie.fsa')
+                    query_dict = load_majority_seqs_from_fasta_file(f'{alignment_result_path}/{major_id}/majority_seqs.fasta')
+                    ref_dict = load_majority_seqs_from_fasta_file(f'{alignment_result_path}/{minor_id}/majority_seqs.fasta')
+                    bio_validation_dict = bio_validation_mutations(query_dict, f'{alignment_result_path}/{minor_id}/specie.fsa')
 
                     for key in query_dict:
                         mutations = []
@@ -214,3 +211,4 @@ for species, sequencing_ids in species_sequencing_ids.items():
                     print(f"Total density: {total_proximity_density}")
                     if mutations_in_proximity > 0:
                         print(f"Average proximity density: {total_proximity_density / mutations_in_proximity}")
+

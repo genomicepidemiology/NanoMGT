@@ -351,7 +351,7 @@ def determine_gradient_value(df, param):
 
         # Establish the trend
         trend = f1_dense[-1] - f1_dense[0]
-        #print('trend:', trend)
+        print(f"Processing param: {param}, maf: {maf}, trend: {trend}")
 
         # Find the peak derivative value and determine the value slightly after the peak
         max_derivative_value = np.max(derivative_values)
@@ -369,13 +369,7 @@ def determine_gradient_value(df, param):
         first_f1_score = f1_dense[0]
         last_f1_score = f1_dense[-1]
 
-        #print (param, maf)
-        #print('max_derivative_value:', max_derivative_value)
-        #print('peak_index:', peak_index)
-        #print('target_value:', target_value)
-        #print('param_value_to_return:', param_value_to_return)
-        #print('first_f1_score:', first_f1_score)
-        #print('last_f1_score:', last_f1_score)
+        print(f"Processed param: {param}, maf: {maf}, param_value_to_return: {param_value_to_return}")
 
         results.append({
             'maf': maf,
@@ -401,6 +395,7 @@ def process_total_parameter_results(total_parameter_results):
                 result_dict[maf] = {}
             for result in processed_results:
                 result_dict[maf][param] = result['param_value_to_return']
+                print(f"Result for param: {param}, maf: {maf}: {result['param_value_to_return']}")
     return result_dict
 
 
@@ -430,6 +425,7 @@ def load_results(param_list, maf_interval, output_training_folder):
                     # Sort the lists
                     total_parameter_results[param][maf][batch_id][0].sort()
                     total_parameter_results[param][maf][batch_id][1].sort()
+                    print(f"Loaded results for param: {param}, maf: {maf}, batch_id: {batch_id}")
 
     # Calculate averages and create new object with unique values
     average_parameter_results = {}
@@ -514,7 +510,7 @@ def load_top_hit(file_path, param_to_fetch):
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
-
+"""
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -576,7 +572,7 @@ for maf in maf_interval:
                             cpus = 40
                         run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                              test_object, maps_path, simulated_batches_csv_path)
-
+"""
 # Eval each parameter value
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 
