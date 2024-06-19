@@ -576,9 +576,6 @@ for maf in maf_interval:
 # Eval each parameter value
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 
-print (total_parameter_results)
-
-sys.exit()
 for maf in maf_interval:
     for param in param_list:
         output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param, maf))
@@ -590,5 +587,8 @@ for maf in maf_interval:
                     writer.writerow([maf, batch_id, f1_score, param_value])
 
 processed_results = process_total_parameter_results(total_parameter_results)
+print (processed_results)
+
+sys.exit()
 with open(output_training_folder + '/final_parameters.json', 'w') as json_file:
     json.dump(processed_results, json_file, indent=4)
