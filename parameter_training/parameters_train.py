@@ -518,7 +518,7 @@ def load_top_hit(file_path, param_to_fetch):
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
-"""
+
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -533,7 +533,7 @@ for maf in maf_interval:
                                      parameters_interval_search, maps_path, simulated_batches_csv_path)
                 #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, simulated_batches_csv_path,
                 #    0.1, 5, 15, 0.44, 5, 0.15)
-"""
+
 all_best_params = defaultdict(list)
 
 for maf in maf_interval:
@@ -577,7 +577,7 @@ for maf in maf_interval:
                 if batch_id >= maf:
                     input_file_path = os.path.join(alignment_results_path, folder)
                     alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
-                    new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
+                    new_output_folder = output_training_folder + '/' + '2_round_maf_' + str(maf) + '/' + folder
                     os.makedirs(new_output_folder, exist_ok=True)
                     run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                          parameters_interval_search, maps_path, simulated_batches_csv_path)
