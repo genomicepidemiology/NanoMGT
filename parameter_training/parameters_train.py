@@ -579,9 +579,8 @@ for maf in maf_interval:
                     alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
                     new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
                     os.makedirs(new_output_folder, exist_ok=True)
-                    print (maf, batch_id, parameters_interval_search)
-                    #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
-                    #                     parameters_interval_search, maps_path, simulated_batches_csv_path)
+                    run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
+                                         parameters_interval_search, maps_path, simulated_batches_csv_path)
 #2 round grid search for optimum
 """
 # Test individual parameters
