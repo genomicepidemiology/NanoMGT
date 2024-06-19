@@ -581,7 +581,36 @@ for maf in maf_interval:
                     os.makedirs(new_output_folder, exist_ok=True)
                     run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                          parameters_interval_search, maps_path, simulated_batches_csv_path)
+all_best_params = defaultdict(list)
+
+for maf in maf_interval:
+    print(f"maf_{maf}")
+    average_best_params = {}
+    for folder in folders:
+        if folder.startswith('depth220_SRR27755678'):
+            batch_id = int(folder.split('_')[-2][5:])
+            if batch_id >= maf:
+                new_output_folder = output_training_folder + '/' + '2_round_maf_' + str(maf) + '/' + folder
+                results_filename = new_output_folder + "/all_results.csv"
+                best_params = calculate_best_parameters(results_filename)
+                for param, value in best_params.items():
+                    param_name = param[1:]
+                    if param_name in param_list:
+                        all_best_params[param_name].append(value)
+    for param in param_list:
+        if param in all_best_params:
+            values = all_best_params[param]
+            average_value = sum(values) / len(values)
+            average_best_params[param] = average_value
+            print(f"Average of best {param}: {average_value:.4f}")
+    output_file_path = os.path.join(output_training_folder, "2_round_{}_average_best_params.json".format('maf_' + str(maf)))
+    with open(output_file_path, 'w') as json_file:
+        json.dump(average_best_params, json_file, indent=4)
+
 #2 round grid search for optimum
+
+
+
 """
 # Test individual parameters
 for maf in maf_interval:
