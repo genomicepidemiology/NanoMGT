@@ -280,38 +280,22 @@ def calculate_best_parameters(file_name):
     return {param: value for param, (value, _) in best_params_per_file.items()}
 
 def load_default_parameters(file_path):
-    with open(file_path, 'r') as json_file:
-        params = json.load(json_file)
-    if 'maf' in params:
-        del params['maf']
-    return params
+    with open(file_path, 'r') as file:
+        return json.load(file)
 
-def generate_test_values(default_value, num_values=40, increment=0.025):
-    increments = np.linspace(-num_values // 2, num_values // 2, num_values) * increment
-    return default_value * (1 + increments)
-
-def create_test_object(default_params, param_to_test, test_values):
-    param_mapping = {
-        'cor': 'cor_interval',
-        'ii': 'ii_interval',
-        'pp': 'pp_interval',
-        'np': 'np_interval',
-        'dp': 'dp_interval'
-    }
-
-    test_object = {}
-    for param, default_value in default_params.items():
-        mapped_param = param_mapping.get(param)
-        if mapped_param is None:
-            continue
-
-        if param == param_to_test:
-            test_object[mapped_param] = test_values
-        else:
-            test_object[mapped_param] = [default_value]
-
-    return test_object
-
+def generate_test_values(average_value, num_increments):
+    increment = average_value * 0.05
+    test_values = []
+    for i in range(-num_increments, num_increments + 1):
+        test_values.append(average_value + i * increment)
+    return test_values
+def create_test_object(default_params, param, test_values):
+    test_objects = []
+    for value in test_values:
+        new_params = default_params.copy()
+        new_params[param] = value
+        test_objects.append(new_params)
+    return test_objects
 
 def determine_gradient_value(df, param):
     results = []
@@ -576,7 +560,35 @@ for maf in maf_interval:
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
 
+# Number of increments to test
+num_increments = 2  # For example, testing 2 increments on each side
 
+# Test individual parameters
+for maf in maf_interval:
+    output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
+    default_params = load_default_parameters(output_file_path)
+
+    for param, default_value in default_params.items():
+        if param != 'af':  # Remove this later when maf is not saved
+            test_values = generate_test_values(default_value, num_increments)
+            test_objects = create_test_object(default_params, param, test_values)
+
+            for folder in folders:
+                if folder.startswith('depth'):
+                    batch_id = int(folder.split('_')[-2][5:])
+                    if batch_id >= maf:
+                        for test_object in test_objects:
+                            param_value = test_object[param]
+                            new_output_folder = os.path.join(output_training_folder, f'maf_{maf}',
+                                                             f'{param}_{param_value}_{folder}')
+                            input_file_path = os.path.join(alignment_results_path, folder)
+                            alignment_folder = f'/home/people/malhal/test/training_test/{folder}'
+                            os.makedirs(new_output_folder, exist_ok=True)
+                            if cpus > 41:  # Only training 20 values
+                                cpus = 40
+                            print (maf, batch_id, test_object)
+                            #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
+                            #                     test_object, maps_path, simulated_batches_csv_path)
 #2 round grid search for optimum
 """
 # Test individual parameters
