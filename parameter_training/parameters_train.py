@@ -517,7 +517,7 @@ def load_top_hit(file_path, param_to_fetch):
 
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
-param_list = ['np', 'cor', 'pp', 'dp', 'ii']
+    param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 """
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
@@ -562,33 +562,26 @@ for maf in maf_interval:
 
 # Number of increments to test
 num_increments = 2  # For example, testing 2 increments on each side
-
-# Test individual parameters
 for maf in maf_interval:
+    os.makedirs(output_training_folder + '/2_round_maf_' + str(maf), exist_ok=True)
     output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
     default_params = load_default_parameters(output_file_path)
 
     for param, default_value in default_params.items():
-        if param != 'af':  # Remove this later when maf is not saved
-            test_values = generate_test_values(default_value, num_increments)
-            test_objects = create_test_object(default_params, param, test_values)
+        test_values = generate_test_values(default_value, num_increments)
+        parameters_interval_search[param + '_interval'] = test_values  # Add generated values to the interval search
 
-            for folder in folders:
-                if folder.startswith('depth'):
-                    batch_id = int(folder.split('_')[-2][5:])
-                    if batch_id >= maf:
-                        for test_object in test_objects:
-                            param_value = test_object[param]
-                            new_output_folder = os.path.join(output_training_folder, f'maf_{maf}',
-                                                             f'{param}_{param_value}_{folder}')
-                            input_file_path = os.path.join(alignment_results_path, folder)
-                            alignment_folder = f'/home/people/malhal/test/training_test/{folder}'
-                            os.makedirs(new_output_folder, exist_ok=True)
-                            if cpus > 41:  # Only training 20 values
-                                cpus = 40
-                            print (maf, batch_id, test_object)
-                            #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
-                            #                     test_object, maps_path, simulated_batches_csv_path)
+        for folder in folders:
+            if folder.startswith('depth220_SRR27755678'):
+                batch_id = int(folder.split('_')[-2][5:])
+                if batch_id >= maf:
+                    input_file_path = os.path.join(alignment_results_path, folder)
+                    alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
+                    new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
+                    os.makedirs(new_output_folder, exist_ok=True)
+                    print (maf, batch_id, parameters_interval_search)
+                    #run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
+                    #                     parameters_interval_search, maps_path, simulated_batches_csv_path)
 #2 round grid search for optimum
 """
 # Test individual parameters
