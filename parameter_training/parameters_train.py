@@ -578,8 +578,6 @@ total_parameter_results = load_results(param_list, maf_interval, output_training
 
 for item in total_parameter_results:
     print (item)
-    for value in item:
-        print (total_parameter_results[item])
 
 sys.exit()
 for maf in maf_interval:
