@@ -325,11 +325,9 @@ def determine_gradient_value(df, param):
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
 
-        # Log the raw param values and f1 scores
         print(f"Raw param values for {param}, maf {maf}: {param_values}")
         print(f"Raw f1 scores for {param}, maf {maf}: {f1_scores}")
 
-        # Merging duplicate parameter values
         param_f1_map = defaultdict(list)
         for param_value, f1_score in zip(param_values, f1_scores):
             param_f1_map[param_value].append(f1_score)
@@ -337,7 +335,6 @@ def determine_gradient_value(df, param):
         param_values_new = np.array(list(param_f1_map.keys()))
         f1_scores_new = np.array([np.mean(f1_scores) for f1_scores in param_f1_map.values()])
 
-        # Log the merged param values and f1 scores
         print(f"Merged param values for {param}, maf {maf}: {param_values_new}")
         print(f"Merged f1 scores for {param}, maf {maf}: {f1_scores_new}")
 
@@ -346,8 +343,22 @@ def determine_gradient_value(df, param):
             continue
         param_values_range = np.max(param_values_new) - np.min(param_values_new)
         f1_scores_range = np.max(f1_scores_new) - np.min(f1_scores_new)
-        if param_values_range == 0 or f1_scores_range == 0:
-            print(f"Skipping {param}, maf {maf} due to zero range")
+
+        if param_values_range == 0:
+            print(f"Skipping {param}, maf {maf} due to zero parameter value range")
+            continue
+
+        if f1_scores_range == 0:
+            print(f"Zero range for f1 scores detected, using average param value for {param}, maf {maf}")
+            param_value_to_return = np.mean(param_values_new)
+            results.append({
+                'maf': maf,
+                'param': param,
+                'param_value_to_return': param_value_to_return,
+                'first_f1_score': f1_scores_new[0],
+                'last_f1_score': f1_scores_new[-1],
+                'lowest_slope_angle': 0  # since there's no slope, set to 0
+            })
             continue
 
         f1_scores_first_value = f1_scores_new[0]
@@ -359,16 +370,13 @@ def determine_gradient_value(df, param):
 
         derivative_values = derivative(param_dense)
 
-        # Establish the trend
         trend = f1_dense[-1] - f1_dense[0]
         print(f"Processing param: {param}, maf: {maf}, trend: {trend}")
 
-        # Find the peak derivative value and determine the value slightly after the peak
         max_derivative_value = np.max(derivative_values)
         peak_index = np.argmax(derivative_values)
         target_value = 0.8 * max_derivative_value
 
-        # Find the first index after the peak where the derivative value drops below the target value
         param_value_to_return = param_dense[peak_index]
         for idx in range(peak_index + 1, len(derivative_values)):
             if derivative_values[idx] <= target_value:
