@@ -325,6 +325,10 @@ def determine_gradient_value(df, param):
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
 
+        # Log the raw param values and f1 scores
+        print(f"Raw param values for {param}, maf {maf}: {param_values}")
+        print(f"Raw f1 scores for {param}, maf {maf}: {f1_scores}")
+
         # Merging duplicate parameter values
         param_f1_map = defaultdict(list)
         for param_value, f1_score in zip(param_values, f1_scores):
@@ -333,11 +337,17 @@ def determine_gradient_value(df, param):
         param_values_new = np.array(list(param_f1_map.keys()))
         f1_scores_new = np.array([np.mean(f1_scores) for f1_scores in param_f1_map.values()])
 
+        # Log the merged param values and f1 scores
+        print(f"Merged param values for {param}, maf {maf}: {param_values_new}")
+        print(f"Merged f1 scores for {param}, maf {maf}: {f1_scores_new}")
+
         if len(param_values_new) < 2 or len(f1_scores_new) < 2:
+            print(f"Skipping {param}, maf {maf} due to insufficient data points")
             continue
         param_values_range = np.max(param_values_new) - np.min(param_values_new)
         f1_scores_range = np.max(f1_scores_new) - np.min(f1_scores_new)
         if param_values_range == 0 or f1_scores_range == 0:
+            print(f"Skipping {param}, maf {maf} due to zero range")
             continue
 
         f1_scores_first_value = f1_scores_new[0]
@@ -381,6 +391,7 @@ def determine_gradient_value(df, param):
         })
     return results
 
+
 def process_total_parameter_results(total_parameter_results):
     result_dict = {}
     for param, maf_data in total_parameter_results.items():
@@ -388,14 +399,24 @@ def process_total_parameter_results(total_parameter_results):
             df_rows = []
             for batch_id, (param_values, f1_scores) in batch_data.items():
                 for param_value, f1_score in zip(param_values, f1_scores):
-                    df_rows.append({'MAF': maf, 'Batch ID': batch_id, 'F1 Score': f1_score, 'Parameter Value': param_value})
+                    df_rows.append(
+                        {'MAF': maf, 'Batch ID': batch_id, 'F1 Score': f1_score, 'Parameter Value': param_value})
             df = pd.DataFrame(df_rows)
+
+            # Log the dataframe for the current param and maf
+            print(f"DataFrame for param: {param}, maf: {maf}")
+            print(df)
+
             processed_results = determine_gradient_value(df, param)
+
             if maf not in result_dict:
                 result_dict[maf] = {}
             for result in processed_results:
                 result_dict[maf][param] = result['param_value_to_return']
-                print(f"Result for param: {param}, maf: {maf}: {result['param_value_to_return']}")
+                # Log the processed result for debugging
+                print(f"Processed result for param: {param}, maf: {maf}")
+                print(result)
+
     return result_dict
 
 
@@ -576,9 +597,6 @@ for maf in maf_interval:
 # Eval each parameter value
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 
-print (total_parameter_results['np'][5][10])
-
-sys.exit()
 for maf in maf_interval:
     for param in param_list:
         output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param, maf))
