@@ -17,11 +17,11 @@ SRR27755678	Salmonella enterica ~400x depth
 SRR28370694	Staphylococcus aureus ~200x depth
 ERR8958843 Staphylococcus aureus >2000x depth
 
-HAC Basecalled:
+SRR28370636 Listeria monocytogenes
+SRR27755674 Listeria monocytogenes
+SRR26899103 Listeria monocytogenes
 
-
-
-
+Listeria monocytogenes approx. genome size for depth simulation: 3000000
 Escherichia coli approx. genome size for depth simulation: 5000000
 Staphylococcus aureus approx. genome size for depth simulation: 3000000
 Campylobacter jejuni approx. genome size for depth simulation: 1700000

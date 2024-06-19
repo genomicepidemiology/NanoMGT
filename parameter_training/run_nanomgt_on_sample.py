@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+"""
 # List of folders to process
 path = "/home/people/malhal/data/new_nanomgt/genomes/genomes/simulated_reads/renamed_reads/"
 folders = os.listdir(path)
@@ -47,7 +48,7 @@ for folder in folders:
 
 """
 # Use this for aligning individual isolates to make the variant position map used to benchmark
-path = "/home/people/malhal/data/new_nanomgt/genomes/genomes/simulated_reads/renamed_reads/"
+path = "/home/people/malhal/data/new_nanomgt/sup_data/"
 
 # Align individual isolates to make maps of variance
 fastq_files = [f for f in os.listdir(path) if f.endswith('.fastq')]
@@ -61,5 +62,3 @@ for file in fastq_files:
     command = f"~/NanoMGT/bin/nanomgt --nanopore {input_file_path} --o {output_name} --threads 8 --db_dir ~/nanomgt_db/"
 
     os.system(command)
-
-"""
