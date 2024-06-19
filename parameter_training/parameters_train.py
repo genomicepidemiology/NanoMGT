@@ -26,7 +26,7 @@ simulated_batches_csv_path = '/home/people/malhal/test/training_test/data/simula
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
-maf_interval = [1, 2, 3, 4, 5]
+maf_interval = [5]
 
 cor_interval_search = [0.3, 0.5, 0.7]
 dp_interval_search = [0.1, 0.3, 0.5]
@@ -34,11 +34,6 @@ np_interval_search = [0.1, 1, 2, 3]
 pp_interval_search = [0.1, 0.3, 0.5]
 ii_interval_search = [0.01, 0.1, 0.3, 0.5]
 
-#cor_interval_search = [0.3]
-#dp_interval_search = [0.35]
-#np_interval_search = [3]
-#pp_interval_search = [0.15]
-#ii_interval_search = [0.5]
 
 parameters_interval_search = {
     'cor_interval': cor_interval_search,
@@ -539,7 +534,7 @@ def load_top_hit(file_path, param_to_fetch):
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
-"""
+
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -580,6 +575,8 @@ for maf in maf_interval:
     print(f"Averages saved to {output_file_path}")
 
 
+#2 round grid search for optimum
+"""
 # Test individual parameters
 for maf in maf_interval:
     output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
