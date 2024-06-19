@@ -576,8 +576,7 @@ for maf in maf_interval:
 # Eval each parameter value
 total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
 
-for item in total_parameter_results:
-    print (item)
+print (total_parameter_results['np'])
 
 sys.exit()
 for maf in maf_interval:
