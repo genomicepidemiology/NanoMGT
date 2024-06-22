@@ -547,7 +547,7 @@ for maf in maf_interval:
     print(f"maf_{maf}")
     average_best_params = {}
     for folder in folders:
-        if folder.startswith('depth220_SRR27755678'):
+        if folder.startswith('depth220_SRR27755678_majority_batches_batch10') or folder.startswith('depth220_SRR27755678_majority_batches_batch9'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
                 new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
@@ -557,13 +557,14 @@ for maf in maf_interval:
                     param_name = param[1:]
                     if param_name in param_list:
                         all_best_params[param_name].append(value)
+    sys.exit()
     for param in param_list:
         if param in all_best_params:
             values = all_best_params[param]
             average_value = sum(values) / len(values)
             average_best_params[param] = average_value
             print(f"Average of best {param}: {average_value:.4f}")
-    output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
+    output_file_path = os.path.join(output_training_folder, "maf_{}_average_best_params.json".format(maf))
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
 
@@ -581,7 +582,7 @@ for round in rounds:
     for maf in maf_interval:
         os.makedirs(output_training_folder + '/{}_round_maf_{}'.format(round, maf), exist_ok=True)
         if round == 2:
-            output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
+            output_file_path = os.path.join(output_training_folder, "maf_{}_average_best_params.json".format(maf))
         else:
             output_file_path = os.path.join(output_training_folder, "{}_round_maf_{}_average_best_params.json".format(round-1, maf))
         default_params = load_default_parameters(output_file_path)
