@@ -592,8 +592,6 @@ for round in rounds:
         for param, default_value in default_params.items():
             test_values = generate_test_values(default_value, num_increments, round_increment_dict[round])
             parameters_interval_search[param + '_interval'] = test_values  # Add generated values to the interval search
-        print (parameters_interval_search)
-        sys.exit()
 
         for folder in folders:
             if folder.startswith('depth220_SRR27755678'):
@@ -605,8 +603,9 @@ for round in rounds:
                     os.makedirs(new_output_folder, exist_ok=True)
                     run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                          parameters_interval_search, maps_path, simulated_batches_csv_path)
+
     all_best_params = defaultdict(list)
-    #
+
     for maf in maf_interval:
         average_best_params = {}
         for folder in folders:
@@ -628,4 +627,3 @@ for round in rounds:
         output_file_path = os.path.join(output_training_folder, "{}_round_maf_{}_average_best_params.json".format(round, maf))
         with open(output_file_path, 'w') as json_file:
             json.dump(average_best_params, json_file, indent=4)
-    sys.exit()
