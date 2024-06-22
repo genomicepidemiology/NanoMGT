@@ -598,7 +598,7 @@ for round in rounds:
                         run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                              parameters_interval_search, maps_path, simulated_batches_csv_path)
     all_best_params = defaultdict(list)
-
+    #
     for maf in maf_interval:
         print(f"maf_{maf}")
         average_best_params = {}
