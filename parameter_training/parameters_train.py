@@ -197,8 +197,8 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
     for cor in cor_interval:
 
-        consensus_dict = nvc.build_consensus_dict(os.path.join(results_folder, 'rmlst_alignment.res'),
-                                                  os.path.join(results_folder, 'rmlst_alignment.mat'))
+        consensus_dict = nvc.build_consensus_dict(os.path.join(alignment_folder, 'rmlst_alignment.res'),
+                                                  os.path.join(alignment_folder, 'rmlst_alignment.mat'))
 
         confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, min_n, maf, cor)
 
