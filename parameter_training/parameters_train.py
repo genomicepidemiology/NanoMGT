@@ -193,9 +193,9 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
     all_results = []
 
-    processed_combinations = 0
-
     for cor in cor_interval:
+
+        processed_combinations = 0
 
         consensus_dict = nvc.build_consensus_dict(os.path.join(alignment_folder, 'rmlst_alignment.res'),
                                                   os.path.join(alignment_folder, 'rmlst_alignment.mat'))
@@ -561,6 +561,8 @@ for maf in maf_interval:
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
 
+sys.exit()
+
 # Number of increments to test
 num_increments = 2  # For example, testing 2 increments on each side
 for maf in maf_interval:
@@ -609,49 +611,3 @@ for maf in maf_interval:
         json.dump(average_best_params, json_file, indent=4)
 
 #2 round grid search for optimum
-
-
-
-"""
-# Test individual parameters
-for maf in maf_interval:
-    output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
-    default_params = load_default_parameters(output_file_path)
-    for param, default_value in default_params.items():
-        if param != 'af':  # Remove this later when maf is not saved
-            test_values = generate_test_values(default_value)
-            test_object = create_test_object(default_params, param, test_values)
-
-            for folder in folders:
-                if folder.startswith('depth'):
-                    batch_id = int(folder.split('_')[-2][5:])
-                    if batch_id >= maf:
-                        new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + param + '_' + folder
-                        input_file_path = os.path.join(alignment_results_path, folder)
-                        alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
-                        os.makedirs(new_output_folder, exist_ok=True)
-                        if cpus > 41:  # Only training 20 values
-                            cpus = 40
-                        run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
-                                             test_object, maps_path, simulated_batches_csv_path)
-
-# Eval each parameter value
-total_parameter_results = load_results(param_list, maf_interval, output_training_folder)
-
-for maf in maf_interval:
-    for param in param_list:
-        output_file_csv = os.path.join(output_training_folder, '{}_{}_results.csv'.format(param, maf))
-        with open(output_file_csv, mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(['MAF', 'Batch ID', 'F1 Score', 'Parameter Value'])
-            for batch_id, (param_values, f1_scores) in total_parameter_results[param][maf].items():
-                for param_value, f1_score in zip(param_values, f1_scores):
-                    writer.writerow([maf, batch_id, f1_score, param_value])
-
-processed_results = process_total_parameter_results(total_parameter_results)
-print (processed_results)
-
-sys.exit()
-with open(output_training_folder + '/final_parameters.json', 'w') as json_file:
-    json.dump(processed_results, json_file, indent=4)
-"""
