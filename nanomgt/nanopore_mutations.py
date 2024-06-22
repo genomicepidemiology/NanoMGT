@@ -134,7 +134,7 @@ def identify_mutations(mutation_vector, reference_sequence, gene_mutations, read
     return mutations
 def parse_sam_and_find_mutations(sam_file_path, confirmed_mutation_dict, consensus_dict):
     """
-    Parses a SAM file, extracts necessary information and finds mutations in each read.
+    Parses a SAM file, extracts necessary information and finds mutations in each read..
 
     Parameters:
     - sam_file_path (str): The path to the SAM file.
