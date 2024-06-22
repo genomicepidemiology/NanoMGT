@@ -588,21 +588,23 @@ for round in rounds:
             output_file_path = os.path.join(output_training_folder, "{}_round_maf_{}_average_best_params.json".format(round-1, maf))
         default_params = load_default_parameters(output_file_path)
         print (default_params)
-        sys.exit()
 
         for param, default_value in default_params.items():
             test_values = generate_test_values(default_value, num_increments, round_increment_dict[round])
             parameters_interval_search[param + '_interval'] = test_values  # Add generated values to the interval search
-            for folder in folders:
-                if folder.startswith('depth220_SRR27755678'):
-                    batch_id = int(folder.split('_')[-2][5:])
-                    if batch_id >= maf:
-                        input_file_path = os.path.join(alignment_results_path, folder)
-                        alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
-                        new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
-                        os.makedirs(new_output_folder, exist_ok=True)
-                        run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
-                                             parameters_interval_search, maps_path, simulated_batches_csv_path)
+        print (parameters_interval_search)
+        sys.exit()
+
+        for folder in folders:
+            if folder.startswith('depth220_SRR27755678'):
+                batch_id = int(folder.split('_')[-2][5:])
+                if batch_id >= maf:
+                    input_file_path = os.path.join(alignment_results_path, folder)
+                    alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
+                    new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
+                    os.makedirs(new_output_folder, exist_ok=True)
+                    run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
+                                         parameters_interval_search, maps_path, simulated_batches_csv_path)
     all_best_params = defaultdict(list)
     #
     for maf in maf_interval:
