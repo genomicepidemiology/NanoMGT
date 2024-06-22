@@ -202,7 +202,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
         confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, min_n, maf, cor)
 
-        bio_validation_dict = nvc.bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
+        bio_validation_dict = nvc.bio_validation_mutations(consensus_dict, os.path.join(alignment_folder, 'specie.fsa'))
 
         sample = results_folder.split('/')[-1]
 
