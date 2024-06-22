@@ -218,7 +218,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
         for future in concurrent.futures.as_completed(futures_to_params):
             params = futures_to_params[future]
             processed_combinations += 1
-            print(f"Processed {processed_combinations}/{total_combinations} combinations.")
+            #print(f"Processed {processed_combinations}/{total_combinations} combinations.")
             try:
                 result = future.result()
                 f1, parameter_string, precision, recall, tp, fp, fn = result
@@ -310,8 +310,8 @@ def determine_gradient_value(df, param):
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
 
-        print(f"Raw param values for {param}, maf {maf}: {param_values}")
-        print(f"Raw f1 scores for {param}, maf {maf}: {f1_scores}")
+        #print(f"Raw param values for {param}, maf {maf}: {param_values}")
+        #print(f"Raw f1 scores for {param}, maf {maf}: {f1_scores}")
 
         param_f1_map = defaultdict(list)
         for param_value, f1_score in zip(param_values, f1_scores):
@@ -320,8 +320,8 @@ def determine_gradient_value(df, param):
         param_values_new = np.array(list(param_f1_map.keys()))
         f1_scores_new = np.array([np.mean(f1_scores) for f1_scores in param_f1_map.values()])
 
-        print(f"Merged param values for {param}, maf {maf}: {param_values_new}")
-        print(f"Merged f1 scores for {param}, maf {maf}: {f1_scores_new}")
+        #print(f"Merged param values for {param}, maf {maf}: {param_values_new}")
+        #print(f"Merged f1 scores for {param}, maf {maf}: {f1_scores_new}")
 
         if len(param_values_new) < 2 or len(f1_scores_new) < 2:
             print(f"Skipping {param}, maf {maf} due to insufficient data points")
@@ -334,7 +334,7 @@ def determine_gradient_value(df, param):
             continue
 
         if f1_scores_range == 0:
-            print(f"Zero range for f1 scores detected, using average param value for {param}, maf {maf}")
+            #print(f"Zero range for f1 scores detected, using average param value for {param}, maf {maf}")
             param_value_to_return = np.mean(param_values_new)
             results.append({
                 'maf': maf,
@@ -535,6 +535,7 @@ for maf in maf_interval:
                 alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
                 new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
                 os.makedirs(new_output_folder, exist_ok=True)
+                print ('Searching parameters for ', folder)
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                      parameters_interval_search, maps_path, simulated_batches_csv_path)
                 #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, simulated_batches_csv_path,
@@ -561,12 +562,11 @@ for maf in maf_interval:
             values = all_best_params[param]
             average_value = sum(values) / len(values)
             average_best_params[param] = average_value
-            print(f"Average of best {param}: {average_value:.4f}")
     output_file_path = os.path.join(output_training_folder, "maf_{}_average_best_params.json".format(maf))
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
 
-
+sys.exit()
 # Number of increments to test
 num_increments = 2  # For example, testing 2 increments on each side
 rounds = [2, 3]
@@ -600,7 +600,6 @@ for round in rounds:
     all_best_params = defaultdict(list)
     #
     for maf in maf_interval:
-        print(f"maf_{maf}")
         average_best_params = {}
         for folder in folders:
             if folder.startswith('depth220_SRR27755678'):
@@ -618,7 +617,6 @@ for round in rounds:
                 values = all_best_params[param]
                 average_value = sum(values) / len(values)
                 average_best_params[param] = average_value
-                print(f"Average of best {param}: {average_value:.4f}")
         output_file_path = os.path.join(output_training_folder, "{}_round_maf_{}_average_best_params.json".format(round, maf))
         with open(output_file_path, 'w') as json_file:
             json.dump(average_best_params, json_file, indent=4)

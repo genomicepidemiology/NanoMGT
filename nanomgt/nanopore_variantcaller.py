@@ -313,17 +313,18 @@ def snv_convergence(output_path, maf, cor, np, pp, dp, proxi, dp_window, ii,
         tuple: A tuple containing the updated dictionary of confirmed mutations, temporary co-occurrence data, iteration count, and mutation threshold dictionary.
     """
 
-    print('loading reads_mutation_dict...')
+    #print('loading reads_mutation_dict...')
 
+    #TBD could we do this before parallel?
     reads_mutation_dict = parse_sam_and_find_mutations(output_path + '/rmlst_alignment.sam',
                                                        confirmed_mutation_dict,
                                                        consensus_dict
                                                        )
     print(len(reads_mutation_dict))
-    print('reads_mutation_dict loaded')
+    #print('reads_mutation_dict loaded')
 
     current_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
-    print('Current count: {}'.format(current_count))
+    #print('Current count: {}'.format(current_count))
     iteration_count = 0
     original_cor = cor
     original_dp = dp
@@ -345,16 +346,16 @@ def snv_convergence(output_path, maf, cor, np, pp, dp, proxi, dp_window, ii,
 
             new_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
             iteration_count += 1
-            print(f'Iteration: {iteration_count}', file=sys.stderr)
-            print(f'Mutations: {new_count}', file=sys.stderr)
-            print(f'{iteration_count},{new_count}', file=convergence_file)
+            #print(f'Iteration: {iteration_count}', file=sys.stderr)
+            #print(f'Mutations: {new_count}', file=sys.stderr)
+            #print(f'{iteration_count},{new_count}', file=convergence_file)
             # Check for convergence: no change in mutation count
             if new_count == current_count:
                 break
             current_count = new_count
 
     end_time = time.time()
-    print(f'Time taken for all iterations: {end_time - start_time} seconds', file=sys.stderr)
+    #print(f'Time taken for all iterations: {end_time - start_time} seconds', file=sys.stderr)
 
     return confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count, mutation_threshold_dict
 
