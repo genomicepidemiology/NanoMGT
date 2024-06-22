@@ -524,11 +524,11 @@ def load_top_hit(file_path, param_to_fetch):
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
-"""
+
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
-        if folder.startswith('depth220_SRR27755678_majority_batches_batch10') or folder.startswith('depth220_SRR27755678_majority_batches_batch9'):
+        if folder.startswith('depth220_SRR27755678'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
                 input_file_path = os.path.join(alignment_results_path, folder)
@@ -539,14 +539,14 @@ for maf in maf_interval:
                                      parameters_interval_search, maps_path, simulated_batches_csv_path)
                 #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, simulated_batches_csv_path,
                 #    0.1, 5, 15, 0.44, 5, 0.15)
-"""
+
 all_best_params = defaultdict(list)
 
 for maf in maf_interval:
     print(f"maf_{maf}")
     average_best_params = {}
     for folder in folders:
-        if folder.startswith('depth220_SRR27755678_majority_batches_batch10') or folder.startswith('depth220_SRR27755678_majority_batches_batch9'):
+        if folder.startswith('depth220_SRR27755678'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
                 new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
@@ -566,11 +566,10 @@ for maf in maf_interval:
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
 
-sys.exit()
 
 # Number of increments to test
 num_increments = 2  # For example, testing 2 increments on each side
-rounds = [2, 3, 4]
+rounds = [2, 3]
 round_increment_dict = {
     2: 0.1,
     3: 0.05,
