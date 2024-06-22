@@ -571,6 +571,8 @@ for maf in maf_interval:
 
     for param, default_value in default_params.items():
         test_values = generate_test_values(default_value, num_increments, 0.1)
+        print (test_values)
+        sys.exit()
         parameters_interval_search[param + '_interval'] = test_values  # Add generated values to the interval search
         for folder in folders:
             if folder.startswith('depth220_SRR27755678'):
