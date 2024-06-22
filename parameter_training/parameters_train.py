@@ -568,12 +568,9 @@ for maf in maf_interval:
     os.makedirs(output_training_folder + '/{}_round_maf_{}'.format(round, maf), exist_ok=True)
     output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
     default_params = load_default_parameters(output_file_path)
-    print (default_params)
-    sys.exit()
 
     for param, default_value in default_params.items():
         test_values = generate_test_values(default_value, num_increments, 0.1)
-        sys.exit()
         parameters_interval_search[param + '_interval'] = test_values  # Add generated values to the interval search
         for folder in folders:
             if folder.startswith('depth220_SRR27755678'):
