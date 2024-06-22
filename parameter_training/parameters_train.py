@@ -284,8 +284,8 @@ def load_default_parameters(file_path):
     with open(file_path, 'r') as file:
         return json.load(file)
 
-def generate_test_values(average_value, num_increments):
-    increment = average_value * 0.05
+def generate_test_values(average_value, num_increments, percentage):
+    increment = average_value * percentage
     test_values = []
     for i in range(-num_increments, num_increments + 1):
         test_values.append(average_value + i * increment)
@@ -519,7 +519,7 @@ def load_top_hit(file_path, param_to_fetch):
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
-
+"""
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -560,27 +560,25 @@ for maf in maf_interval:
     output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
-
-sys.exit()
-
+"""
 # Number of increments to test
 num_increments = 2  # For example, testing 2 increments on each side
+round = 2
 for maf in maf_interval:
-    os.makedirs(output_training_folder + '/2_round_maf_' + str(maf), exist_ok=True)
+    os.makedirs(output_training_folder + '/{}_round_maf_{}'.format(round, maf), exist_ok=True)
     output_file_path = os.path.join(output_training_folder, "{}_average_best_params.json".format('maf_' + str(maf)))
     default_params = load_default_parameters(output_file_path)
 
     for param, default_value in default_params.items():
-        test_values = generate_test_values(default_value, num_increments)
+        test_values = generate_test_values(default_value, num_increments, 0.1)
         parameters_interval_search[param + '_interval'] = test_values  # Add generated values to the interval search
-
         for folder in folders:
             if folder.startswith('depth220_SRR27755678'):
                 batch_id = int(folder.split('_')[-2][5:])
                 if batch_id >= maf:
                     input_file_path = os.path.join(alignment_results_path, folder)
                     alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
-                    new_output_folder = output_training_folder + '/' + '2_round_maf_' + str(maf) + '/' + folder
+                    new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
                     os.makedirs(new_output_folder, exist_ok=True)
                     run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                          parameters_interval_search, maps_path, simulated_batches_csv_path)
@@ -593,7 +591,7 @@ for maf in maf_interval:
         if folder.startswith('depth220_SRR27755678'):
             batch_id = int(folder.split('_')[-2][5:])
             if batch_id >= maf:
-                new_output_folder = output_training_folder + '/' + '2_round_maf_' + str(maf) + '/' + folder
+                new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
                 results_filename = new_output_folder + "/all_results.csv"
                 best_params = calculate_best_parameters(results_filename)
                 for param, value in best_params.items():
@@ -606,7 +604,7 @@ for maf in maf_interval:
             average_value = sum(values) / len(values)
             average_best_params[param] = average_value
             print(f"Average of best {param}: {average_value:.4f}")
-    output_file_path = os.path.join(output_training_folder, "2_round_{}_average_best_params.json".format('maf_' + str(maf)))
+    output_file_path = os.path.join(output_training_folder, "{}_round_maf_{}_average_best_params.json".format(round, maf))
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
 
