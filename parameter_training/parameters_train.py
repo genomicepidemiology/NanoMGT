@@ -523,7 +523,7 @@ def load_top_hit(file_path, param_to_fetch):
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
-
+"""
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -538,7 +538,7 @@ for maf in maf_interval:
                                      parameters_interval_search, maps_path, simulated_batches_csv_path)
                 #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, simulated_batches_csv_path,
                 #    0.1, 5, 15, 0.44, 5, 0.15)
-
+"""
 all_best_params = defaultdict(list)
 
 for maf in maf_interval:
@@ -555,6 +555,7 @@ for maf in maf_interval:
                     param_name = param[1:]
                     if param_name in param_list:
                         all_best_params[param_name].append(value)
+    print (all_best_params)
     for param in param_list:
         if param in all_best_params:
             values = all_best_params[param]
