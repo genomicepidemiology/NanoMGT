@@ -247,7 +247,8 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
 def extract_parameters(param_string):
     param_pattern = r'([a-z_]+)_([0-9.]+)'
-    return dict(re.findall(param_pattern, param_string))
+    return {key: float(value) for key, value in re.findall(param_pattern, param_string)}
+
 
 
 def calculate_best_parameters(file_name):
@@ -278,7 +279,7 @@ def calculate_best_parameters(file_name):
 
     # Sort the top parameters by the penalty order
     def sort_key(params):
-        return tuple(float(params.get(param, float('inf'))) for param in penalty_order)
+        return tuple(params.get(param, float('inf')) for param in penalty_order)
 
     sorted_top_parameters = sorted(top_parameters, key=sort_key)
 
@@ -555,7 +556,6 @@ for maf in maf_interval:
                     param_name = param[1:]
                     if param_name in param_list:
                         all_best_params[param_name].append(value)
-    print (all_best_params)
     for param in param_list:
         if param in all_best_params:
             values = all_best_params[param]
