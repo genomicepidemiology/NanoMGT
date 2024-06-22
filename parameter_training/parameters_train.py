@@ -251,6 +251,7 @@ def extract_parameters(param_string):
     param_pattern = r'([a-z_]+)_([0-9.]+)'
     return dict(re.findall(param_pattern, param_string))
 
+
 def calculate_best_parameters(file_name):
     df = pd.read_csv(file_name)
 
@@ -260,25 +261,30 @@ def calculate_best_parameters(file_name):
         f1_score = row['F1 Score']
         parameters = extract_parameters(row['Parameters'])
 
-        for param, value in parameters.items():
-            key = f"{param}_{value}"
-            parameters_data[key]['f1_scores'].append(f1_score)
+        key = frozenset(parameters.items())
+        parameters_data[key]['f1_scores'].append(f1_score)
 
-            if f1_score > parameters_data[key]['best_f1_score']:
-                parameters_data[key]['best_f1_score'] = f1_score
-                parameters_data[key]['best_params'] = {param: float(value)}
+        if f1_score > parameters_data[key]['best_f1_score']:
+            parameters_data[key]['best_f1_score'] = f1_score
+            parameters_data[key]['best_params'] = parameters
 
-    best_params_per_file = {}
-    for key, data in parameters_data.items():
-        param_name, param_value = key.rsplit('_', 1)
-        param_value = float(param_value)
+    # Extract the top-scoring combinations
+    top_f1_score = max(data['best_f1_score'] for data in parameters_data.values())
+    top_parameters = [data['best_params'] for data in parameters_data.values() if data['best_f1_score'] == top_f1_score]
 
-        if param_name not in best_params_per_file:
-            best_params_per_file[param_name] = (param_value, data['best_f1_score'])
-        elif data['best_f1_score'] > best_params_per_file[param_name][1]:
-            best_params_per_file[param_name] = (param_value, data['best_f1_score'])
+    if len(top_parameters) == 1:
+        return top_parameters[0]
 
-    return {param: value for param, (value, _) in best_params_per_file.items()}
+    # Define the order of parameters to sort by
+    penalty_order = ['np', 'pp', 'dp', 'cor', 'ii']
+
+    # Sort the top parameters by the penalty order
+    def sort_key(params):
+        return tuple(float(params.get(param, float('inf'))) for param in penalty_order)
+
+    sorted_top_parameters = sorted(top_parameters, key=sort_key)
+
+    return sorted_top_parameters[0]
 
 def load_default_parameters(file_path):
     with open(file_path, 'r') as file:
