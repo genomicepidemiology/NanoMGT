@@ -46,13 +46,7 @@ parameters_interval_search = {
 cpus = 40
 
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, simulated_batches_csv_path,
-                    ii, proxi, dp_window, pp, np, dp):
-    consensus_dict = nvc.build_consensus_dict(os.path.join(results_folder, 'rmlst_alignment.res'),
-                                          os.path.join(results_folder, 'rmlst_alignment.mat'))
-
-    confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, min_n, maf, cor)
-
-    bio_validation_dict = nvc.bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
+                    ii, proxi, dp_window, pp, np, dp, consensus_dict, confirmed_mutation_dict, bio_validation_dict):
 
     confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count, mutation_threshold_dict =\
         nvc.snv_convergence(results_folder, maf, cor, np, pp, dp, proxi, dp_window, ii,
@@ -61,13 +55,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
     nvc.format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
                   co_occurrence_tmp_dict, mutation_threshold_dict)
 
-    sample = results_folder.split('/')[-1]
-
-    minor_mutation_expected = benchmark_analysis_result(sample, simulated_batches_csv_path, maps_path)
-
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
-
-    print(len(minor_mutation_expected), len(minor_mutation_results))
 
     precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
 
@@ -196,7 +184,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
     top_fp = None
     top_fn = None
 
-    all_params = list(product(cor_interval, ii_interval, pp_interval, np_interval, dp_interval))
+    all_params = list(product(ii_interval, pp_interval, np_interval, dp_interval))
     total_combinations = len(all_params)
     print(f"Total number of parameter combinations: {total_combinations}")
 
@@ -207,44 +195,57 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
     processed_combinations = 0
 
-    with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
-        futures_to_params = {
-            executor.submit(
-                train_parameters, maf, alignment_folder, min_n,
-                combo[0], new_output_folder, maps_path, simulated_batches_csv_path, combo[1], proxi, dp_window,
-                combo[2], combo[3], combo[4]
-            ): combo for combo in all_params
-        }
+    for cor in cor_interval:
 
-        for future in concurrent.futures.as_completed(futures_to_params):
-            params = futures_to_params[future]
-            processed_combinations += 1
-            print(f"Processed {processed_combinations}/{total_combinations} combinations.")
-            try:
-                result = future.result()
-                f1, parameter_string, precision, recall, tp, fp, fn = result
-                all_results.append([f1, parameter_string, precision, recall, tp, fp, fn])
+        consensus_dict = nvc.build_consensus_dict(os.path.join(results_folder, 'rmlst_alignment.res'),
+                                                  os.path.join(results_folder, 'rmlst_alignment.mat'))
 
-                if f1 > best_score:
-                    best_score = f1
-                    best_params = parameter_string
-                    top_precision = precision
-                    top_recall = recall
-                    top_tp = tp
-                    top_fp = fp
-                    top_fn = fn
-            except Exception as exc:
-                print(f"Generated an exception: {exc}")
+        confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, min_n, maf, cor)
 
-    with open(results_filename, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN'])
-        writer.writerows(all_results)
+        bio_validation_dict = nvc.bio_validation_mutations(consensus_dict, os.path.join(results_folder, 'specie.fsa'))
 
-    with open(top_result_filename, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN'])
-        writer.writerow([best_score, best_params, top_precision, top_recall, top_tp, top_fp, top_fn])
+        sample = results_folder.split('/')[-1]
+
+        minor_mutation_expected = benchmark_analysis_result(sample, simulated_batches_csv_path, maps_path)
+
+        with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
+            futures_to_params = {
+                executor.submit(
+                    train_parameters, maf, alignment_folder, min_n,
+                    cor, new_output_folder, maps_path, simulated_batches_csv_path, combo[0], proxi, dp_window,
+                    combo[1], combo[2], combo[3], consensus_dict, confirmed_mutation_dict, bio_validation_dict, minor_mutation_expected
+                ): combo for combo in all_params
+            }
+
+            for future in concurrent.futures.as_completed(futures_to_params):
+                params = futures_to_params[future]
+                processed_combinations += 1
+                print(f"Processed {processed_combinations}/{total_combinations} combinations.")
+                try:
+                    result = future.result()
+                    f1, parameter_string, precision, recall, tp, fp, fn = result
+                    all_results.append([f1, parameter_string, precision, recall, tp, fp, fn])
+
+                    if f1 > best_score:
+                        best_score = f1
+                        best_params = parameter_string
+                        top_precision = precision
+                        top_recall = recall
+                        top_tp = tp
+                        top_fp = fp
+                        top_fn = fn
+                except Exception as exc:
+                    print(f"Generated an exception: {exc}")
+
+        with open(results_filename, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN'])
+            writer.writerows(all_results)
+
+        with open(top_result_filename, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN'])
+            writer.writerow([best_score, best_params, top_precision, top_recall, top_tp, top_fp, top_fn])
 
 def extract_parameters(param_string):
     param_pattern = r'([a-z_]+)_([0-9.]+)'
