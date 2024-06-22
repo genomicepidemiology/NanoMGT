@@ -43,7 +43,7 @@ parameters_interval_search = {
     'dp_interval': dp_interval_search
 }
 
-cpus = 40
+cpus = 60
 
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, simulated_batches_csv_path,
                     ii, proxi, dp_window, pp, np, dp, consensus_dict, bio_validation_dict, minor_mutation_expected):
@@ -538,8 +538,6 @@ for maf in maf_interval:
                                      parameters_interval_search, maps_path, simulated_batches_csv_path)
                 #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, simulated_batches_csv_path,
                 #    0.1, 5, 15, 0.44, 5, 0.15)
-
-sys.exit()
 
 all_best_params = defaultdict(list)
 
