@@ -218,7 +218,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
         for future in concurrent.futures.as_completed(futures_to_params):
             params = futures_to_params[future]
             processed_combinations += 1
-            #print(f"Processed {processed_combinations}/{total_combinations} combinations.")
+            print(f"Processed {processed_combinations}/{total_combinations} combinations.")
             try:
                 result = future.result()
                 f1, parameter_string, precision, recall, tp, fp, fn = result
@@ -524,7 +524,7 @@ def load_top_hit(file_path, param_to_fetch):
 output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
-
+"""
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -566,7 +566,7 @@ for maf in maf_interval:
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
 
-sys.exit()
+"""
 # Number of increments to test
 num_increments = 2  # For example, testing 2 increments on each side
 rounds = [2, 3]

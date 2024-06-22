@@ -320,7 +320,7 @@ def snv_convergence(output_path, maf, cor, np, pp, dp, proxi, dp_window, ii,
                                                        confirmed_mutation_dict,
                                                        consensus_dict
                                                        )
-    print(len(reads_mutation_dict))
+    #print(len(reads_mutation_dict))
     #print('reads_mutation_dict loaded')
 
     current_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
