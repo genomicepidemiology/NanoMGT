@@ -218,7 +218,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
         for future in concurrent.futures.as_completed(futures_to_params):
             params = futures_to_params[future]
             processed_combinations += 1
-            print(f"Processed {processed_combinations}/{total_combinations} combinations.")
+            #print(f"Processed {processed_combinations}/{total_combinations} combinations.")
             try:
                 result = future.result()
                 f1, parameter_string, precision, recall, tp, fp, fn = result
@@ -525,6 +525,7 @@ output_training_folder = 'nanomgt_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
+"""
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -566,24 +567,28 @@ for maf in maf_interval:
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
 
-sys.exit()
+"""
 
 # Number of increments to test
-num_increments = 2  # For example, testing 2 increments on each side
-rounds = [2, 3]
+num_increments = 1  # For example, testing 2 increments on each side
+rounds = [2, 3, 4]
 round_increment_dict = {
     2: 0.1,
     3: 0.05,
     4: 0.3
 }
 for round in rounds:
+    print ('starting round ', round)
     for maf in maf_interval:
+        print (maf)
         os.makedirs(output_training_folder + '/{}_round_maf_{}'.format(round, maf), exist_ok=True)
         if round == 2:
             output_file_path = os.path.join(output_training_folder, "maf_{}_average_best_params.json".format(maf))
         else:
             output_file_path = os.path.join(output_training_folder, "{}_round_maf_{}_average_best_params.json".format(round-1, maf))
         default_params = load_default_parameters(output_file_path)
+        print (default_params)
+        sys.exit()
 
         for param, default_value in default_params.items():
             test_values = generate_test_values(default_value, num_increments, round_increment_dict[round])
@@ -621,3 +626,4 @@ for round in rounds:
         output_file_path = os.path.join(output_training_folder, "{}_round_maf_{}_average_best_params.json".format(round, maf))
         with open(output_file_path, 'w') as json_file:
             json.dump(average_best_params, json_file, indent=4)
+    sys.exit()
