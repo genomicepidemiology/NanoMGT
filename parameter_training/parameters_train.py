@@ -204,7 +204,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
         bio_validation_dict = nvc.bio_validation_mutations(consensus_dict, os.path.join(alignment_folder, 'specie.fsa'))
 
-        sample = results_folder.split('/')[-1]
+        sample = alignment_folder.split('/')[-1]
 
         minor_mutation_expected = benchmark_analysis_result(sample, simulated_batches_csv_path, maps_path)
 
