@@ -492,7 +492,7 @@ def blacklist_positions(fastq_file, quality_threshold):
 
 
 def format_output(output, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict,
-                  mutation_threshold_dict, parameter_string_name):
+                  mutation_threshold_dict, name_string):
     """
     Format and print the output of confirmed mutations with additional information.
 
@@ -507,8 +507,8 @@ def format_output(output, confirmed_mutation_dict, consensus_dict, bio_validatio
     Returns:
         None
     """
-    if parameter_string_name != '':
-        output_name = output + '/{}_minor_mutations.csv'.format(parameter_string_name)
+    if name_string != '':
+        output_name = output + '/{}_minor_mutations.csv'.format(name_string)
     else:
         output_name =output + '/minor_mutations.csv'
     with open(output_name, 'w') as outfile:

@@ -235,6 +235,11 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
         writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN', 'top_minor_mutation_results', 'top_minor_mutation_expected'])
         writer.writerow([best_score, best_params, top_precision, top_recall, top_tp, top_fp, top_fn, top_minor_mutation_results, top_minor_mutation_expected])
 
+    for file in os.listdir(new_output_folder):
+        if file.endswith('minor_mutations.csv'):
+            if not file.startswith(best_params):
+                os.system('rm {}/{}'.format(new_output_folder, file))
+
 def extract_parameters(param_string):
     param_pattern = r'([a-z_]+)_([0-9.]+)'
     return {key: float(value) for key, value in re.findall(param_pattern, param_string)}
