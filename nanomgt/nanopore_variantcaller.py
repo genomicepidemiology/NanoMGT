@@ -96,7 +96,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     print_minor_variants(confirmed_mutation_dict, consensus_dict, arguments.output)
     ## Format and output the results
     format_output(arguments.output, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
-                  co_occurrence_tmp_dict, mutation_threshold_dict)
+                  co_occurrence_tmp_dict, mutation_threshold_dict, '')
 
     # Write majority sequences to file
     with open(os.path.join(arguments.output, 'majority_seqs.fasta'), 'w') as f:
@@ -492,7 +492,7 @@ def blacklist_positions(fastq_file, quality_threshold):
 
 
 def format_output(output, confirmed_mutation_dict, consensus_dict, bio_validation_dict, co_occurrence_tmp_dict,
-                  mutation_threshold_dict):
+                  mutation_threshold_dict, parameter_string_name):
     """
     Format and print the output of confirmed mutations with additional information.
 
@@ -507,7 +507,11 @@ def format_output(output, confirmed_mutation_dict, consensus_dict, bio_validatio
     Returns:
         None
     """
-    with open(output + '/minor_mutations.csv', 'w') as outfile:
+    if parameter_string_name != '':
+        output_name = output + '/{}_minor_mutations.csv'.format(parameter_string_name)
+    else:
+        output_name =output + '/minor_mutations.csv'
+    with open(output_name, 'w') as outfile:
         header = 'Gene,Position,MajorityBase,MutationBase,MutationDepth,TotalDepth,GeneLength,MutationComment,CoOccurrence,Threshold'
         print(header, file=outfile)
         for allele in confirmed_mutation_dict:

@@ -55,14 +55,14 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
         nvc.snv_convergence(results_folder, maf, cor, np, pp, dp, proxi, dp_window, ii,
                             confirmed_mutation_dict, consensus_dict, bio_validation_dict)
 
+    parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_ii_{ii}"
+
     nvc.format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
-                  co_occurrence_tmp_dict, mutation_threshold_dict)
+                  co_occurrence_tmp_dict, mutation_threshold_dict, parameter_string)
 
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
 
     precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
-
-    parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_ii_{ii}"
 
     return f1, parameter_string, precision, recall, tp, fp, fn, minor_mutation_results, minor_mutation_expected
 
