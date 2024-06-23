@@ -204,7 +204,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
         for future in concurrent.futures.as_completed(futures_to_params):
             params = futures_to_params[future]
             processed_combinations += 1
-            #print(f"Processed {processed_combinations}/{total_combinations} combinations.")
+            print(f"Processed {processed_combinations}/{total_combinations} combinations.")
             try:
                 result = future.result()
                 f1, parameter_string, precision, recall, tp, fp, fn = result
