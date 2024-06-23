@@ -97,11 +97,12 @@ def get_number_of_columns(dataframe):
 
 
 def benchmark_analysis_result(sample, json_file_path, maps_path):
-    batch_id = int(sample.split('_')[-2][5:])
+    batch_id = int(sample.split('_')[-1])
+    species = sample.split('_')[0] + '_' + sample.split('_')[1]
 
     # Load JSON data
     with open(json_file_path, 'r') as file:
-        data = json.load(file)
+        data = json.load(json_file_path + '/' + species)
 
     # Get the highest percentage ID and minor IDs
     top_id, minor = find_highest_percentage_id(batch_id, data)
@@ -185,10 +186,6 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
                                               os.path.join(alignment_folder, 'rmlst_alignment.mat'))
     bio_validation_dict = nvc.bio_validation_mutations(consensus_dict, os.path.join(alignment_folder, 'specie.fsa'))
 
-    print (alignment_folder)
-    sample = alignment_folder.split('/')[-1]
-    print (sample)
-    sys.exit()
 
     minor_mutation_expected = benchmark_analysis_result(sample, json_info_path, maps_path)
 
@@ -411,7 +408,7 @@ def load_results(param_list, maf_interval, output_training_folder):
             print(os.path.join(output_training_folder, "maf_{}".format(maf)))
             for folder in os.listdir(os.path.join(output_training_folder, "maf_{}".format(maf))):
                 if folder.startswith(param):
-                    batch_id = int(folder.split('_')[-2][5:])
+                    batch_id = int(folder.split('_')[-1])
                     total_parameter_results[param][maf][batch_id] = [[], []]
                     results_file = os.path.join(output_training_folder, "maf_{}".format(maf), folder, 'all_results.csv')
 
@@ -519,10 +516,6 @@ for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
         batch_id = int(folder.split('_')[-1])
-        species = folder.split('_')[0] + '_' + folder.split('_')[1]
-        print (batch_id)
-        print (species)
-        sys.exit()
         if batch_id >= maf:
             input_file_path = os.path.join(alignment_results_path, folder)
             alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
@@ -540,7 +533,7 @@ for maf in maf_interval:
     print(f"maf_{maf}")
     average_best_params = {}
     for folder in folders:
-        batch_id = int(folder.split('_')[-2][5:])
+        batch_id = int(folder.split('_')[-1])
         if batch_id >= maf:
             new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
             results_filename = new_output_folder + "/all_results.csv"
@@ -585,7 +578,7 @@ for round in rounds:
             parameters_interval_search[param + '_interval'] = test_values  # Add generated values to the interval search
 
         for folder in folders:
-            batch_id = int(folder.split('_')[-2][5:])
+            batch_id = int(folder.split('_')[-1])
             if batch_id >= maf:
                 input_file_path = os.path.join(alignment_results_path, folder)
                 alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
@@ -599,7 +592,7 @@ for round in rounds:
     for maf in maf_interval:
         average_best_params = {}
         for folder in folders:
-            batch_id = int(folder.split('_')[-2][5:])
+            batch_id = int(folder.split('_')[-1])
             if batch_id >= maf:
                 new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
                 results_filename = new_output_folder + "/all_results.csv"
