@@ -186,6 +186,9 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
                                               os.path.join(alignment_folder, 'rmlst_alignment.mat'))
     bio_validation_dict = nvc.bio_validation_mutations(consensus_dict, os.path.join(alignment_folder, 'specie.fsa'))
 
+    sample = alignment_folder
+    print (sample)
+    sys.exit()
 
     minor_mutation_expected = benchmark_analysis_result(sample, json_info_path, maps_path)
 
