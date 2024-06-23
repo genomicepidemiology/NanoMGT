@@ -27,7 +27,7 @@ training_or_validation_extension_json = '_training.json'
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
-maf_interval = [1, 2, 3, 4, 5]
+maf_interval = [3, 4, 5]
 
 cor_interval_search = [0.1, 0.3, 0.5, 0.7, 0.9]
 dp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
