@@ -27,7 +27,7 @@ training_or_validation_extension_json = '_training.json'
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
-maf_interval = [5]
+maf_interval = [1, 2, 3, 4, 5]
 
 cor_interval_search = [0.1, 0.3, 0.5, 0.7, 0.9]
 dp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
@@ -191,8 +191,6 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
     minor_mutation_expected = benchmark_analysis_result(sample, json_info_path, maps_path, training_or_validation_extension_json)
 
-    print (minor_mutation_expected)
-    sys.exit()
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
         futures_to_params = {
