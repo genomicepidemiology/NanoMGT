@@ -101,8 +101,8 @@ def benchmark_analysis_result(sample, json_file_path, maps_path):
     species = sample.split('_')[0] + '_' + sample.split('_')[1]
 
     # Load JSON data
-    with open(json_file_path, 'r') as file:
-        data = json.load(json_file_path + '/' + species)
+    with open(json_file_path + '/' + species, 'r') as file:
+        data = json.load(file)
 
     # Get the highest percentage ID and minor IDs
     top_id, minor = find_highest_percentage_id(batch_id, data)
