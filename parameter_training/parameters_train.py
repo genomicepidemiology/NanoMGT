@@ -23,6 +23,7 @@ from nanomgt import nanopore_variantcaller as nvc
 alignment_results_path = '/home/people/malhal/test/sup_nanomgt_data/training/'
 maps_path = '/home/people/malhal/test/sup_nanomgt_data/variant_maps/'
 json_info_path = '/home/people/malhal/data/new_nanomgt/sup_data/'
+training_or_validation_extension_json = '_training.json'
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
@@ -96,12 +97,12 @@ def get_number_of_columns(dataframe):
     return dataframe.shape[1]
 
 
-def benchmark_analysis_result(sample, json_file_path, maps_path):
+def benchmark_analysis_result(sample, json_file_path, maps_path, training_or_validation_extension_json):
     batch_id = int(sample.split('_')[-1])
     species = sample.split('_')[0] + '_' + sample.split('_')[1]
 
     # Load JSON data
-    with open(json_file_path + '/' + species, 'r') as file:
+    with open(json_file_path + '/' + species + training_or_validation_extension_json, 'r') as file:
         data = json.load(file)
 
     # Get the highest percentage ID and minor IDs
@@ -152,7 +153,7 @@ def calculate_metrics(expected_mutations, actual_mutations):
 
     return precision, recall, f1, total_tp, total_fp, total_fn
 
-def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, parameters, maps_path, json_info_path):
+def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, parameters, maps_path, json_info_path, training_or_validation_extension_json):
     min_n = 3
     proxi = 5
     dp_window = 15
@@ -188,7 +189,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
     sample = alignment_folder.split('/')[-1]
 
-    minor_mutation_expected = benchmark_analysis_result(sample, json_info_path, maps_path)
+    minor_mutation_expected = benchmark_analysis_result(sample, json_info_path, maps_path, training_or_validation_extension_json)
 
     print (minor_mutation_expected)
     sys.exit()
@@ -523,7 +524,7 @@ for maf in maf_interval:
             os.makedirs(new_output_folder, exist_ok=True)
             print ('Searching parameters for ', folder)
             run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
-                                 parameters_interval_search, maps_path, json_info_path)
+                                 parameters_interval_search, maps_path, json_info_path, training_or_validation_extension_json)
             #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, json_info_path,
             #    0.1, 5, 15, 0.44, 5, 0.15)
 
@@ -584,7 +585,7 @@ for round in rounds:
                 new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
                 os.makedirs(new_output_folder, exist_ok=True)
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
-                                     parameters_interval_search, maps_path, json_info_path)
+                                     parameters_interval_search, maps_path, json_info_path, training_or_validation_extension_json)
 
     all_best_params = defaultdict(list)
 
