@@ -27,7 +27,7 @@ training_or_validation_extension_json = '_training.json'
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
-maf_interval = [5, 4, 3, 2, 1]
+maf_interval = [5]
 
 cor_interval_search = [0.1, 0.3, 0.5, 0.7]
 dp_interval_search = [0.1, 0.2, 0.3, 0.4]
@@ -64,7 +64,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
 
     parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_ii_{ii}"
 
-    return f1, parameter_string, precision, recall, tp, fp, fn
+    return f1, parameter_string, precision, recall, tp, fp, fn, minor_mutation_results, minor_mutation_expected
 
 def load_data(filepath):
     return pd.read_csv(filepath, skipinitialspace=True)
@@ -171,6 +171,8 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
     top_tp = None
     top_fp = None
     top_fn = None
+    top_minor_mutation_results = None
+    top_minor_mutation_expected = None
 
     all_params = list(product(cor_interval, ii_interval, pp_interval, np_interval, dp_interval))
     total_combinations = len(all_params)
@@ -207,8 +209,8 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
             print(f"Processed {processed_combinations}/{total_combinations} combinations.")
             try:
                 result = future.result()
-                f1, parameter_string, precision, recall, tp, fp, fn = result
-                all_results.append([f1, parameter_string, precision, recall, tp, fp, fn])
+                f1, parameter_string, precision, recall, tp, fp, fn, minor_mutation_results, minor_mutation_expected = result
+                all_results.append([f1, parameter_string, precision, recall, tp, fp, fn, minor_mutation_results, minor_mutation_expected])
 
                 if f1 > best_score:
                     best_score = f1
@@ -218,6 +220,8 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
                     top_tp = tp
                     top_fp = fp
                     top_fn = fn
+                    top_minor_mutation_results = minor_mutation_results
+                    top_minor_mutation_expected = minor_mutation_expected
             except Exception as exc:
                 print(f"Generated an exception: {exc}")
 
@@ -228,8 +232,8 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
     with open(top_result_filename, 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN'])
-        writer.writerow([best_score, best_params, top_precision, top_recall, top_tp, top_fp, top_fn])
+        writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN', 'top_minor_mutation_results', 'top_minor_mutation_expected'])
+        writer.writerow([best_score, best_params, top_precision, top_recall, top_tp, top_fp, top_fn, top_minor_mutation_results, top_minor_mutation_expected])
 
 def extract_parameters(param_string):
     param_pattern = r'([a-z_]+)_([0-9.]+)'
