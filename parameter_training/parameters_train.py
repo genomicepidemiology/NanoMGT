@@ -409,6 +409,8 @@ def load_results(param_list, maf_interval, output_training_folder):
             for folder in os.listdir(os.path.join(output_training_folder, "maf_{}".format(maf))):
                 if folder.startswith(param):
                     batch_id = int(folder.split('_')[-1])
+                    if batch_id > 10:
+                        batch_id = batch_id - 10
                     total_parameter_results[param][maf][batch_id] = [[], []]
                     results_file = os.path.join(output_training_folder, "maf_{}".format(maf), folder, 'all_results.csv')
 
@@ -516,6 +518,8 @@ for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
         batch_id = int(folder.split('_')[-1])
+        if batch_id > 10:
+            batch_id = batch_id - 10
         if batch_id >= maf:
             alignment_folder = os.path.join(alignment_results_path, folder)
             new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
@@ -533,6 +537,8 @@ for maf in maf_interval:
     average_best_params = {}
     for folder in folders:
         batch_id = int(folder.split('_')[-1])
+        if batch_id > 10:
+            batch_id = batch_id - 10
         if batch_id >= maf:
             new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
             results_filename = new_output_folder + "/all_results.csv"
@@ -579,6 +585,8 @@ for round in rounds:
 
         for folder in folders:
             batch_id = int(folder.split('_')[-1])
+            if batch_id > 10:
+                batch_id = batch_id-10
             if batch_id >= maf:
                 alignment_folder = os.path.join(alignment_results_path, folder)
                 new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
@@ -592,6 +600,8 @@ for round in rounds:
         average_best_params = {}
         for folder in folders:
             batch_id = int(folder.split('_')[-1])
+            if batch_id > 10:
+                batch_id = batch_id-10
             if batch_id >= maf:
                 new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
                 results_filename = new_output_folder + "/all_results.csv"
