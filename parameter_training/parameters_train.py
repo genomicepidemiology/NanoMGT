@@ -20,19 +20,19 @@ sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + s
 
 from nanomgt import nanopore_variantcaller as nvc
 
-alignment_results_path = '/home/people/malhal/test/training_test/'
-maps_path = '/home/people/malhal/test/training_test/maps/'
-simulated_batches_csv_path = '/home/people/malhal/test/training_test/data/simulated_batches/'
+alignment_results_path = '/home/people/malhal/test/sup_nanomgt_data/training'
+maps_path = '/home/people/malhal/test/sup_nanomgt_data/variant_maps'
+json_info_path = '/home/people/malhal/data/new_nanomgt/sup_data/'
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
 maf_interval = [5]
 
-cor_interval_search = [0.3, 0.5, 0.7]
-dp_interval_search = [0.1, 0.3, 0.5]
+cor_interval_search = [0.1, 0.3, 0.5, 0.7, 0.9]
+dp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
 np_interval_search = [0.1, 1, 2, 3]
-pp_interval_search = [0.1, 0.3, 0.5]
-ii_interval_search = [0.01, 0.1, 0.3, 0.5]
+pp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
+ii_interval_search = [0.01, 0.1, 0.2, 0.3, 0.4, 0.5]
 
 
 parameters_interval_search = {
@@ -45,7 +45,7 @@ parameters_interval_search = {
 
 cpus = 60
 
-def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, simulated_batches_csv_path,
+def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, json_info_path,
                     ii, proxi, dp_window, pp, np, dp, consensus_dict, bio_validation_dict, minor_mutation_expected):
 
     confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, min_n, maf, cor)
@@ -68,36 +68,13 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
 def load_data(filepath):
     return pd.read_csv(filepath, skipinitialspace=True)
 
-def find_highest_percentage_id(batch_id, df):
-    batch_data = df[df['Batch'] == batch_id]
-    if batch_data.empty:
-        return "Batch ID not found."
-    highest_percentage = 0
-    highest_percentage_id = ''
-    all = []
-    for index, row in batch_data.iterrows():
-        if 'Percentage3' in df.columns:
-            for i in range(1, 4):
-                percentage = int(row[f'Percentage{i}'][:-1])
-                if percentage > highest_percentage:
-                    highest_percentage = percentage
-                    highest_percentage_id = row[f'ID{i}']
-                all.append((row[f'ID{i}']))
-        else:
-            for i in range(1, 3):
-                percentage = int(row[f'Percentage{i}'][:-1])
-                if percentage > highest_percentage:
-                    highest_percentage = percentage
-                    highest_percentage_id = row[f'ID{i}']
-                all.append((row[f'ID{i}']))
-
-    minor = []
-
-    for item in all:
-        if item != highest_percentage_id:
-            minor.append(item)
-
-    return highest_percentage_id, minor
+def find_highest_percentage_id(batch_id, data):
+    for entry in data:
+        if entry['batch_id'] == batch_id:
+            majority_id = list(entry['minority_abundance']['Majority'].keys())[0]
+            minor_ids = list(entry['minority_abundance']['Minority'].keys())
+            return majority_id, minor_ids
+    return "Batch ID not found.", []
 
 def load_mutations_from_files(file_paths):
     mutations_dict = {}
@@ -118,22 +95,29 @@ def load_mutations_from_files(file_paths):
 def get_number_of_columns(dataframe):
     return dataframe.shape[1]
 
-def benchmark_analysis_result(sample, batch_csv_path, maps_path):
-    batch_id = int(sample.split('_')[-2][5:])
-    batch_csv = batch_csv_path + "_".join(sample.split('_')[1:-2]) + ".csv"
-    data = load_data(batch_csv)
-    sample_number = int((get_number_of_columns(data) - 1) / 2)
 
+def benchmark_analysis_result(sample, json_file_path, maps_path):
+    batch_id = int(sample.split('_')[-2][5:])
+
+    # Load JSON data
+    with open(json_file_path, 'r') as file:
+        data = json.load(file)
+
+    # Get the highest percentage ID and minor IDs
     top_id, minor = find_highest_percentage_id(batch_id, data)
 
+    if top_id == "Batch ID not found.":
+        return top_id
+
     map_files = []
-    for i in range(sample_number - 1):
-        map_file = f'{maps_path}/major_{top_id}_minor_{minor[i]}.txt'
+    for minor_id in minor:
+        map_file = f'{maps_path}/major_{top_id}_minor_{minor_id}.json'
         map_files.append(map_file)
 
     mutation_map = load_mutations_from_files(map_files)
 
     return mutation_map
+
 
 def convert_mutation_dict_to_object(mutation_dict):
     mutation_object = {}
@@ -167,7 +151,7 @@ def calculate_metrics(expected_mutations, actual_mutations):
 
     return precision, recall, f1, total_tp, total_fp, total_fn
 
-def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, parameters, maps_path, simulated_batches_csv_path):
+def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, parameters, maps_path, json_info_path):
     min_n = 3
     proxi = 5
     dp_window = 15
@@ -203,14 +187,19 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
 
     sample = alignment_folder.split('/')[-1]
+    print (sample)
+    sys.exit()
 
-    minor_mutation_expected = benchmark_analysis_result(sample, simulated_batches_csv_path, maps_path)
+    minor_mutation_expected = benchmark_analysis_result(sample, json_info_path, maps_path)
+
+    print (minor_mutation_expected)
+    sys.exit()
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
         futures_to_params = {
             executor.submit(
                 train_parameters, maf, alignment_folder, min_n,
-                combo[0], new_output_folder, maps_path, simulated_batches_csv_path, combo[1], proxi, dp_window,
+                combo[0], new_output_folder, maps_path, json_info_path, combo[1], proxi, dp_window,
                 combo[2], combo[3], combo[4], consensus_dict, bio_validation_dict, minor_mutation_expected
             ): combo for combo in all_params
         }
@@ -521,26 +510,25 @@ def load_top_hit(file_path, param_to_fetch):
 
     return f1_score, param_value
 
-output_training_folder = 'nanomgt_training_output'
+output_training_folder = 'sup_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
-"""
+
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
-        if folder.startswith('depth220_SRR27755678'):
-            batch_id = int(folder.split('_')[-2][5:])
-            if batch_id >= maf:
-                input_file_path = os.path.join(alignment_results_path, folder)
-                alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
-                new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
-                os.makedirs(new_output_folder, exist_ok=True)
-                print ('Searching parameters for ', folder)
-                run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
-                                     parameters_interval_search, maps_path, simulated_batches_csv_path)
-                #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, simulated_batches_csv_path,
-                #    0.1, 5, 15, 0.44, 5, 0.15)
+        batch_id = int(folder.split('_')[-2][5:])
+        if batch_id >= maf:
+            input_file_path = os.path.join(alignment_results_path, folder)
+            alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
+            new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
+            os.makedirs(new_output_folder, exist_ok=True)
+            print ('Searching parameters for ', folder)
+            run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
+                                 parameters_interval_search, maps_path, json_info_path)
+            #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, json_info_path,
+            #    0.1, 5, 15, 0.44, 5, 0.15)
 
 all_best_params = defaultdict(list)
 
@@ -548,16 +536,15 @@ for maf in maf_interval:
     print(f"maf_{maf}")
     average_best_params = {}
     for folder in folders:
-        if folder.startswith('depth220_SRR27755678'):
-            batch_id = int(folder.split('_')[-2][5:])
-            if batch_id >= maf:
-                new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
-                results_filename = new_output_folder + "/all_results.csv"
-                best_params = calculate_best_parameters(results_filename)
-                for param, value in best_params.items():
-                    param_name = param[1:]
-                    if param_name in param_list:
-                        all_best_params[param_name].append(value)
+        batch_id = int(folder.split('_')[-2][5:])
+        if batch_id >= maf:
+            new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
+            results_filename = new_output_folder + "/all_results.csv"
+            best_params = calculate_best_parameters(results_filename)
+            for param, value in best_params.items():
+                param_name = param[1:]
+                if param_name in param_list:
+                    all_best_params[param_name].append(value)
     for param in param_list:
         if param in all_best_params:
             values = all_best_params[param]
@@ -567,15 +554,15 @@ for maf in maf_interval:
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
 
-"""
+
 
 # Number of increments to test
-num_increments = 1  # For example, testing 2 increments on each side
+num_increments = 2  # For example, testing 2 increments on each side
 rounds = [2, 3, 4]
 round_increment_dict = {
     2: 0.1,
     3: 0.05,
-    4: 0.3
+    4: 0.03
 }
 for round in rounds:
     print ('starting round ', round)
@@ -594,31 +581,29 @@ for round in rounds:
             parameters_interval_search[param + '_interval'] = test_values  # Add generated values to the interval search
 
         for folder in folders:
-            if folder.startswith('depth220_SRR27755678'):
-                batch_id = int(folder.split('_')[-2][5:])
-                if batch_id >= maf:
-                    input_file_path = os.path.join(alignment_results_path, folder)
-                    alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
-                    new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
-                    os.makedirs(new_output_folder, exist_ok=True)
-                    run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
-                                         parameters_interval_search, maps_path, simulated_batches_csv_path)
+            batch_id = int(folder.split('_')[-2][5:])
+            if batch_id >= maf:
+                input_file_path = os.path.join(alignment_results_path, folder)
+                alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
+                new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
+                os.makedirs(new_output_folder, exist_ok=True)
+                run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
+                                     parameters_interval_search, maps_path, json_info_path)
 
     all_best_params = defaultdict(list)
 
     for maf in maf_interval:
         average_best_params = {}
         for folder in folders:
-            if folder.startswith('depth220_SRR27755678'):
-                batch_id = int(folder.split('_')[-2][5:])
-                if batch_id >= maf:
-                    new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
-                    results_filename = new_output_folder + "/all_results.csv"
-                    best_params = calculate_best_parameters(results_filename)
-                    for param, value in best_params.items():
-                        param_name = param[1:]
-                        if param_name in param_list:
-                            all_best_params[param_name].append(value)
+            batch_id = int(folder.split('_')[-2][5:])
+            if batch_id >= maf:
+                new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
+                results_filename = new_output_folder + "/all_results.csv"
+                best_params = calculate_best_parameters(results_filename)
+                for param, value in best_params.items():
+                    param_name = param[1:]
+                    if param_name in param_list:
+                        all_best_params[param_name].append(value)
         for param in param_list:
             if param in all_best_params:
                 values = all_best_params[param]
