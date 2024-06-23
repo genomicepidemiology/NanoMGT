@@ -20,8 +20,8 @@ sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + s
 
 from nanomgt import nanopore_variantcaller as nvc
 
-alignment_results_path = '/home/people/malhal/test/sup_nanomgt_data/training'
-maps_path = '/home/people/malhal/test/sup_nanomgt_data/variant_maps'
+alignment_results_path = '/home/people/malhal/test/sup_nanomgt_data/training/'
+maps_path = '/home/people/malhal/test/sup_nanomgt_data/variant_maps/'
 json_info_path = '/home/people/malhal/data/new_nanomgt/sup_data/'
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
@@ -517,8 +517,7 @@ for maf in maf_interval:
     for folder in folders:
         batch_id = int(folder.split('_')[-1])
         if batch_id >= maf:
-            input_file_path = os.path.join(alignment_results_path, folder)
-            alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
+            alignment_folder = os.path.join(alignment_results_path, folder)
             new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
             os.makedirs(new_output_folder, exist_ok=True)
             print ('Searching parameters for ', folder)
@@ -580,8 +579,7 @@ for round in rounds:
         for folder in folders:
             batch_id = int(folder.split('_')[-1])
             if batch_id >= maf:
-                input_file_path = os.path.join(alignment_results_path, folder)
-                alignment_folder = '/home/people/malhal/test/training_test/{}'.format(folder)
+                alignment_folder = os.path.join(alignment_results_path, folder)
                 new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
                 os.makedirs(new_output_folder, exist_ok=True)
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
