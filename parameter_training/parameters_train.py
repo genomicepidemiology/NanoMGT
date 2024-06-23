@@ -113,7 +113,7 @@ def benchmark_analysis_result(sample, json_file_path, maps_path, training_or_val
 
     map_files = []
     for minor_id in minor:
-        map_file = f'{maps_path}/major_{top_id}_minor_{minor_id}.json'
+        map_file = f'{maps_path}/major_{top_id}_minor_{minor_id}.txt'
         map_files.append(map_file)
 
     mutation_map = load_mutations_from_files(map_files)
