@@ -518,6 +518,7 @@ param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
+        print (folder)
         batch_id = int(folder.split('_')[-2][5:])
         if batch_id >= maf:
             input_file_path = os.path.join(alignment_results_path, folder)
