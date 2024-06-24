@@ -64,7 +64,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
 
     precision, recall, f1, tp, fp, fn = calculate_metrics(minor_mutation_expected, minor_mutation_results)
 
-    return f1, parameter_string, precision, recall, tp, fp, fn, minor_mutation_results, minor_mutation_expected
+    return f1, parameter_string, precision, recall, tp, fp, fn
 
 def load_data(filepath):
     return pd.read_csv(filepath, skipinitialspace=True)
@@ -209,7 +209,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
             print(f"Processed {processed_combinations}/{total_combinations} combinations.")
             try:
                 result = future.result()
-                f1, parameter_string, precision, recall, tp, fp, fn, minor_mutation_results, minor_mutation_expected = result
+                f1, parameter_string, precision, recall, tp, fp, fn = result
                 all_results.append([f1, parameter_string, precision, recall, tp, fp, fn, minor_mutation_results, minor_mutation_expected])
 
                 if f1 > best_score:
@@ -220,8 +220,6 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
                     top_tp = tp
                     top_fp = fp
                     top_fn = fn
-                    top_minor_mutation_results = minor_mutation_results
-                    top_minor_mutation_expected = minor_mutation_expected
             except Exception as exc:
                 print(f"Generated an exception: {exc}")
 
@@ -232,8 +230,8 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
     with open(top_result_filename, 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN', 'top_minor_mutation_results', 'top_minor_mutation_expected'])
-        writer.writerow([best_score, best_params, top_precision, top_recall, top_tp, top_fp, top_fn, top_minor_mutation_results, top_minor_mutation_expected])
+        writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN'])
+        writer.writerow([best_score, best_params, top_precision, top_recall, top_tp, top_fp, top_fn])
 
     for file in os.listdir(new_output_folder):
         if file.endswith('minor_mutations.csv'):
@@ -522,7 +520,7 @@ output_training_folder = 'sup_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
-"""
+
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -538,7 +536,7 @@ for maf in maf_interval:
                                  parameters_interval_search, maps_path, json_info_path, training_or_validation_extension_json)
             #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, json_info_path,
             #    0.1, 5, 15, 0.44, 5, 0.15)
-"""
+
 all_best_params = defaultdict(list)
 
 for maf in maf_interval:
