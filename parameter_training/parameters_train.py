@@ -29,8 +29,8 @@ folders = [f for f in os.listdir(alignment_results_path)]
 
 maf_interval = [5, 4, 3, 2, 1]
 
-cor_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
-dp_interval_search = [0.01, 0.1, 0.2, 0.3, 0.4]
+cor_interval_search = [0.1, 0.3, 0.5, 0.7]
+dp_interval_search = [0.01, 0.1, 0.2, 0.3]
 np_interval_search = [0.1, 1, 2, 3]
 pp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
 ii_interval_search = [0.01, 0.1, 0.2, 0.3, 0.4]
@@ -567,10 +567,10 @@ for maf in maf_interval:
 num_increments = 1  # For example, testing 2 increments on each side
 rounds = [2, 3, 4, 5]
 round_increment_dict = {
-    2: 0.15,
-    3: 0.1,
-    4: 0.05,
-    5: 0.03
+    2: 0.20,
+    3: 0.15,
+    4: 0.10,
+    5: 0.05
 }
 for round in rounds:
     print ('starting round ', round)
