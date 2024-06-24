@@ -759,12 +759,18 @@ def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, 
         # Should never happen
         return []  # No co-occurrence and not in proximity
 
+
     co_threshold = mutation_depth * (1 / 2)
     if co_threshold < 3:
         co_threshold = 3
 
     # Find the index of the mutation in the mutation list
     mutation_index = mutation_list.index(mutation)
+
+    print(mutation, position_depth)
+    print(mutation_list)
+    print (list_of_mutation_co_occurrence)
+    print ('prixmity: ', proximity_mutations)
 
     co_occurrence_list = []
     # Check if the co-occurrence count of the mutation with any other mutation is above the threshold
