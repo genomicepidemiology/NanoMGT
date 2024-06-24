@@ -5,6 +5,7 @@ from collections import defaultdict
 
 alignment_path = "/home/people/malhal/test/characterize_sup/"
 isolate_file_path = "/home/people/malhal/test/characterize_sup/sup_isolates.json"
+
 # Load isolate file data
 with open(isolate_file_path, 'r') as f:
     isolate_data = json.load(f)
@@ -27,6 +28,7 @@ for organism, isolates in isolate_data.items():
         proximity_mutations = 0
         novel_mutations = 0
         co_occurring_mutations = 0
+        co_occurring_not_novel_mutations = 0
         proximity_density_list = []
 
         # Read minor mutations file
@@ -43,6 +45,8 @@ for organism, isolates in isolate_data.items():
 
                 if row['CoOccurrence'] == 'Yes':
                     co_occurring_mutations += 1
+                    if row['MutationComment'] != 'Novel mutation':
+                        co_occurring_not_novel_mutations += 1
 
         # Calculate proximity mutations and proximity density
         positions = [int(mutation['Position']) for mutation in mutations]
@@ -59,6 +63,7 @@ for organism, isolates in isolate_data.items():
         percent_co_occurring = (co_occurring_mutations / total_mutations) * 100 if total_mutations else 0
         percent_novel = (novel_mutations / total_mutations) * 100 if total_mutations else 0
         percent_proximity = (proximity_mutations / total_mutations) * 100 if total_mutations else 0
+        percent_co_occurring_not_novel = (co_occurring_not_novel_mutations / total_mutations) * 100 if total_mutations else 0
 
         # Store results
         results.append({
@@ -67,16 +72,18 @@ for organism, isolates in isolate_data.items():
             'Total_Mutations': total_mutations,
             'Proximity_Mutations': proximity_mutations,
             'Novel_Mutations': novel_mutations,
-            'Average_Proximity_Density': average_proximity_density,
+            'Co_Occurring_Not_Novel_Mutations': co_occurring_not_novel_mutations,
+            'Percent_Co_Occurring_Not_Novel': percent_co_occurring_not_novel,
             'Co_Occurring_Mutations': co_occurring_mutations,
             'Percent_Co_Occurring': percent_co_occurring,
             'Percent_Novel': percent_novel,
-            'Percent_Proximity': percent_proximity
+            'Percent_Proximity': percent_proximity,
+            'Average_Proximity_Density': average_proximity_density
         })
 
 # Output results in CSV format
 output_csv_path = "characterization.csv"
-csv_columns = ['Organism', 'Isolate', 'Total_Mutations', 'Proximity_Mutations', 'Novel_Mutations', 'Average_Proximity_Density', 'Co_Occurring_Mutations', 'Percent_Co_Occurring', 'Percent_Novel', 'Percent_Proximity']
+csv_columns = ['Organism', 'Isolate', 'Total_Mutations', 'Proximity_Mutations', 'Novel_Mutations', 'Co_Occurring_Not_Novel_Mutations', 'Percent_Co_Occurring_Not_Novel', 'Co_Occurring_Mutations', 'Percent_Co_Occurring', 'Percent_Novel', 'Percent_Proximity', 'Average_Proximity_Density']
 
 with open(output_csv_path, 'w', newline='') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
