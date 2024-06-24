@@ -14,6 +14,7 @@ for file in fastq_files:
 
     # Normal run
     #command = f"~/NanoMGT/bin/nanomgt --nanopore {input_file_path} --o {output_name} --threads 8 --db_dir ~/nanomgt_db/"
-
-    command = f"~/NanoMGT/bin/nanomgt --nanopore {input_file_path} --o {output_name} --threads 8 --db_dir ~/nanomgt_db/ --cor 0 --np 0 --dp 0 --pp 0 --ii 0"
+    # With all params set to 0 for characterization of isolate noise.
+    command = f"~/NanoMGT/bin/nanomgt --nanopore {input_file_path} --o {output_name}" \
+              f" --threads 8 --db_dir ~/nanomgt_db/ --cor 0 --np 0 --dp 0 --pp 0 --ii 0"
     os.system(command)

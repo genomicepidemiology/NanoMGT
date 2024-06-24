@@ -29,7 +29,7 @@ folders = [f for f in os.listdir(alignment_results_path)]
 
 maf_interval = [5]
 
-cor_interval_search = [0.1, 0.3, 0.5]
+cor_interval_search = [0.1, 0.2, 0.3, 0.4]
 dp_interval_search = [0.1, 0.2, 0.3]
 np_interval_search = [1, 2, 3]
 pp_interval_search = [0.1, 0.2, 0.3]
@@ -231,11 +231,11 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
         writer.writerow(['F1 Score', 'Parameters', 'Precision', 'Recall', 'TP', 'FP', 'FN'])
         writer.writerow([best_score, best_params, top_precision, top_recall, top_tp, top_fp, top_fn])
 
-    for file in os.listdir(new_output_folder):
-        if file.endswith('minor_mutations.csv'):
-            if not file.startswith(best_params):
-                os.system('rm {}/{}'.format(new_output_folder, file))
-
+    if best_score != 0:
+        for file in os.listdir(new_output_folder):
+            if file.endswith('minor_mutations.csv'):
+                if not file.startswith(best_params):
+                    os.system('rm {}/{}'.format(new_output_folder, file))
 def extract_parameters(param_string):
     param_pattern = r'([a-z_]+)_([0-9.]+)'
     return {key: float(value) for key, value in re.findall(param_pattern, param_string)}
@@ -590,9 +590,11 @@ for round in rounds:
 
         for folder in folders:
             batch_id = int(folder.split('_')[-1])
-            if batch_id > 10:
-                batch_id = batch_id-10*round
-            if batch_id >= maf:
+            if batch_id == 10:
+                abundance = batch_id
+            else
+                abundace = batch_id = int(folder.split('_')[-1][-1])
+            if abundance >= maf:
                 alignment_folder = os.path.join(alignment_results_path, folder)
                 new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
                 os.makedirs(new_output_folder, exist_ok=True)
@@ -604,9 +606,11 @@ for round in rounds:
         average_best_params = {}
         for folder in folders:
             batch_id = int(folder.split('_')[-1])
-            if batch_id > 10:
-                batch_id = batch_id-10*round
-            if batch_id >= maf:
+            if batch_id == 10:
+                abundance = batch_id
+            else
+                abundace = batch_id = int(folder.split('_')[-1][-1])
+            if abundance >= maf:
                 new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
                 results_filename = new_output_folder + "/all_results.csv"
                 best_params = calculate_best_parameters(results_filename)
