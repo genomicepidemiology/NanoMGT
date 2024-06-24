@@ -341,7 +341,7 @@ def snv_convergence(output_path, maf, cor, np, pp, dp, proxi, dp_window, ii,
             # Perform upper co-occurring mutations analysis
             confirmed_mutation_dict, co_occurrence_tmp_dict, mutation_threshold_dict = convergence_threshold(
                 maf, cor, np, pp, dp, proxi, dp_window, confirmed_mutation_dict, consensus_dict,
-                bio_validation_dict, reads_mutation_dict
+                bio_validation_dict, reads_mutation_dict, min_n
             )
 
             new_count = count_mutations_in_mutations_dict(confirmed_mutation_dict)
@@ -613,7 +613,7 @@ def derive_mutation_positions(consensus_dict, min_n, maf, cor):
     return all_confirmed_mutation_dict
 
 def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_mutation_dict, consensus_dict,
-                          bio_validation_dict, reads_mutation_dict):
+                          bio_validation_dict, reads_mutation_dict, min_n):
     """
     Filter and adjust confirmed mutations based on co-occurrence, depth, and biological validation.
 
@@ -708,8 +708,8 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
                     mutation_threshold += dp * position_depth * maf * len(density_mutations)
 
                 #min_n fix later TBD
-                if mutation_threshold < 3:
-                    mutation_threshold = 3
+                if mutation_threshold < min_n:
+                    mutation_threshold = min_n
 
                 mutation_threshold_dict[allele][mutation] = mutation_threshold  # Store the threshold
 
@@ -717,6 +717,7 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
                     adjusted_mutation_dict[allele][0].append(confirmed_mutation_dict[allele][0][i])
                     adjusted_mutation_dict[allele][1].append(confirmed_mutation_dict[allele][1][i])
 
+        #Single mutations
         else:
             adjusted_mutation_dict[allele] = [[], []]
             if confirmed_mutation_dict[allele][0] != []:
@@ -730,8 +731,8 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
                     mutation_threshold += np * position_depth * maf
 
                 # min_n fix later TBD
-                if mutation_threshold < 3:
-                    mutation_threshold = 3
+                if mutation_threshold < min_n:
+                    mutation_threshold = min_n
 
                 mutation_threshold_dict[allele][mutation] = mutation_threshold  # Store the threshold
 
