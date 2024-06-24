@@ -29,11 +29,11 @@ folders = [f for f in os.listdir(alignment_results_path)]
 
 maf_interval = [5]
 
-cor_interval_search = [0.1, 0.3, 0.5, 0.7]
-dp_interval_search = [0.1, 0.2, 0.3, 0.4]
-np_interval_search = [0.1, 1, 2, 3]
-pp_interval_search = [0.1, 0.2, 0.3, 0.4]
-ii_interval_search = [0.01, 0.1, 0.2, 0.3, 0.4]
+cor_interval_search = [0.1, 0.3, 0.5]
+dp_interval_search = [0.1, 0.2, 0.3]
+np_interval_search = [1, 2, 3]
+pp_interval_search = [0.1, 0.2, 0.3]
+ii_interval_search = [0.1, 0.2, 0.3
 
 
 parameters_interval_search = {
