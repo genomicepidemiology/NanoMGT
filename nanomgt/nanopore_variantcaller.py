@@ -690,11 +690,13 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
                     # Adjust the threshold based on the number of co-occurrences with diminishing returns
                     base_reward = position_depth * maf * cor
                     total_reward = base_reward
-                    diminishing_factor = 1
+                    additional_reward = base_reward * 0.2 * (len(co_occurrence_list) - 1)
 
-                    for _ in range(1, len(co_occurrence_list)):
-                        diminishing_factor /= 2
-                        total_reward += base_reward * diminishing_factor
+                    # Cap the additional reward to a maximum of 100% of the base reward
+                    if additional_reward > base_reward:
+                        additional_reward = base_reward
+
+                    total_reward += additional_reward
 
                     mutation_threshold -= total_reward
 
