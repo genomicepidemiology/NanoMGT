@@ -27,13 +27,13 @@ training_or_validation_extension_json = '_training.json'
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
-maf_interval = [5]
+maf_interval = [5, 4, 3, 2, 1]
 
-cor_interval_search = [0.1, 0.2, 0.3, 0.4]
-dp_interval_search = [0.1, 0.2, 0.3]
-np_interval_search = [1, 2, 3]
-pp_interval_search = [0.1, 0.2, 0.3]
-ii_interval_search = [0.1, 0.2, 0.3]
+cor_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
+dp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
+np_interval_search = [0.1, 1, 2, 3]
+pp_interval_search = [0.1, 0.2, 0.3, 0.4]
+ii_interval_search = [0.01, 0.1, 0.2, 0.3, 0.4]
 
 
 parameters_interval_search = {
@@ -518,7 +518,7 @@ output_training_folder = 'sup_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
-"""
+
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -562,7 +562,7 @@ for maf in maf_interval:
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
 
-"""
+
 # Number of increments to test
 num_increments = 1  # For example, testing 2 increments on each side
 rounds = [2, 3, 4, 5]
