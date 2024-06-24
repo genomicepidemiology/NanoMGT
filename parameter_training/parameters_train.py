@@ -171,8 +171,6 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
     top_tp = None
     top_fp = None
     top_fn = None
-    top_minor_mutation_results = None
-    top_minor_mutation_expected = None
 
     all_params = list(product(cor_interval, ii_interval, pp_interval, np_interval, dp_interval))
     total_combinations = len(all_params)
@@ -210,7 +208,7 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
             try:
                 result = future.result()
                 f1, parameter_string, precision, recall, tp, fp, fn = result
-                all_results.append([f1, parameter_string, precision, recall, tp, fp, fn, minor_mutation_results, minor_mutation_expected])
+                all_results.append([f1, parameter_string, precision, recall, tp, fp, fn])
 
                 if f1 > best_score:
                     best_score = f1
