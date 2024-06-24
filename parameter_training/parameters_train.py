@@ -522,7 +522,7 @@ output_training_folder = 'sup_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
-
+"""
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -538,13 +538,14 @@ for maf in maf_interval:
                                  parameters_interval_search, maps_path, json_info_path, training_or_validation_extension_json)
             #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, json_info_path,
             #    0.1, 5, 15, 0.44, 5, 0.15)
-
+"""
 all_best_params = defaultdict(list)
 
 for maf in maf_interval:
     print(f"maf_{maf}")
     average_best_params = {}
     for folder in folders:
+        print (folder)
         batch_id = int(folder.split('_')[-1])
         if batch_id > 10:
             batch_id = batch_id - 10
@@ -566,7 +567,7 @@ for maf in maf_interval:
         json.dump(average_best_params, json_file, indent=4)
 
 
-
+sys.exit()
 # Number of increments to test
 num_increments = 1  # For example, testing 2 increments on each side
 rounds = [2, 3, 4, 5]
