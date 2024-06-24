@@ -593,7 +593,7 @@ for round in rounds:
             if batch_id == 10:
                 abundance = batch_id
             else:
-                abundace = batch_id = int(folder.split('_')[-1][-1])
+                abundance = batch_id = int(folder.split('_')[-1][-1])
             if abundance >= maf:
                 alignment_folder = os.path.join(alignment_results_path, folder)
                 new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
@@ -609,7 +609,7 @@ for round in rounds:
             if batch_id == 10:
                 abundance = batch_id
             else:
-                abundace = batch_id = int(folder.split('_')[-1][-1])
+                abundance = batch_id = int(folder.split('_')[-1][-1])
             if abundance >= maf:
                 new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
                 results_filename = new_output_folder + "/all_results.csv"
