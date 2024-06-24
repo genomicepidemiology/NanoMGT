@@ -38,7 +38,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     kma.KMARunner(arguments.nanopore,
                   os.path.join(arguments.output, "bacteria_mapping"),
                   os.path.join(arguments.db_dir, "bac_db"),
-                  f"-mem_mode -Sparse -ss c -t {arguments.threads}").run()
+                  f"-mem_mode -Sparse -mf 50000 -ss c -t {arguments.threads}").run()
 
     # Identify the highest scoring bacterial template
     highest_scoring_template = highest_scoring_hit(os.path.join(arguments.output, "bacteria_mapping.spa"))
