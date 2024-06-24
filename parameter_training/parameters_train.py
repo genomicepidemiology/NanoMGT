@@ -592,7 +592,7 @@ for round in rounds:
             batch_id = int(folder.split('_')[-1])
             if batch_id == 10:
                 abundance = batch_id
-            else
+            else:
                 abundace = batch_id = int(folder.split('_')[-1][-1])
             if abundance >= maf:
                 alignment_folder = os.path.join(alignment_results_path, folder)
