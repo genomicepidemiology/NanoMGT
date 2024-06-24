@@ -595,7 +595,7 @@ for round in rounds:
         for folder in folders:
             batch_id = int(folder.split('_')[-1])
             if batch_id > 10:
-                batch_id = batch_id-10
+                batch_id = batch_id-10*round
             if batch_id >= maf:
                 alignment_folder = os.path.join(alignment_results_path, folder)
                 new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
@@ -609,7 +609,7 @@ for round in rounds:
         for folder in folders:
             batch_id = int(folder.split('_')[-1])
             if batch_id > 10:
-                batch_id = batch_id-10
+                batch_id = batch_id-10*round
             if batch_id >= maf:
                 new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
                 results_filename = new_output_folder + "/all_results.csv"
