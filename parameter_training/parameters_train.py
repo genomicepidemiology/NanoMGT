@@ -30,9 +30,9 @@ folders = [f for f in os.listdir(alignment_results_path)]
 maf_interval = [5, 4, 3, 2, 1]
 
 cor_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
-dp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
-np_interval_search = [0.1, 1, 2, 3]
-pp_interval_search = [0.1, 0.2, 0.3, 0.4]
+dp_interval_search = [0.01, 0.1, 0.2, 0.3, 0.4, 0.5]
+np_interval_search = [0.1, 1, 2, 3, 4]
+pp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
 ii_interval_search = [0.01, 0.1, 0.2, 0.3, 0.4]
 
 
@@ -53,7 +53,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
 
     confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count, mutation_threshold_dict =\
         nvc.snv_convergence(results_folder, maf, cor, np, pp, dp, proxi, dp_window, ii,
-                            confirmed_mutation_dict, consensus_dict, bio_validation_dict)
+                            confirmed_mutation_dict, consensus_dict, bio_validation_dict, min_n)
 
     parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_ii_{ii}"
 

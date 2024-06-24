@@ -56,7 +56,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     kma.KMARunner(arguments.nanopore,
                   os.path.join(arguments.output, "initial_rmlst_alignment"),
                   os.path.join(arguments.output, 'specie_db'),
-                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.75 -sam 2096 > {os.path.join(arguments.output, 'initial_rmlst_alignment.sam')}").run()
+                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -matrix -eq {arguments.q_score} -mct 0.75 -sam 2096 -mf 50000> {os.path.join(arguments.output, 'initial_rmlst_alignment.sam')}").run()
 
     # Index top hits from the initial RMLST alignment
     index_top_hits_db(arguments.output)
@@ -65,7 +65,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     kma.KMARunner(arguments.nanopore,
                   os.path.join(arguments.output, "rmlst_alignment"),
                   os.path.join(arguments.output, 'top_hits_db'),
-                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -eq {arguments.q_score} -matrix -mct 0.75 -sam 2096 > {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
+                  f"-t {arguments.threads} -ID 10 -ont -md 1.5 -eq {arguments.q_score} -matrix -mct 0.75 -sam 2096 -mf 50000> {os.path.join(arguments.output, 'rmlst_alignment.sam')}").run()
 
     os.system(f'gunzip {os.path.join(arguments.output, "rmlst_alignment.mat.gz")}')
 
@@ -88,7 +88,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count, mutation_threshold_dict = snv_convergence(
         arguments.output, arguments.maf, arguments.cor, arguments.np, arguments.pp, arguments.dp, arguments.proxi,
         arguments.dp_window, arguments.ii, confirmed_mutation_dict, consensus_dict,
-        bio_validation_dict)
+        bio_validation_dict, arguments.min_n)
 
     for item in confirmed_mutation_dict:
         print(item, confirmed_mutation_dict[item])
@@ -289,7 +289,7 @@ def highest_scoring_hit(file_path):
 
 
 def snv_convergence(output_path, maf, cor, np, pp, dp, proxi, dp_window, ii,
-                    confirmed_mutation_dict, consensus_dict, bio_validation_dict):
+                    confirmed_mutation_dict, consensus_dict, bio_validation_dict, min_n):
     """
     Executes an iterative process to identify co-occurring mutations in reads until convergence is achieved.
     The process adjusts the parameters for correlation and density penalty in each iteration and checks for
