@@ -775,10 +775,6 @@ def check_mutation_co_occurrence(list_of_mutation_co_occurrence, mutation_list, 
     co_occurrence_list = []
     # Check if the co-occurrence count of the mutation with any other mutation is above the threshold
     for i, count in enumerate(list_of_mutation_co_occurrence):
-        if mutation_list[i] in proximity_mutations:
-            # Add penalty for proximity to make it harder to get the co-occurrence reward
-            # for mutations within the proximity
-            co_threshold = co_threshold * proximity_penalty
         if i != mutation_index and count >= co_threshold:
             co_occurrence_list.append(mutation_list[i])
 
