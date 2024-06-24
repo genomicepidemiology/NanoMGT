@@ -727,7 +727,11 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
                 depth = confirmed_mutation_dict[allele][1][0]
                 biological_existence = check_single_mutation_existence(bio_validation_dict, allele, mutation)
                 if not biological_existence:
-                    mutation_threshold += (np - 1) * position_depth * maf
+                    mutation_threshold += np * position_depth * maf
+
+                # min_n fix later TBD
+                if mutation_threshold < 3:
+                    mutation_threshold = 3
 
                 mutation_threshold_dict[allele][mutation] = mutation_threshold  # Store the threshold
 
