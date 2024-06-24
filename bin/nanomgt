@@ -36,8 +36,8 @@ def main():
                         help='Number of threads to use. Default: 4')
     parser.add_argument('--min_n', action="store", type=int, dest='min_n', default=3,
                         help='Minimum number of nucleotides required to call a SNV. Default: 3')
-    parser.add_argument('--maf', action="store", type=float, dest='maf', default=0.03,
-                        help='Minimum related depth (MAF) for validating single allele SNVs. Default: 0.03')
+    parser.add_argument('--maf', action="store", type=float, dest='maf', default=0.05,
+                        help='Minimum related depth (MAF) for validating single allele SNVs. Default: 0.05')
     parser.add_argument('--cor', action="store", type=str, dest='cor', default='auto',
                         help='Co-occurrence reward. -= MAF * cor. Value is based on the MAF value. Default: auto')
     parser.add_argument('--np', action="store", type=str, dest='np', default='auto',
