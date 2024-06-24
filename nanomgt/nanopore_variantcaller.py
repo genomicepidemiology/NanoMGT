@@ -687,13 +687,16 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
                     for item in co_occurrence_list:
                         if item not in co_occurrence_tmp_dict[allele]:
                             co_occurrence_tmp_dict[allele].append(item)
-                    # Adjust the threshold based on the number of co-occurrences
-                    co_occurrence_factor = len(co_occurrence_list)
+                    # Adjust the threshold based on the number of co-occurrences with diminishing returns
                     base_reward = position_depth * maf * cor
-                    additional_reward = base_reward * 0.1 * (
-                                co_occurrence_factor - 1)  # 10% of the base reward for each additional co-occurrence
-                    reward = base_reward + additional_reward
-                    mutation_threshold -= reward
+                    total_reward = base_reward
+                    diminishing_factor = 1
+
+                    for _ in range(1, len(co_occurrence_list)):
+                        diminishing_factor /= 2
+                        total_reward += base_reward * diminishing_factor
+
+                    mutation_threshold -= total_reward
 
                 if not biological_existence:
                     mutation_threshold += np * position_depth * maf

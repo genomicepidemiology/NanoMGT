@@ -75,7 +75,7 @@ for organism, isolates in isolate_data.items():
         })
 
 # Output results in CSV format
-output_csv_path = "characterizatin.csv"
+output_csv_path = "characterization.csv"
 csv_columns = ['Organism', 'Isolate', 'Total_Mutations', 'Proximity_Mutations', 'Novel_Mutations', 'Average_Proximity_Density', 'Co_Occurring_Mutations', 'Percent_Co_Occurring', 'Percent_Novel', 'Percent_Proximity']
 
 with open(output_csv_path, 'w', newline='') as csvfile:
