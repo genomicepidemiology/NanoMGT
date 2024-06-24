@@ -602,7 +602,7 @@ for round in rounds:
                 os.makedirs(new_output_folder, exist_ok=True)
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                      parameters_interval_search, maps_path, json_info_path, training_or_validation_extension_json)
-
+                sys.exit()
     all_best_params = defaultdict(list)
 
     for maf in maf_interval:

@@ -681,13 +681,19 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
                 co_occurrence_list = check_mutation_co_occurrence(row, mutation_list, mutation,
                                                                   position_depth, cor, pp, maf, proxi_mutations,
                                                                   mutation_depth)
-                if co_occurrence_list != []:
+                if co_occurrence_list:
                     if mutation not in co_occurrence_tmp_dict[allele]:
                         co_occurrence_tmp_dict[allele].append(mutation)
                     for item in co_occurrence_list:
                         if item not in co_occurrence_tmp_dict[allele]:
                             co_occurrence_tmp_dict[allele].append(item)
-                    mutation_threshold -= position_depth * maf * cor
+                    # Adjust the threshold based on the number of co-occurrences
+                    co_occurrence_factor = len(co_occurrence_list)
+                    base_reward = position_depth * maf * cor
+                    additional_reward = base_reward * 0.1 * (
+                                co_occurrence_factor - 1)  # 10% of the base reward for each additional co-occurrence
+                    reward = base_reward + additional_reward
+                    mutation_threshold -= reward
 
                 if not biological_existence:
                     mutation_threshold += np * position_depth * maf
@@ -695,6 +701,10 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
                     mutation_threshold += pp * position_depth * maf
                 if density_mutations != []:
                     mutation_threshold += dp * position_depth * maf * len(density_mutations)
+
+                #min_n fix later TBD
+                if mutation_threshold < 3:
+                    mutation_threshold = 3
 
                 mutation_threshold_dict[allele][mutation] = mutation_threshold  # Store the threshold
 
