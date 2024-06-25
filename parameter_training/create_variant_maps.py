@@ -4,7 +4,7 @@ import json
 from Bio import pairwise2
 from Bio.Seq import Seq
 
-alignment_result_path = "/home/people/malhal/test/sup_nanomgt_data"
+alignment_result_path = "/home/people/malhal/test/mixed_isolates_nanomgt"
 
 def calculate_proximity_density(mutations):
     mutation_positions = {int(mut.split('_')[0]): mut for mut in mutations}
@@ -156,7 +156,7 @@ def find_close_mutations(mutations):
 
 
 # Load species sequencing IDs from file
-with open('species_sequencing_ids.json', 'r') as f:
+with open('/home/people/malhal/test/mixed_isolates_nanomgt/mixed_isolates.json', 'r') as f:
     species_sequencing_ids = json.load(f)
 
 for species, sequencing_ids in species_sequencing_ids.items():

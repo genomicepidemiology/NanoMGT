@@ -20,20 +20,20 @@ sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + s
 
 from nanomgt import nanopore_variantcaller as nvc
 
-alignment_results_path = '/home/people/malhal/test/sup_nanomgt_data/training/'
-maps_path = '/home/people/malhal/test/sup_nanomgt_data/variant_maps/'
-json_info_path = '/home/people/malhal/data/new_nanomgt/sup_data/'
+alignment_results_path = '/home/projects/cge/people/malhal/nanomgt_article_results/mixed_isolates/training/'
+maps_path = '/home/projects/cge/people/malhal/nanomgt_article_results/mixed_isolates/variant_maps/'
+json_info_path = '/home/projects/cge/people/malhal/nanomgt_article_results/mixed_isolates/'
 training_or_validation_extension_json = '_training.json'
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
-maf_interval = [5, 4]
+maf_interval = [5, 4, 3, 2, 1]
 
-cor_interval_search = [0.3]
-dp_interval_search = [0.1, 0.2]
-np_interval_search = [2, 3]
-pp_interval_search = [0.2, 0.3]
-ii_interval_search = [0.1, 0.3]
+cor_interval_search = [0.1, 0.3, 0.5, 0.7]
+dp_interval_search = [0.01, 0.1, 0.2, 0.3]
+np_interval_search = [0.1, 1, 2, 3]
+pp_interval_search = [0.1, 0.2, 0.3, 0.4, 0.5]
+ii_interval_search = [0.01, 0.1, 0.2, 0.3, 0.4]
 
 
 parameters_interval_search = {
@@ -44,7 +44,8 @@ parameters_interval_search = {
     'dp_interval': dp_interval_search
 }
 
-cpus = 60
+#test
+cpus = 4
 
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, json_info_path,
                     ii, proxi, dp_window, pp, np, dp, consensus_dict, bio_validation_dict, minor_mutation_expected):

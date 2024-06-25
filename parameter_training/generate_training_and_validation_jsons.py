@@ -32,7 +32,7 @@ def divide_into_sets(data):
 
 
 # Sample JSON input (replace this with the path to your actual input file)
-input_file_path = "mixed_isolates.json"  # Replace this with your actual input file path
+input_file_path = "contaminated_isolates.json"  # Replace this with your actual input file path
 with open(input_file_path, "r") as json_file:
     data = json.load(json_file)
 
@@ -40,8 +40,8 @@ with open(input_file_path, "r") as json_file:
 training_set, validation_set = divide_into_sets(data)
 
 # Save the training and validation sets to JSON files
-output_training_path = "training_set_mixed_isolates.json"
-output_validation_path = "validation_set_mixed_isolates.json"
+output_training_path = "training_set_contaminated_isolates.json"
+output_validation_path = "validation_set_contaminated_isolates.json"
 
 with open(output_training_path, "w") as json_file:
     json.dump(training_set, json_file, indent=4)

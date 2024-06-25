@@ -3,10 +3,10 @@
         "batch_id": 1,
         "minority_abundance": {
             "Majority": {
-                "SRR28370636": 99
+                "SRR26899118": 99
             },
             "Minority": {
-                "SRR27755674": 1
+                "SRR26353490": 1
             }
         }
     },
@@ -14,10 +14,10 @@
         "batch_id": 2,
         "minority_abundance": {
             "Majority": {
-                "SRR27755674": 99
+                "SRR26353490": 99
             },
             "Minority": {
-                "SRR28370636": 1
+                "SRR26899118": 1
             }
         }
     },
@@ -25,10 +25,10 @@
         "batch_id": 3,
         "minority_abundance": {
             "Majority": {
-                "SRR28370636": 98
+                "SRR26899118": 98
             },
             "Minority": {
-                "SRR27755674": 2
+                "SRR26353490": 2
             }
         }
     },
@@ -36,10 +36,10 @@
         "batch_id": 4,
         "minority_abundance": {
             "Majority": {
-                "SRR27755674": 98
+                "SRR26353490": 98
             },
             "Minority": {
-                "SRR28370636": 2
+                "SRR26899118": 2
             }
         }
     },
@@ -47,10 +47,10 @@
         "batch_id": 5,
         "minority_abundance": {
             "Majority": {
-                "SRR28370636": 97
+                "SRR26899118": 97
             },
             "Minority": {
-                "SRR27755674": 3
+                "SRR26353490": 3
             }
         }
     },
@@ -58,10 +58,10 @@
         "batch_id": 6,
         "minority_abundance": {
             "Majority": {
-                "SRR27755674": 97
+                "SRR26353490": 97
             },
             "Minority": {
-                "SRR28370636": 3
+                "SRR26899118": 3
             }
         }
     },
@@ -69,10 +69,10 @@
         "batch_id": 7,
         "minority_abundance": {
             "Majority": {
-                "SRR28370636": 96
+                "SRR26899118": 96
             },
             "Minority": {
-                "SRR27755674": 4
+                "SRR26353490": 4
             }
         }
     },
@@ -80,10 +80,10 @@
         "batch_id": 8,
         "minority_abundance": {
             "Majority": {
-                "SRR27755674": 96
+                "SRR26353490": 96
             },
             "Minority": {
-                "SRR28370636": 4
+                "SRR26899118": 4
             }
         }
     },
@@ -91,10 +91,10 @@
         "batch_id": 9,
         "minority_abundance": {
             "Majority": {
-                "SRR28370636": 95
+                "SRR26899118": 95
             },
             "Minority": {
-                "SRR27755674": 5
+                "SRR26353490": 5
             }
         }
     },
@@ -102,10 +102,10 @@
         "batch_id": 10,
         "minority_abundance": {
             "Majority": {
-                "SRR27755674": 95
+                "SRR26353490": 95
             },
             "Minority": {
-                "SRR28370636": 5
+                "SRR26899118": 5
             }
         }
     },
@@ -113,10 +113,10 @@
         "batch_id": 11,
         "minority_abundance": {
             "Majority": {
-                "SRR28370636": 94
+                "SRR26899118": 94
             },
             "Minority": {
-                "SRR27755674": 6
+                "SRR26353490": 6
             }
         }
     },
@@ -124,10 +124,10 @@
         "batch_id": 12,
         "minority_abundance": {
             "Majority": {
-                "SRR27755674": 94
+                "SRR26353490": 94
             },
             "Minority": {
-                "SRR28370636": 6
+                "SRR26899118": 6
             }
         }
     },
@@ -135,10 +135,10 @@
         "batch_id": 13,
         "minority_abundance": {
             "Majority": {
-                "SRR28370636": 93
+                "SRR26899118": 93
             },
             "Minority": {
-                "SRR27755674": 7
+                "SRR26353490": 7
             }
         }
     },
@@ -146,10 +146,10 @@
         "batch_id": 14,
         "minority_abundance": {
             "Majority": {
-                "SRR27755674": 93
+                "SRR26353490": 93
             },
             "Minority": {
-                "SRR28370636": 7
+                "SRR26899118": 7
             }
         }
     },
@@ -157,10 +157,10 @@
         "batch_id": 15,
         "minority_abundance": {
             "Majority": {
-                "SRR28370636": 92
+                "SRR26899118": 92
             },
             "Minority": {
-                "SRR27755674": 8
+                "SRR26353490": 8
             }
         }
     },
@@ -168,10 +168,10 @@
         "batch_id": 16,
         "minority_abundance": {
             "Majority": {
-                "SRR27755674": 92
+                "SRR26353490": 92
             },
             "Minority": {
-                "SRR28370636": 8
+                "SRR26899118": 8
             }
         }
     },
@@ -179,10 +179,10 @@
         "batch_id": 17,
         "minority_abundance": {
             "Majority": {
-                "SRR28370636": 91
+                "SRR26899118": 91
             },
             "Minority": {
-                "SRR27755674": 9
+                "SRR26353490": 9
             }
         }
     },
@@ -190,10 +190,10 @@
         "batch_id": 18,
         "minority_abundance": {
             "Majority": {
-                "SRR27755674": 91
+                "SRR26353490": 91
             },
             "Minority": {
-                "SRR28370636": 9
+                "SRR26899118": 9
             }
         }
     },
@@ -201,10 +201,10 @@
         "batch_id": 19,
         "minority_abundance": {
             "Majority": {
-                "SRR28370636": 90
+                "SRR26899118": 90
             },
             "Minority": {
-                "SRR27755674": 10
+                "SRR26353490": 10
             }
         }
     },
@@ -212,10 +212,10 @@
         "batch_id": 20,
         "minority_abundance": {
             "Majority": {
-                "SRR27755674": 90
+                "SRR26353490": 90
             },
             "Minority": {
-                "SRR28370636": 10
+                "SRR26899118": 10
             }
         }
     }

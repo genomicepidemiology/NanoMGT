@@ -2,7 +2,7 @@ import os
 import subprocess
 
 # Use this for aligning individual isolates to make the variant position map used to benchmark
-path = "/home/people/malhal/data/new_nanomgt/sup_data"
+path = "/home/people/malhal/data/new_nanomgt/mixed_data/all_reads/"
 
 # Align individual isolates to make maps of variance
 fastq_files = [f for f in os.listdir(path) if f.endswith('.fastq')]

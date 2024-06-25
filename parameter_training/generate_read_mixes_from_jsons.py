@@ -9,12 +9,19 @@ with open('genome_sizes.json', 'r') as f:
 
 # List of JSON files to load
 json_files = [
+    'campylobacter_jejuni_training.json',
     'campylobacter_jejuni_validation.json',
+    'escherichia_coli_training.json',
     'escherichia_coli_validation.json',
-    'klebsiella_pneumoniae_validation.json',
-    'listeria_monocytogenes_training.json',
+    'klebsiella_pneumoniae_training.json',
+    #'klebsiella_pneumoniae_validation.json',
+    #'listeria_monocytogenes_training.json',
+    #'listeria_monocytogenes_validation.json',
+    #'pseudomonas_aeruginosa_training.json',
     'salmonella_enterica_training.json',
-    'staphylococcus_aureus_training.json'
+    'salmonella_enterica_validation.json',
+    'staphylococcus_aureus_training.json',
+    'staphylococcus_aureus_validation.json'
 ]
 
 # Initialize dictionaries to store sequencing IDs and batch information
@@ -28,11 +35,13 @@ for file in json_files:
         data = json.load(f)
         species_sequencing_ids[species_name] = []
         for item in data:
+            print (file)
+            print (item)
             species_sequencing_ids[species_name].extend(item.values())
         batch_info[species_name] = data
 
 # Path to the folder containing FASTQ files
-fastq_folder_path = '/home/people/malhal/data/new_nanomgt/sup_data'  # Replace this with the actual path
+fastq_folder_path = '/home/people/malhal/data/new_nanomgt/mixed_data'  # Replace this with the actual path
 
 # Function to calculate the average read length for a given FASTQ file
 def calculate_average_read_length(file_path):

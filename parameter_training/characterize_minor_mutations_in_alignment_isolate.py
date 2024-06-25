@@ -3,8 +3,8 @@ import json
 import csv
 from collections import defaultdict
 
-alignment_path = "/home/people/malhal/test/characterize_sup/"
-isolate_file_path = "/home/people/malhal/test/characterize_sup/sup_isolates.json"
+alignment_path = "/home/people/malhal/test/mixed_isolates_nanomgt/"
+isolate_file_path = "/home/people/malhal/test/mixed_isolates_nanomgt/mixed_isolates.json"
 
 # Load isolate file data
 with open(isolate_file_path, 'r') as f:
