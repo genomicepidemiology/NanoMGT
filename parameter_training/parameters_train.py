@@ -27,6 +27,10 @@ training_or_validation_extension_json = '_training.json'
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
+output_training_folder = 'clean_training_output'
+os.makedirs(output_training_folder, exist_ok=True)
+param_list = ['np', 'cor', 'pp', 'dp', 'ii']
+
 maf_interval = [5]
 
 cor_interval_search = [0.3]
@@ -44,7 +48,7 @@ parameters_interval_search = {
     'dp_interval': dp_interval_search
 }
 
-cpus = 40
+cpus = 30
 
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, json_info_path,
                     ii, proxi, dp_window, pp, np, dp, consensus_dict, bio_validation_dict, minor_mutation_expected):
@@ -520,9 +524,6 @@ def load_top_hit(file_path, param_to_fetch):
 
     return f1_score, param_value
 
-output_training_folder = 'sup_training_output'
-os.makedirs(output_training_folder, exist_ok=True)
-param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
 
 for maf in maf_interval:
