@@ -3,11 +3,10 @@
         "batch_id": 1,
         "minority_abundance": {
             "Majority": {
-                "SRR24833086": 80
+                "SRR24833086": 99
             },
             "Minority": {
-                "SRR18117841": 10,
-                "ERR8958866": 10
+                "ERR8958866": 1
             }
         }
     },
@@ -15,11 +14,10 @@
         "batch_id": 2,
         "minority_abundance": {
             "Majority": {
-                "SRR18117841": 80
+                "ERR8958866": 99
             },
             "Minority": {
-                "ERR8958866": 10,
-                "SRR24833086": 10
+                "SRR24833086": 1
             }
         }
     },
@@ -27,11 +25,10 @@
         "batch_id": 3,
         "minority_abundance": {
             "Majority": {
-                "ERR8958866": 80
+                "SRR24833086": 98
             },
             "Minority": {
-                "SRR24833086": 10,
-                "SRR18117841": 10
+                "ERR8958866": 2
             }
         }
     },
@@ -39,11 +36,10 @@
         "batch_id": 4,
         "minority_abundance": {
             "Majority": {
-                "SRR18117841": 80
+                "ERR8958866": 98
             },
             "Minority": {
-                "SRR24833086": 10,
-                "ERR8958866": 10
+                "SRR24833086": 2
             }
         }
     },
@@ -51,11 +47,10 @@
         "batch_id": 5,
         "minority_abundance": {
             "Majority": {
-                "SRR24833086": 80
+                "SRR24833086": 97
             },
             "Minority": {
-                "ERR8958866": 10,
-                "SRR18117841": 10
+                "ERR8958866": 3
             }
         }
     },
@@ -63,11 +58,10 @@
         "batch_id": 6,
         "minority_abundance": {
             "Majority": {
-                "ERR8958866": 82
+                "ERR8958866": 97
             },
             "Minority": {
-                "SRR24833086": 9,
-                "SRR18117841": 9
+                "SRR24833086": 3
             }
         }
     },
@@ -75,11 +69,10 @@
         "batch_id": 7,
         "minority_abundance": {
             "Majority": {
-                "SRR18117841": 82
+                "SRR24833086": 96
             },
             "Minority": {
-                "ERR8958866": 9,
-                "SRR24833086": 9
+                "ERR8958866": 4
             }
         }
     },
@@ -87,11 +80,10 @@
         "batch_id": 8,
         "minority_abundance": {
             "Majority": {
-                "SRR24833086": 82
+                "ERR8958866": 96
             },
             "Minority": {
-                "ERR8958866": 9,
-                "SRR18117841": 9
+                "SRR24833086": 4
             }
         }
     },
@@ -99,11 +91,10 @@
         "batch_id": 9,
         "minority_abundance": {
             "Majority": {
-                "ERR8958866": 82
+                "SRR24833086": 95
             },
             "Minority": {
-                "SRR18117841": 9,
-                "SRR24833086": 9
+                "ERR8958866": 5
             }
         }
     },
@@ -111,11 +102,10 @@
         "batch_id": 10,
         "minority_abundance": {
             "Majority": {
-                "SRR24833086": 82
+                "ERR8958866": 95
             },
             "Minority": {
-                "SRR18117841": 9,
-                "ERR8958866": 9
+                "SRR24833086": 5
             }
         }
     },
@@ -123,11 +113,10 @@
         "batch_id": 11,
         "minority_abundance": {
             "Majority": {
-                "SRR24833086": 84
+                "SRR24833086": 94
             },
             "Minority": {
-                "ERR8958866": 8,
-                "SRR18117841": 8
+                "ERR8958866": 6
             }
         }
     },
@@ -135,11 +124,10 @@
         "batch_id": 12,
         "minority_abundance": {
             "Majority": {
-                "SRR18117841": 84
+                "ERR8958866": 94
             },
             "Minority": {
-                "SRR24833086": 8,
-                "ERR8958866": 8
+                "SRR24833086": 6
             }
         }
     },
@@ -147,11 +135,10 @@
         "batch_id": 13,
         "minority_abundance": {
             "Majority": {
-                "SRR24833086": 84
+                "SRR24833086": 93
             },
             "Minority": {
-                "SRR18117841": 8,
-                "ERR8958866": 8
+                "ERR8958866": 7
             }
         }
     },
@@ -159,11 +146,10 @@
         "batch_id": 14,
         "minority_abundance": {
             "Majority": {
-                "ERR8958866": 84
+                "ERR8958866": 93
             },
             "Minority": {
-                "SRR24833086": 8,
-                "SRR18117841": 8
+                "SRR24833086": 7
             }
         }
     },
@@ -171,11 +157,10 @@
         "batch_id": 15,
         "minority_abundance": {
             "Majority": {
-                "SRR18117841": 84
+                "SRR24833086": 92
             },
             "Minority": {
-                "ERR8958866": 8,
-                "SRR24833086": 8
+                "ERR8958866": 8
             }
         }
     },
@@ -183,11 +168,10 @@
         "batch_id": 16,
         "minority_abundance": {
             "Majority": {
-                "ERR8958866": 86
+                "ERR8958866": 92
             },
             "Minority": {
-                "SRR18117841": 7,
-                "SRR24833086": 7
+                "SRR24833086": 8
             }
         }
     },
@@ -195,11 +179,10 @@
         "batch_id": 17,
         "minority_abundance": {
             "Majority": {
-                "ERR8958866": 86
+                "SRR24833086": 91
             },
             "Minority": {
-                "SRR24833086": 7,
-                "SRR18117841": 7
+                "ERR8958866": 9
             }
         }
     },
@@ -207,11 +190,10 @@
         "batch_id": 18,
         "minority_abundance": {
             "Majority": {
-                "SRR18117841": 86
+                "ERR8958866": 91
             },
             "Minority": {
-                "ERR8958866": 7,
-                "SRR24833086": 7
+                "SRR24833086": 9
             }
         }
     },
@@ -219,11 +201,10 @@
         "batch_id": 19,
         "minority_abundance": {
             "Majority": {
-                "SRR18117841": 86
+                "SRR24833086": 90
             },
             "Minority": {
-                "SRR24833086": 7,
-                "ERR8958866": 7
+                "ERR8958866": 10
             }
         }
     },
@@ -231,371 +212,10 @@
         "batch_id": 20,
         "minority_abundance": {
             "Majority": {
-                "SRR24833086": 86
-            },
-            "Minority": {
-                "ERR8958866": 7,
-                "SRR18117841": 7
-            }
-        }
-    },
-    {
-        "batch_id": 21,
-        "minority_abundance": {
-            "Majority": {
-                "ERR8958866": 88
-            },
-            "Minority": {
-                "SRR18117841": 6,
-                "SRR24833086": 6
-            }
-        }
-    },
-    {
-        "batch_id": 22,
-        "minority_abundance": {
-            "Majority": {
-                "ERR8958866": 88
-            },
-            "Minority": {
-                "SRR24833086": 6,
-                "SRR18117841": 6
-            }
-        }
-    },
-    {
-        "batch_id": 23,
-        "minority_abundance": {
-            "Majority": {
-                "SRR18117841": 88
-            },
-            "Minority": {
-                "SRR24833086": 6,
-                "ERR8958866": 6
-            }
-        }
-    },
-    {
-        "batch_id": 24,
-        "minority_abundance": {
-            "Majority": {
-                "SRR18117841": 88
-            },
-            "Minority": {
-                "ERR8958866": 6,
-                "SRR24833086": 6
-            }
-        }
-    },
-    {
-        "batch_id": 25,
-        "minority_abundance": {
-            "Majority": {
-                "SRR24833086": 88
-            },
-            "Minority": {
-                "SRR18117841": 6,
-                "ERR8958866": 6
-            }
-        }
-    },
-    {
-        "batch_id": 26,
-        "minority_abundance": {
-            "Majority": {
-                "SRR18117841": 90
-            },
-            "Minority": {
-                "SRR24833086": 5,
-                "ERR8958866": 5
-            }
-        }
-    },
-    {
-        "batch_id": 27,
-        "minority_abundance": {
-            "Majority": {
-                "SRR18117841": 90
-            },
-            "Minority": {
-                "ERR8958866": 5,
-                "SRR24833086": 5
-            }
-        }
-    },
-    {
-        "batch_id": 28,
-        "minority_abundance": {
-            "Majority": {
                 "ERR8958866": 90
             },
             "Minority": {
-                "SRR24833086": 5,
-                "SRR18117841": 5
-            }
-        }
-    },
-    {
-        "batch_id": 29,
-        "minority_abundance": {
-            "Majority": {
-                "SRR24833086": 90
-            },
-            "Minority": {
-                "SRR18117841": 5,
-                "ERR8958866": 5
-            }
-        }
-    },
-    {
-        "batch_id": 30,
-        "minority_abundance": {
-            "Majority": {
-                "SRR24833086": 90
-            },
-            "Minority": {
-                "ERR8958866": 5,
-                "SRR18117841": 5
-            }
-        }
-    },
-    {
-        "batch_id": 31,
-        "minority_abundance": {
-            "Majority": {
-                "ERR8958866": 92
-            },
-            "Minority": {
-                "SRR24833086": 4,
-                "SRR18117841": 4
-            }
-        }
-    },
-    {
-        "batch_id": 32,
-        "minority_abundance": {
-            "Majority": {
-                "SRR24833086": 92
-            },
-            "Minority": {
-                "SRR18117841": 4,
-                "ERR8958866": 4
-            }
-        }
-    },
-    {
-        "batch_id": 33,
-        "minority_abundance": {
-            "Majority": {
-                "SRR18117841": 92
-            },
-            "Minority": {
-                "ERR8958866": 4,
-                "SRR24833086": 4
-            }
-        }
-    },
-    {
-        "batch_id": 34,
-        "minority_abundance": {
-            "Majority": {
-                "SRR18117841": 92
-            },
-            "Minority": {
-                "SRR24833086": 4,
-                "ERR8958866": 4
-            }
-        }
-    },
-    {
-        "batch_id": 35,
-        "minority_abundance": {
-            "Majority": {
-                "ERR8958866": 92
-            },
-            "Minority": {
-                "SRR18117841": 4,
-                "SRR24833086": 4
-            }
-        }
-    },
-    {
-        "batch_id": 36,
-        "minority_abundance": {
-            "Majority": {
-                "SRR24833086": 94
-            },
-            "Minority": {
-                "SRR18117841": 3,
-                "ERR8958866": 3
-            }
-        }
-    },
-    {
-        "batch_id": 37,
-        "minority_abundance": {
-            "Majority": {
-                "SRR24833086": 94
-            },
-            "Minority": {
-                "ERR8958866": 3,
-                "SRR18117841": 3
-            }
-        }
-    },
-    {
-        "batch_id": 38,
-        "minority_abundance": {
-            "Majority": {
-                "ERR8958866": 94
-            },
-            "Minority": {
-                "SRR18117841": 3,
-                "SRR24833086": 3
-            }
-        }
-    },
-    {
-        "batch_id": 39,
-        "minority_abundance": {
-            "Majority": {
-                "ERR8958866": 94
-            },
-            "Minority": {
-                "SRR24833086": 3,
-                "SRR18117841": 3
-            }
-        }
-    },
-    {
-        "batch_id": 40,
-        "minority_abundance": {
-            "Majority": {
-                "SRR18117841": 94
-            },
-            "Minority": {
-                "ERR8958866": 3,
-                "SRR24833086": 3
-            }
-        }
-    },
-    {
-        "batch_id": 41,
-        "minority_abundance": {
-            "Majority": {
-                "SRR18117841": 96
-            },
-            "Minority": {
-                "ERR8958866": 2,
-                "SRR24833086": 2
-            }
-        }
-    },
-    {
-        "batch_id": 42,
-        "minority_abundance": {
-            "Majority": {
-                "SRR24833086": 96
-            },
-            "Minority": {
-                "SRR18117841": 2,
-                "ERR8958866": 2
-            }
-        }
-    },
-    {
-        "batch_id": 43,
-        "minority_abundance": {
-            "Majority": {
-                "ERR8958866": 96
-            },
-            "Minority": {
-                "SRR18117841": 2,
-                "SRR24833086": 2
-            }
-        }
-    },
-    {
-        "batch_id": 44,
-        "minority_abundance": {
-            "Majority": {
-                "SRR24833086": 96
-            },
-            "Minority": {
-                "ERR8958866": 2,
-                "SRR18117841": 2
-            }
-        }
-    },
-    {
-        "batch_id": 45,
-        "minority_abundance": {
-            "Majority": {
-                "ERR8958866": 96
-            },
-            "Minority": {
-                "SRR24833086": 2,
-                "SRR18117841": 2
-            }
-        }
-    },
-    {
-        "batch_id": 46,
-        "minority_abundance": {
-            "Majority": {
-                "ERR8958866": 98
-            },
-            "Minority": {
-                "SRR18117841": 1,
-                "SRR24833086": 1
-            }
-        }
-    },
-    {
-        "batch_id": 47,
-        "minority_abundance": {
-            "Majority": {
-                "SRR18117841": 98
-            },
-            "Minority": {
-                "ERR8958866": 1,
-                "SRR24833086": 1
-            }
-        }
-    },
-    {
-        "batch_id": 48,
-        "minority_abundance": {
-            "Majority": {
-                "ERR8958866": 98
-            },
-            "Minority": {
-                "SRR24833086": 1,
-                "SRR18117841": 1
-            }
-        }
-    },
-    {
-        "batch_id": 49,
-        "minority_abundance": {
-            "Majority": {
-                "SRR24833086": 98
-            },
-            "Minority": {
-                "SRR18117841": 1,
-                "ERR8958866": 1
-            }
-        }
-    },
-    {
-        "batch_id": 50,
-        "minority_abundance": {
-            "Majority": {
-                "SRR24833086": 98
-            },
-            "Minority": {
-                "ERR8958866": 1,
-                "SRR18117841": 1
+                "SRR24833086": 10
             }
         }
     }

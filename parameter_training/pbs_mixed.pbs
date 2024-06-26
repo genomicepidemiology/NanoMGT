@@ -6,13 +6,13 @@
 #PBS -m abe
 
 # Move to the directory where you want to execute your commands
-cd /home/projects/cge/people/malhal/nanomgt_article_results/mixed_isolates
+cd /home/projects/cge/people/malhal/nanomgt_article_results/clean
 
 # Load necessary modules
 module load tools
 module load miniconda3/23.5.0
 conda activate mambaenv
-python3 /home/projects/cge/people/malhal/NanoMGT/parameter_training/mixed_parameters_train.py
+python3 /home/projects/cge/people/malhal/NanoMGT/parameter_training/parameters_train.py
 
 
 # Add additional commands here if needed

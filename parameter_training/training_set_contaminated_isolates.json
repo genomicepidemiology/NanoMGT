@@ -6,19 +6,16 @@
     "Escherichia coli": [
         "SRR24837710",
         "SRR24837712",
-        "SRR24834173",
-        "ERR12533301",
-        "SRR28789469"
+        "SRR24834173"
     ],
     "Klebsiella pneumoniae": [
-        "SRR28370696",
+        "SRR27348733",
         "SRR29213739",
         "SRR24833081"
     ],
     "Staphylococcus aureus": [
-        "ERR8958848",
         "ERR8958843",
-        "SRR28415520"
+        "SRR28370638"
     ],
     "Salmonella enterica": [
         "SRR27755679",
