@@ -12,7 +12,7 @@ cd /home/projects/cge/people/malhal/nanomgt_article_results/clean
 module load tools
 module load miniconda3/23.5.0
 conda activate mambaenv
-python3 /home/projects/cge/people/malhal/NanoMGT/parameter_training/parameters_train.py
+python3 /home/projects/cge/people/malhal/NanoMGT/parameter_training/clean_parameters_train.py
 
 
 # Add additional commands here if needed
