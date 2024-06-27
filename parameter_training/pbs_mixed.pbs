@@ -1,18 +1,21 @@
-#!/bin/bash
-#PBS -N mixed_training
+#!/bin/sh
+#PBS -W group_list=cge -A cge
+#PBS -N clean_training
+#PBS -e clean_test.err
+#PBS -o clean_test.log
+#PBS -l nodes=1:ppn=40
+#PBS -l mem=128gb
 #PBS -l walltime=72:00:00
-#PBS -l select=1:ncpus=72:mem=128gb
-#PBS -j oe
-#PBS -m abe
+
 
 # Move to the directory where you want to execute your commands
-cd /home/projects/cge/people/malhal/nanomgt_article_results/clean
+cd /home/projects/cge/people/malhal/nanomgt_article_results/contaminated
 
 # Load necessary modules
 module load tools
 module load miniconda3/23.5.0
 conda activate mambaenv
-python3 /home/projects/cge/people/malhal/NanoMGT/parameter_training/clean_parameters_train.py
+python3 /home/projects/cge/people/malhal/NanoMGT/parameter_training/contaminated_parameters_train.py
 
 
 # Add additional commands here if needed
