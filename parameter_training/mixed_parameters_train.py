@@ -529,18 +529,19 @@ def load_top_hit(file_path, param_to_fetch):
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
+        if "staphylococcus_aureus_45" not in folder:
         batch_id = int(folder.split('_')[-1])
-        if batch_id > 10:
-            batch_id = batch_id - 10
-        if batch_id >= maf:
-            alignment_folder = os.path.join(alignment_results_path, folder)
-            new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
-            os.makedirs(new_output_folder, exist_ok=True)
-            print ('Searching parameters for ', folder)
-            run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
-                                 parameters_interval_search, maps_path, json_info_path, training_or_validation_extension_json)
-            #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, json_info_path,
-            #    0.1, 5, 15, 0.44, 5, 0.15)
+            if batch_id > 10:
+                batch_id = batch_id - 10
+            if batch_id >= maf:
+                alignment_folder = os.path.join(alignment_results_path, folder)
+                new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
+                os.makedirs(new_output_folder, exist_ok=True)
+                print ('Searching parameters for ', folder)
+                run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
+                                     parameters_interval_search, maps_path, json_info_path, training_or_validation_extension_json)
+                #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, json_info_path,
+                #    0.1, 5, 15, 0.44, 5, 0.15)
 
 all_best_params = defaultdict(list)
 
@@ -548,19 +549,20 @@ for maf in maf_interval:
     print(f"maf_{maf}")
     average_best_params = {}
     for folder in folders:
-        print (folder)
-        batch_id = int(folder.split('_')[-1])
-        if batch_id > 10:
-            batch_id = batch_id - 10
-        if batch_id >= maf:
-            new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
-            results_filename = new_output_folder + "/all_results.csv"
-            best_params = calculate_best_parameters(results_filename)
-            if best_params != None:
-                for param, value in best_params.items():
-                    param_name = param[1:]
-                    if param_name in param_list:
-                        all_best_params[param_name].append(value)
+        if "staphylococcus_aureus_45" not in folder:
+            print (folder)
+            batch_id = int(folder.split('_')[-1])
+            if batch_id > 10:
+                batch_id = batch_id - 10
+            if batch_id >= maf:
+                new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
+                results_filename = new_output_folder + "/all_results.csv"
+                best_params = calculate_best_parameters(results_filename)
+                if best_params != None:
+                    for param, value in best_params.items():
+                        param_name = param[1:]
+                        if param_name in param_list:
+                            all_best_params[param_name].append(value)
     for param in param_list:
         if param in all_best_params:
             values = all_best_params[param]
@@ -597,36 +599,38 @@ for round in rounds:
             parameters_interval_search[param + '_interval'] = test_values  # Add generated values to the interval search
 
         for folder in folders:
-            batch_id = int(folder.split('_')[-1])
-            if batch_id == 10:
-                abundance = batch_id
-            else:
-                abundance = batch_id = int(folder.split('_')[-1][-1])
-            if abundance >= maf:
-                alignment_folder = os.path.join(alignment_results_path, folder)
-                new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
-                os.makedirs(new_output_folder, exist_ok=True)
-                run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
-                                     parameters_interval_search, maps_path, json_info_path, training_or_validation_extension_json)
+            if "staphylococcus_aureus_45" not in folder:
+                batch_id = int(folder.split('_')[-1])
+                if batch_id == 10:
+                    abundance = batch_id
+                else:
+                    abundance = batch_id = int(folder.split('_')[-1][-1])
+                if abundance >= maf:
+                    alignment_folder = os.path.join(alignment_results_path, folder)
+                    new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
+                    os.makedirs(new_output_folder, exist_ok=True)
+                    run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
+                                         parameters_interval_search, maps_path, json_info_path, training_or_validation_extension_json)
     all_best_params = defaultdict(list)
 
     for maf in maf_interval:
         average_best_params = {}
         for folder in folders:
-            batch_id = int(folder.split('_')[-1])
-            if batch_id == 10:
-                abundance = batch_id
-            else:
-                abundance = batch_id = int(folder.split('_')[-1][-1])
-            if abundance >= maf:
-                new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
-                results_filename = new_output_folder + "/all_results.csv"
-                best_params = calculate_best_parameters(results_filename)
-                if best_params != None:
-                    for param, value in best_params.items():
-                        param_name = param[1:]
-                        if param_name in param_list:
-                            all_best_params[param_name].append(value)
+            if "staphylococcus_aureus_45" not in folder:
+                batch_id = int(folder.split('_')[-1])
+                if batch_id == 10:
+                    abundance = batch_id
+                else:
+                    abundance = batch_id = int(folder.split('_')[-1][-1])
+                if abundance >= maf:
+                    new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
+                    results_filename = new_output_folder + "/all_results.csv"
+                    best_params = calculate_best_parameters(results_filename)
+                    if best_params != None:
+                        for param, value in best_params.items():
+                            param_name = param[1:]
+                            if param_name in param_list:
+                                all_best_params[param_name].append(value)
         for param in param_list:
             if param in all_best_params:
                 values = all_best_params[param]

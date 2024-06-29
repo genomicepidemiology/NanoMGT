@@ -1,11 +1,11 @@
 import os
 import subprocess
 
-input = 'confindr_data_clean'
-output = 'confindr_results_clean'
+input = 'confindr_data_mixed'
+output = 'confindr_results_mixed'
 
 # Define the path to the directory containing the folders
-data_dir_path = "/home/people/malhal/data/new_nanomgt/confindr_resub/" + input
+data_dir_path = "/home/people/malhal/data/new_nanomgt/" + input
 
 # List all entries in the directory and filter out the folders
 folders = [name for name in os.listdir(data_dir_path)
@@ -14,7 +14,7 @@ folders = [name for name in os.listdir(data_dir_path)
 bf = [0.05]
 # Iterate over the list of folders and run the echo command for each
 for rate in bf:
-    os.system(f"mkdir /home/people/malhal/data/new_nanomgt/confindr_resub/{output}/bf_{rate}")
+    os.system(f"mkdir /home/people/malhal/data/new_nanomgt/{output}/bf_{rate}")
     for folder in folders:
-        cmd = f"confindr -i {data_dir_path}/{folder}/ -o /home/people/malhal/data/new_nanomgt/confindr_resub/{output}/bf_{rate}/{folder} -d /home/people/malhal/contamErase/benchmarking/confindr/rmlst_db/ --rmlst -b 3 -bf {rate} -dt Nanopore -q 14"
+        cmd = f"confindr -i {data_dir_path}/{folder}/ -o /home/people/malhal/data/new_nanomgt/{output}/bf_{rate}/{folder} -d /home/people/malhal/contamErase/benchmarking/confindr/rmlst_db/ --rmlst -b 3 -bf {rate} -dt Nanopore -q 14"
         os.system(cmd)
