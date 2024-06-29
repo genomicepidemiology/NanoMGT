@@ -31,7 +31,7 @@ output_training_folder = 'mixed_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
-maf_interval = [5, 4, 3, 2, 1]
+maf_interval = [3]
 
 cor_interval_search = [0.1, 0.3, 0.5, 0.7]
 dp_interval_search = [0.01, 0.1, 0.2, 0.3, 0.4]
@@ -573,6 +573,8 @@ for maf in maf_interval:
         json.dump(average_best_params, json_file, indent=4)
 
 
+
+sys.exit()
 # Number of increments to test
 num_increments = 1  # For example, testing 2 increments on each side
 rounds = [2, 3, 4, 5]
