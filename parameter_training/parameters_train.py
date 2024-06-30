@@ -31,7 +31,7 @@ output_training_folder = 'clean_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
-maf_interval = [5]
+maf_interval = [1]
 
 cor_interval_search = [0.3]
 dp_interval_search = [0.1]
