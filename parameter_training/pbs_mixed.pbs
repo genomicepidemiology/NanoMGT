@@ -1,21 +1,21 @@
 #!/bin/sh
 #PBS -W group_list=cge -A cge
-#PBS -N 5_mixed_training
-#PBS -e /home/projects/cge/people/malhal/nanomgt_article_results/mixed/5_mixed_test.err
-#PBS -o /home/projects/cge/people/malhal/nanomgt_article_results/mixed/5_mixed_test.log
+#PBS -N 1_clean_training
+#PBS -e /home/projects/cge/people/malhal/nanomgt_article_results/clean/1_clean_test.err
+#PBS -o /home/projects/cge/people/malhal/nanomgt_article_results/clean/1_clean_test.log
 #PBS -l nodes=1:ppn=40
 #PBS -l mem=64gb
 #PBS -l walltime=120:00:00
 
 
 # Move to the directory where you want to execute your commands
-cd /home/projects/cge/people/malhal/nanomgt_article_results/mixed
+cd /home/projects/cge/people/malhal/nanomgt_article_results/clean
 
 # Load necessary modules
 module load tools
 module load miniconda3/23.5.0
 conda activate mambaenv
-python3 /home/projects/cge/people/malhal/NanoMGT/parameter_training/mixed_parameters_train_5.py
+python3 /home/projects/cge/people/malhal/NanoMGT/parameter_training/clean_parameters_train.py
 
 
 # Add additional commands here if needed

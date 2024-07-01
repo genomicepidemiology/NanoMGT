@@ -20,14 +20,14 @@ sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + s
 
 from nanomgt import nanopore_variantcaller as nvc
 
-alignment_results_path = '/home/projects/cge/people/malhal/nanomgt_new_results/mixed/'
+alignment_results_path = '/home/projects/cge/people/malhal/nanomgt_new_results/clean/'
 maps_path = '/home/projects/cge/people/malhal/nanomgt_reads/variant_maps/'
-json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batches_mixed'
+json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batches_clean'
 training_or_validation_extension_json = '_training.json'
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
-output_training_folder = 'mixed_training_output'
+output_training_folder = 'clean_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
