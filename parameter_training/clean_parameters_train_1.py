@@ -572,10 +572,6 @@ for maf in maf_interval:
     with open(output_file_path, 'w') as json_file:
         json.dump(average_best_params, json_file, indent=4)
 
-
-sys.exit()
-maf_interval = [1, 2, 3, 4, 5]
-
 # Number of increments to test
 num_increments = 1  # For example, testing 2 increments on each side
 rounds = [2, 3, 4, 5]

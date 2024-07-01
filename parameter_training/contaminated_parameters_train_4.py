@@ -31,13 +31,14 @@ output_training_folder = 'contaminated_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
-maf_interval = [1]
+maf_interval = [4]
 
-cor_interval_search = [0.3, 0.5, 0.7]
-dp_interval_search = [0.1, 0.2, 0.3, 0.4]
-np_interval_search = [2.5, 3]
-pp_interval_search = [0.2, 0.3, 0.4]
-ii_interval_search = [0.1, 0.2, 0.3]
+cor_interval_search = [0.1, 0.3, 0.5, 0.7]
+dp_interval_search = [0.01, 0.1, 0.2, 0.3]
+np_interval_search = [1, 1.5, 2, 2.5, 3]
+pp_interval_search = [0.1, 0.2, 0.3, 0.4]
+ii_interval_search = [0.01, 0.1, 0.2, 0.3]
+
 
 
 parameters_interval_search = {

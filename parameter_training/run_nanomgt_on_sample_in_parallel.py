@@ -3,7 +3,7 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 
 # Define the path where the FASTQ files are located
-path = "/home/people/malhal/data/new_nanomgt/mixed_data/training_reads/"
+path = "/home/people/malhal/data/new_nanomgt/clean_data/training_reads/"
 
 # List all fastq files in the directory
 fastq_files = [f for f in os.listdir(path) if f.endswith('.fastq')]
@@ -19,7 +19,7 @@ def process_file(file):
     subprocess.run(command, shell=True)
 
 # Create a ThreadPoolExecutor to run processes in parallel
-with ThreadPoolExecutor(max_workers=4) as executor:
+with ThreadPoolExecutor(max_workers=8) as executor:
     # Map the process_file function to each FASTQ file
     executor.map(process_file, fastq_files)
 

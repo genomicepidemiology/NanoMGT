@@ -266,6 +266,10 @@ def calculate_best_parameters(file_name):
             parameters_data[key]['best_params'] = parameters
 
     # Extract the top-scoring combinations
+    if not parameters_data:
+        print("No data to analyze.")  # Or handle the empty case as needed
+        return None
+
     top_f1_score = max(data['best_f1_score'] for data in parameters_data.values())
     # If isolates are identical F1 will always be 0, so we exclude it from the training
     if top_f1_score is None or top_f1_score == 0:
@@ -525,7 +529,7 @@ def load_top_hit(file_path, param_to_fetch):
     return f1_score, param_value
 
 
-
+"""
 for maf in maf_interval:
     os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
     for folder in folders:
@@ -542,7 +546,7 @@ for maf in maf_interval:
                                      parameters_interval_search, maps_path, json_info_path, training_or_validation_extension_json)
                 #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, json_info_path,
                 #    0.1, 5, 15, 0.44, 5, 0.15)
-
+"""
 all_best_params = defaultdict(list)
 
 for maf in maf_interval:

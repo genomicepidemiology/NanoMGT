@@ -266,6 +266,10 @@ def calculate_best_parameters(file_name):
             parameters_data[key]['best_params'] = parameters
 
     # Extract the top-scoring combinations
+    if not parameters_data:
+        print("No data to analyze.")  # Or handle the empty case as needed
+        return None
+
     top_f1_score = max(data['best_f1_score'] for data in parameters_data.values())
     # If isolates are identical F1 will always be 0, so we exclude it from the training
     if top_f1_score is None or top_f1_score == 0:
@@ -286,6 +290,7 @@ def calculate_best_parameters(file_name):
     sorted_top_parameters = sorted(top_parameters, key=sort_key)
 
     return sorted_top_parameters[0]
+
 def load_default_parameters(file_path):
     with open(file_path, 'r') as file:
         return json.load(file)

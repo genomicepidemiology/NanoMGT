@@ -20,25 +20,24 @@ sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + s
 
 from nanomgt import nanopore_variantcaller as nvc
 
-alignment_results_path = '/home/projects/cge/people/malhal/nanomgt_new_results/contaminated/'
+alignment_results_path = '/home/projects/cge/people/malhal/nanomgt_new_results/clean/'
 maps_path = '/home/projects/cge/people/malhal/nanomgt_reads/variant_maps/'
-json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batches_contaminated'
+json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batches_clean'
 training_or_validation_extension_json = '_training.json'
 files = os.listdir(alignment_results_path)
 folders = [f for f in os.listdir(alignment_results_path)]
 
-output_training_folder = 'contaminated_training_output'
+output_training_folder = 'clean_training_output'
 os.makedirs(output_training_folder, exist_ok=True)
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 
-maf_interval = [1]
+maf_interval = [3]
 
-cor_interval_search = [0.3, 0.5, 0.7]
-dp_interval_search = [0.1, 0.2, 0.3, 0.4]
-np_interval_search = [2.5, 3]
-pp_interval_search = [0.2, 0.3, 0.4]
-ii_interval_search = [0.1, 0.2, 0.3]
-
+cor_interval_search = [0.1, 0.3, 0.5, 0.7]
+dp_interval_search = [0.01, 0.1, 0.2, 0.3]
+np_interval_search = [1, 1.5, 2, 2.5, 3]
+pp_interval_search = [0.1, 0.2, 0.3, 0.4]
+ii_interval_search = [0.01, 0.1, 0.2, 0.3]
 
 parameters_interval_search = {
     'cor_interval': cor_interval_search,
