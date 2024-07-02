@@ -670,7 +670,7 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
 
     co_occurrence_tmp_dict = {}
     mutation_threshold_dict = {}  # New dictionary to store mutation thresholds
-    print (ii, pp, np, cor, dp)
+    print (pp, np, cor, dp)
 
     co_occurrence_matrix_dict = derive_co_occurence_matrix(confirmed_mutation_dict, reads_mutation_dict)
 
