@@ -330,6 +330,9 @@ def snv_convergence(output_path, maf, cor, np, pp, dp, proxi, dp_window, ii,
     original_dp = dp
     start_time = time.time()
 
+    print (cor, dp, ii, np, pp)
+    sys.exit()
+
     with open(output_path + '/convergence_results.txt', 'w') as convergence_file:
         print('Iterations,Mutations', file=convergence_file)
 
