@@ -670,7 +670,7 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
 
     co_occurrence_tmp_dict = {}
     mutation_threshold_dict = {}  # New dictionary to store mutation thresholds
-    print (pp, np, cor, dp)
+    print (pp, np, cor, dp, maf)
 
     co_occurrence_matrix_dict = derive_co_occurence_matrix(confirmed_mutation_dict, reads_mutation_dict)
 
@@ -689,6 +689,7 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
                 mutation = mutation_list[i]
                 position = int(mutation.split('_')[0])
                 position_depth = sum(consensus_dict[allele][0][position - 1])
+                print ('position_depth', position_depth)
                 mutation_depth = depth_list[i]
                 proxi_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation, proxi)
                 density_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation, dp_window)
@@ -746,6 +747,8 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
                 mutation = confirmed_mutation_dict[allele][0][0]
                 position = int(mutation.split('_')[0])
                 position_depth = sum(consensus_dict[allele][0][position - 1])
+                print ('position_depth', position_depth)
+
                 mutation_threshold = position_depth * maf
                 print ('mutation_threshold')
                 print (mutation_threshold)
