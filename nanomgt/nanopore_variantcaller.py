@@ -32,9 +32,6 @@ def nanopore_metagenomics_variantcaller(arguments):
 
     arguments = initialize_parameters(arguments, auto_cor, auto_ii, auto_pp, auto_np, auto_dp)
 
-    print (arguments)
-    sys.exit()
-
     set_up_output_and_check_input(arguments)
 
     # Run KMA alignment for bacteria mapping
