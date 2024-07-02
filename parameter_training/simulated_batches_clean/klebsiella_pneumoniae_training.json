@@ -1,1 +1,222 @@
-[]
+[
+    {
+        "batch_id": 1,
+        "minority_abundance": {
+            "Majority": {
+                "ERR8958737": 99
+            },
+            "Minority": {
+                "SRR27348733": 1
+            }
+        }
+    },
+    {
+        "batch_id": 2,
+        "minority_abundance": {
+            "Majority": {
+                "SRR27348733": 99
+            },
+            "Minority": {
+                "ERR8958737": 1
+            }
+        }
+    },
+    {
+        "batch_id": 3,
+        "minority_abundance": {
+            "Majority": {
+                "ERR8958737": 98
+            },
+            "Minority": {
+                "SRR27348733": 2
+            }
+        }
+    },
+    {
+        "batch_id": 4,
+        "minority_abundance": {
+            "Majority": {
+                "SRR27348733": 98
+            },
+            "Minority": {
+                "ERR8958737": 2
+            }
+        }
+    },
+    {
+        "batch_id": 5,
+        "minority_abundance": {
+            "Majority": {
+                "ERR8958737": 97
+            },
+            "Minority": {
+                "SRR27348733": 3
+            }
+        }
+    },
+    {
+        "batch_id": 6,
+        "minority_abundance": {
+            "Majority": {
+                "SRR27348733": 97
+            },
+            "Minority": {
+                "ERR8958737": 3
+            }
+        }
+    },
+    {
+        "batch_id": 7,
+        "minority_abundance": {
+            "Majority": {
+                "ERR8958737": 96
+            },
+            "Minority": {
+                "SRR27348733": 4
+            }
+        }
+    },
+    {
+        "batch_id": 8,
+        "minority_abundance": {
+            "Majority": {
+                "SRR27348733": 96
+            },
+            "Minority": {
+                "ERR8958737": 4
+            }
+        }
+    },
+    {
+        "batch_id": 9,
+        "minority_abundance": {
+            "Majority": {
+                "ERR8958737": 95
+            },
+            "Minority": {
+                "SRR27348733": 5
+            }
+        }
+    },
+    {
+        "batch_id": 10,
+        "minority_abundance": {
+            "Majority": {
+                "SRR27348733": 95
+            },
+            "Minority": {
+                "ERR8958737": 5
+            }
+        }
+    },
+    {
+        "batch_id": 11,
+        "minority_abundance": {
+            "Majority": {
+                "ERR8958737": 94
+            },
+            "Minority": {
+                "SRR27348733": 6
+            }
+        }
+    },
+    {
+        "batch_id": 12,
+        "minority_abundance": {
+            "Majority": {
+                "SRR27348733": 94
+            },
+            "Minority": {
+                "ERR8958737": 6
+            }
+        }
+    },
+    {
+        "batch_id": 13,
+        "minority_abundance": {
+            "Majority": {
+                "ERR8958737": 93
+            },
+            "Minority": {
+                "SRR27348733": 7
+            }
+        }
+    },
+    {
+        "batch_id": 14,
+        "minority_abundance": {
+            "Majority": {
+                "SRR27348733": 93
+            },
+            "Minority": {
+                "ERR8958737": 7
+            }
+        }
+    },
+    {
+        "batch_id": 15,
+        "minority_abundance": {
+            "Majority": {
+                "ERR8958737": 92
+            },
+            "Minority": {
+                "SRR27348733": 8
+            }
+        }
+    },
+    {
+        "batch_id": 16,
+        "minority_abundance": {
+            "Majority": {
+                "SRR27348733": 92
+            },
+            "Minority": {
+                "ERR8958737": 8
+            }
+        }
+    },
+    {
+        "batch_id": 17,
+        "minority_abundance": {
+            "Majority": {
+                "ERR8958737": 91
+            },
+            "Minority": {
+                "SRR27348733": 9
+            }
+        }
+    },
+    {
+        "batch_id": 18,
+        "minority_abundance": {
+            "Majority": {
+                "SRR27348733": 91
+            },
+            "Minority": {
+                "ERR8958737": 9
+            }
+        }
+    },
+    {
+        "batch_id": 19,
+        "minority_abundance": {
+            "Majority": {
+                "ERR8958737": 90
+            },
+            "Minority": {
+                "SRR27348733": 10
+            }
+        }
+    },
+    {
+        "batch_id": 20,
+        "minority_abundance": {
+            "Majority": {
+                "SRR27348733": 90
+            },
+            "Minority": {
+                "ERR8958737": 10
+            }
+        }
+    }
+]

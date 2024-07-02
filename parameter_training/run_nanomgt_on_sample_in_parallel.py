@@ -3,7 +3,7 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 
 # Define the path where the FASTQ files are located
-path = "/home/people/malhal/data/new_nanomgt/mixed_data/"
+path = "/home/people/malhal/data/new_nanomgt/contaminated_data/training_reads/"
 
 # List all fastq files in the directory
 fastq_files = [f for f in os.listdir(path) if f.endswith('.fastq')]
@@ -15,11 +15,11 @@ def process_file(file):
 
     # Construct the command to run NanoMGT with specified parameters
     command = f"~/NanoMGT/bin/nanomgt --nanopore {input_file_path} --o {output_name} " \
-              f"--threads 1 --db_dir ~/nanomgt_db/ --cor 0 --np 0 --dp 0 --pp 0 --ii 0 --maf 0.05"
+              f"--threads 2 --db_dir ~/nanomgt_db/ --cor 0 --np 0 --dp 0 --pp 0 --ii 0 --maf 0.05"
     subprocess.run(command, shell=True)
 
 # Create a ThreadPoolExecutor to run processes in parallel
-with ThreadPoolExecutor(max_workers=8) as executor:
+with ThreadPoolExecutor(max_workers=10) as executor:
     # Map the process_file function to each FASTQ file
     executor.map(process_file, fastq_files)
 

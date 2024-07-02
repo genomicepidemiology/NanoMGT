@@ -1,7 +1,7 @@
 {
     "Campylobacter jejuni": [
-        "SRR27710526",
-        "SRR27710532"
+        "SRR27638397",
+        "SRR27710526"
     ],
     "Escherichia coli": [
         "SRR28370668",
@@ -13,13 +13,19 @@
     "Klebsiella pneumoniae": [
         "ERR8958810",
         "ERR8958737",
-        "SRR27348733"
+        "SRR27348733",
+        "SRR29213739",
+        "SRR24833081"
     ],
     "Staphylococcus aureus": [
+        "SRR28370694",
+        "SRR28370638",
+        "SRR25865495"
     ],
     "Salmonella enterica": [
         "SRR27755684",
-        "SRR27755678"
+        "SRR27755678",
+        "SRR26899146"
     ],
     "Listeria monocytogenes": [
         "SRR27755667",

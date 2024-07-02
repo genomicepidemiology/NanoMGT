@@ -4,14 +4,14 @@ import itertools
 import random
 
 # Define the directory for output
-output_dir = 'simulated_batches_contaminated'
+output_dir = 'simulated_batches_clean'
 os.makedirs(output_dir, exist_ok=True)
 
 # Load training and validation sets
-with open('training_set_contaminated_isolates.json', 'r') as f:
+with open('training_set_clean_isolates.json', 'r') as f:
     training_set = json.load(f)
 
-with open('validation_set_contaminated_isolates.json', 'r') as f:
+with open('validation_set_clean_isolates.json', 'r') as f:
     validation_set = json.load(f)
 
 def generate_combinations(isolates, num_batches):
