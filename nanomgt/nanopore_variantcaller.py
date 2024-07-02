@@ -612,6 +612,40 @@ def derive_mutation_positions(consensus_dict, min_n, maf, cor):
 
     return all_confirmed_mutation_dict
 
+
+def derive_co_occurence_matrix(confirmed_mutation_dict, reads_mutation_dict):
+    co_occurrence_matrix_dict = {}
+
+    for allele in confirmed_mutation_dict:
+        mutation_list = confirmed_mutation_dict[allele][0]
+        num_mutations = len(mutation_list)
+
+        if num_mutations > 1:
+            # Initialize a square matrix of zero with size based on number of mutations
+            co_occurrence_matrix = [[0] * num_mutations for _ in range(num_mutations)]
+
+            for read in reads_mutation_dict:
+                read_allele = read.split(' ')[1]
+                if read_allele == allele:
+                    read_mutations = reads_mutation_dict[read]
+                    valid_mutations = [mutation for mutation in read_mutations if mutation in mutation_list]
+
+                    if len(valid_mutations) > 1:
+                        # Compare each mutation with each other mutation
+                        for i in range(len(valid_mutations)):
+                            for j in range(i + 1, len(valid_mutations)):
+                                mutation1 = mutation_list.index(valid_mutations[i])
+                                mutation2 = mutation_list.index(valid_mutations[j])
+                                # Increase the count for both symmetrical entries in the matrix
+                                co_occurrence_matrix[mutation1][mutation2] += 1
+                                co_occurrence_matrix[mutation2][mutation1] += 1
+
+            # Save the matrix and the associated mutation list in a dictionary
+            co_occurrence_matrix_dict[allele] = [co_occurrence_matrix, mutation_list]
+
+    return co_occurrence_matrix_dict
+
+
 def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_mutation_dict, consensus_dict,
                           bio_validation_dict, reads_mutation_dict, min_n):
     """
@@ -635,27 +669,9 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
     """
 
     co_occurrence_tmp_dict = {}
-    co_occurrence_matrix_dict = {}
     mutation_threshold_dict = {}  # New dictionary to store mutation thresholds
 
-    for allele in confirmed_mutation_dict:
-        mutation_list = confirmed_mutation_dict[allele][0]
-        num_mutations = len(mutation_list)
-        if num_mutations > 1:
-            co_occurrence_matrix = [[0] * num_mutations for _ in range(num_mutations)]
-            for read in reads_mutation_dict:
-                read_allele = read.split(' ')[1]
-                if read_allele == allele:
-                    read_mutations = reads_mutation_dict[read]
-                    valid_mutations = [mutation for mutation in read_mutations if mutation in mutation_list]
-                    if len(valid_mutations) > 1:
-                        for i in range(len(valid_mutations)):
-                            for j in range(i + 1, len(valid_mutations)):
-                                mutation1 = mutation_list.index(valid_mutations[i])
-                                mutation2 = mutation_list.index(valid_mutations[j])
-                                co_occurrence_matrix[mutation1][mutation2] += 1
-                                co_occurrence_matrix[mutation2][mutation1] += 1
-            co_occurrence_matrix_dict[allele] = [co_occurrence_matrix, mutation_list]
+    co_occurrence_matrix_dict = derive_co_occurence_matrix(confirmed_mutation_dict, reads_mutation_dict)
 
     adjusted_mutation_dict = {}
     for allele in confirmed_mutation_dict:
