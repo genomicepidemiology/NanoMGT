@@ -572,16 +572,18 @@ def collect_and_store_best_params(maf_interval, folders, output_training_folder,
     for maf in maf_interval:
         average_best_params = {}
         for folder in folders:
+            print (folder)
             batch_id = int(folder.split('_')[-1])
             if batch_id > 10:
                 batch_id -= 10
             if batch_id >= maf:
                 results_filename = os.path.join(output_training_folder, f"maf_{maf}", folder, "all_results.csv")
                 best_params = calculate_best_parameters(results_filename)
-                if best_params is not None:
+                if best_params != None:
                     for param, value in best_params.items():
-                        if param[1:] in param_list:
-                            all_best_params[param[1:]].append(value)
+                        param_name = param[1:]
+                        if param_name in param_list:
+                            all_best_params[param_name].append(value)
         for param in param_list:
             if param in all_best_params:
                 average_value = sum(all_best_params[param]) / len(all_best_params[param])
