@@ -110,6 +110,7 @@ def benchmark_analysis_result(sample, json_file_path, maps_path, training_or_val
     batch_id = int(sample.split('_')[-1])
     species = sample.split('_')[0] + '_' + sample.split('_')[1]
 
+    print (json_file_path + '/' + species + training_or_validation_extension_json)
     # Load JSON data
     with open(json_file_path + '/' + species + training_or_validation_extension_json, 'r') as file:
         data = json.load(file)
