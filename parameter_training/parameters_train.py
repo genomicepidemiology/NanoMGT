@@ -200,6 +200,9 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
     minor_mutation_expected = benchmark_analysis_result(sample, json_info_path, maps_path, training_or_validation_extension_json)
 
+    print (minor_mutation_expected)
+
+    sys.exit()
 
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
         futures_to_params = {
@@ -572,18 +575,16 @@ def collect_and_store_best_params(maf_interval, folders, output_training_folder,
     for maf in maf_interval:
         average_best_params = {}
         for folder in folders:
-            print (folder)
             batch_id = int(folder.split('_')[-1])
             if batch_id > 10:
                 batch_id -= 10
             if batch_id >= maf:
                 results_filename = os.path.join(output_training_folder, f"maf_{maf}", folder, "all_results.csv")
                 best_params = calculate_best_parameters(results_filename)
-                if best_params != None:
+                if best_params is not None:
                     for param, value in best_params.items():
-                        param_name = param[1:]
-                        if param_name in param_list:
-                            all_best_params[param_name].append(value)
+                        if param[1:] in param_list:
+                            all_best_params[param[1:]].append(value)
         for param in param_list:
             if param in all_best_params:
                 average_value = sum(all_best_params[param]) / len(all_best_params[param])
@@ -599,6 +600,7 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
         maf_folder = f"maf_{maf}"
         maf_path = setup_directory(output_training_folder, maf_folder)
         for folder in folders:
+            print (folder)
             batch_id = int(folder.split('_')[-1])
             if batch_id > 10:
                 batch_id -= 10
