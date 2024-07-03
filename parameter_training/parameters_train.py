@@ -516,31 +516,6 @@ def process_directory(directory):
 
     return result_dict
 
-def load_top_hit(file_path, param_to_fetch):
-    df = pd.read_csv(file_path)
-
-    if df.isnull().values.any() or df.empty:
-        return None, None
-
-    top_hit = df.iloc[0]
-    f1_score = top_hit['F1 Score']
-    parameters = top_hit['Parameters']
-
-    if isinstance(parameters, bytes):
-        parameters = parameters.decode('utf-8')
-    elif not isinstance(parameters, str):
-        parameters = str(parameters)
-
-    param_pattern = r'{}_([0-9.]+)'.format(param_to_fetch)
-    match = re.search(param_pattern, parameters)
-    if match:
-        param_value = float(match.group(1))
-    else:
-        raise ValueError(f"Parameter {param_to_fetch} not found in the parameters string.")
-
-    return f1_score, param_value
-
-
 
 # Functions
 def setup_folders(maf_interval, alignment_results_path):
