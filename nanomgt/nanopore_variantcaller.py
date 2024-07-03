@@ -689,7 +689,6 @@ def convergence_threshold(maf, cor, np, pp, dp, proxi, dp_window, confirmed_muta
                 mutation = mutation_list[i]
                 position = int(mutation.split('_')[0])
                 position_depth = sum(consensus_dict[allele][0][position - 1])
-                print ('position_depth', position_depth)
                 mutation_depth = depth_list[i]
                 proxi_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation, proxi)
                 density_mutations = find_mutations_proximity_specific_mutation(mutation_list, mutation, dp_window)
