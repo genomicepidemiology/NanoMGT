@@ -10,6 +10,8 @@ from nanomgt import kma
 from nanomgt import util
 from itertools import combinations
 from scipy.interpolate import UnivariateSpline
+from scipy.interpolate import interp1d
+
 
 from nanomgt.nanopore_mutations import parse_sam_and_find_mutations
 from nanomgt.nanopore_mutations import extract_alignment
