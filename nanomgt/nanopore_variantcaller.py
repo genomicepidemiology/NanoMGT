@@ -16,7 +16,7 @@ from nanomgt.nanopore_mutations import extract_alignment
 from nanomgt.nanopore_mutations import create_mutation_vector
 import nanomgt.curve_functions as cf
 
-script_path = os.path.realpath(__file__)
+script_path = os.path.dirname(os.path.realpath(__file__))
 sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + sys.path
 
 def nanopore_metagenomics_variantcaller(arguments):
