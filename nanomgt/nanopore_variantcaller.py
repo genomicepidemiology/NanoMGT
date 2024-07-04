@@ -29,7 +29,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     """
     # Set up output directory and verify input file
 
-    print (sys.path)
+    print (sys.path[0])
     auto_cor, auto_ii, auto_pp, auto_np, auto_dp = load_parameters(arguments.maf, arguments.model_file)
 
     print (auto_cor, auto_ii, auto_pp, auto_np, auto_dp)
