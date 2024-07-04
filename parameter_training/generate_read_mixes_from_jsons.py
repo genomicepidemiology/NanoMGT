@@ -5,7 +5,7 @@ import random
 import subprocess
 
 # Define the directory containing the JSON files
-json_directory = '/home/people/malhal/data/new_nanomgt/mixed_data'
+json_directory = '/home/people/malhal/data/new_nanomgt/clean_data/170'
 read_dir = '/home/people/malhal/data/new_nanomgt/mixed_data'
 
 # Automatically find all training and validation JSON files
@@ -96,13 +96,14 @@ def simulate_batches(type_key, species, ids, genome_size, batch_info, output_dir
 # Process each species
 # Process each species
 for type_key in ['training', 'validation']:
-    for species, ids in species_sequencing_ids.items():
-        species_underscored = species.split()[0] + '_' + species.split()[1]
-        formatted_species = species[0].upper() + species[1:]
-        genome_size = genome_sizes.get(formatted_species, None)
-        if genome_size:
-            output_directory_base = f'simulated_{species_underscored}_{type_key}'
-            simulate_batches(type_key, species, ids, genome_size, batch_info, output_directory_base)
+    if batch_info[type_key] != {}:
+        for species, ids in species_sequencing_ids.items():
+            species_underscored = species.split()[0] + '_' + species.split()[1]
+            formatted_species = species[0].upper() + species[1:]
+            genome_size = genome_sizes.get(formatted_species, None)
+            if genome_size:
+                output_directory_base = f'simulated_{species_underscored}_{type_key}'
+                simulate_batches(type_key, species, ids, genome_size, batch_info, output_directory_base)
 
 
-print("Simulation complete.")
+    print("Simulation complete.")

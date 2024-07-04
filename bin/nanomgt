@@ -54,6 +54,8 @@ def main():
                         help='Iteration increase. Value is based on the MAF value. Default: auto')
     parser.add_argument('--q_score', action="store", type=int, dest='q_score', default=14,
                         help='Minimum average q-score for reads to be included. Default: 14')
+    parser.add_argument('--model_file', action="store", type=str, dest='model_file', default='clean_parameters.json',
+                        help='JSON model file')
     parser.add_argument('--majority_alleles_only', action="store_true", dest='majority_alleles_only',
                         help='Only output majority alleles.')
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')

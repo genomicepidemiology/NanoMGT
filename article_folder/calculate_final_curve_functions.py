@@ -3,6 +3,8 @@ import numpy as np
 from scipy.interpolate import UnivariateSpline
 import matplotlib.pyplot as plt
 
+model = 'mixed'
+
 # Define the parameter sets
 parameters_list = []
 
@@ -80,7 +82,7 @@ for idx, (name, data) in enumerate(zip(['cor', 'iteration', 'pp', 'np', 'dp'],
     spline_data = {str(x): float(y) for x, y in zip(fine_x_values, spline_fit_fine)}
 
     # Save each spline fit to a JSON file
-    with open(f'{name}_spline_fits.json', 'w') as f:
+    with open(f'{model}_{name}.json', 'w') as f:
         json.dump(spline_data, f)
 
     # Plotting on subplots

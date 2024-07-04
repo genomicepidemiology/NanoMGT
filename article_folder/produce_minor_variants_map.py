@@ -1,5 +1,6 @@
 import re
 import sys
+import os
 from Bio import pairwise2
 from Bio.Seq import Seq
 
@@ -234,73 +235,63 @@ def find_close_mutations(mutations):
     # Return the set of close mutations
     return close_mutations
 
+def load_ids_from_directory(directory):
+    ids = []
+    for filename in os.listdir(directory):
+        if filename.startswith("ERR") or filename.startswith("SRR"):
+            ids.append(filename.split('_')[1])
+    return ids
 
-# Escherichia coli
-#ecoli_sequencing_ids = ['SRR25689478', 'SRR26036455', 'SRR25608259']
-ecoli_sequencing_ids = ['SRR25689478', 'ERR12533301', 'SRR26036455']
-
-# Staphylococcus aureus
-staph_aureus_sequencing_ids = ['SRR28370694', 'ERR8958843']
-
-# Campylobacter jejuni
-campylobacter_jejuni_sequencing_ids = ['SRR27638397', 'SRR27710526']
-
-# Salmonella enterica
-salmonella_enterica_sequencing_ids = ['SRR28399428', 'SRR27136088', 'SRR27755678']
+#ids = load_ids_from_directory(directory)
 
 
-klebsiella_pneumoniae_sequencing_ids = ['ERR8958737', 'SRR27348733']
+txt_files = os.listdir('/home/people/malhal/test/mixed_isolates_nanomgt/variant_maps')
 
-combined_list_of_ids = [ecoli_sequencing_ids, staph_aureus_sequencing_ids, campylobacter_jejuni_sequencing_ids, salmonella_enterica_sequencing_ids, klebsiella_pneumoniae_sequencing_ids]
-
-#print (combined_list_of_ids)
-
-#for item in combined_list_of_ids:
-for item in combined_list_of_ids:
-    for j in item:
-        for k in item:
-            if j != k:
-                print (j, k)
-                print ('major_{}_minor_{}.txt'.format(k, j))
-                mutations_in_proximity = 0
-                novel_mutation_count = 0
-                total_mutations = 0
-                proximity_mutations = []
-                total_proximity_density = 0
-                with open('major_{}_minor_{}.txt'.format(k, j), 'w') as write_file:
-                    query_dict = load_majority_seqs_from_fasta_file(f'/home/people/malhal/data/new_nanomgt/majority_variants/{j}/majority_seqs.fasta')
-                    ref_dict = load_majority_seqs_from_fasta_file(f'/home/people/malhal/data/new_nanomgt/majority_variants/{k}/majority_seqs.fasta')
-                    bio_validation_dict = bio_validation_mutations(query_dict, '/home/people/malhal/data/new_nanomgt/majority_variants/' + k + '/specie.fsa')
-                    for key in query_dict:
-                        mutations = []
-                        if key not in ref_dict:
-                            print (f"Reference sequence not found for {key}")
-                            sys.exit()
-                        query = query_dict[key]
-                        ref = ref_dict[key]
-                        alignment_query, alignment_ref = align_and_identify_mutations(query, ref)
-                        mutation_vector = create_mutation_vector(alignment_ref, alignment_query)
-                        mutations = identify_mutations(mutation_vector, ref)
+for item in txt_files:
+    if item.endswith('txt'):
+        basename = item[:-4]
+        k = basename.split('_')[1]
+        j = basename.split('_')[3]
+        print (j, k)
+        mutations_in_proximity = 0
+        novel_mutation_count = 0
+        total_mutations = 0
+        proximity_mutations = []
+        total_proximity_density = 0
+        with open('major_{}_minor_{}.txt'.format(k, j), 'w') as write_file:
+            query_dict = load_majority_seqs_from_fasta_file(f'/home/people/malhal/test/mixed_isolates_nanomgt/{j}/majority_seqs.fasta')
+            ref_dict = load_majority_seqs_from_fasta_file(f'/home/people/malhal/test/mixed_isolates_nanomgt//{k}/majority_seqs.fasta')
+            bio_validation_dict = bio_validation_mutations(query_dict, '/home/people/malhal/test/mixed_isolates_nanomgt/' + k + '/specie.fsa')
+            for key in query_dict:
+                mutations = []
+                if key not in ref_dict:
+                    print (f"Reference sequence not found for {key}")
+                    sys.exit()
+                query = query_dict[key]
+                ref = ref_dict[key]
+                alignment_query, alignment_ref = align_and_identify_mutations(query, ref)
+                mutation_vector = create_mutation_vector(alignment_ref, alignment_query)
+                mutations = identify_mutations(mutation_vector, ref)
 
 
-                        if mutations != []:
-                            total_mutations += len(mutations)
-                            print (key, file = write_file)
-                            print (",".join(mutations), file = write_file)
-                            proxi_mutations = find_close_mutations(mutations)
-                            mutations_in_proximity += len(proxi_mutations)
-                            if len(proxi_mutations) > 0:
-                                proximity_density, num_mutations = calculate_proximity_density(proxi_mutations)
-                                total_proximity_density += proximity_density
-                            for mutation in mutations:
-                                biological_existence = check_single_mutation_existence(bio_validation_dict, key,
-                                                                                       mutation)
-                                if not biological_existence:
-                                    novel_mutation_count += 1
-                                    print (key, mutation)
-                    print (f"Total mutations: {total_mutations}")
-                    print (f"Novel mutations: {novel_mutation_count}")
-                    print (f"Mutations in proximity: {mutations_in_proximity}")
-                    print (f"Total density: {total_proximity_density}")
-                    if mutations_in_proximity > 0:
-                        print (f"Average proximity density: {total_proximity_density/mutations_in_proximity}")
+                if mutations != []:
+                    total_mutations += len(mutations)
+                    print (key, file = write_file)
+                    print (",".join(mutations), file = write_file)
+                    proxi_mutations = find_close_mutations(mutations)
+                    mutations_in_proximity += len(proxi_mutations)
+                    if len(proxi_mutations) > 0:
+                        proximity_density, num_mutations = calculate_proximity_density(proxi_mutations)
+                        total_proximity_density += proximity_density
+                    for mutation in mutations:
+                        biological_existence = check_single_mutation_existence(bio_validation_dict, key,
+                                                                               mutation)
+                        if not biological_existence:
+                            novel_mutation_count += 1
+                            print (key, mutation)
+            print (f"Total mutations: {total_mutations}")
+            print (f"Novel mutations: {novel_mutation_count}")
+            print (f"Mutations in proximity: {mutations_in_proximity}")
+            print (f"Total density: {total_proximity_density}")
+            if mutations_in_proximity > 0:
+                print (f"Average proximity density: {total_proximity_density/mutations_in_proximity}")

@@ -29,7 +29,10 @@ def nanopore_metagenomics_variantcaller(arguments):
     """
     # Set up output directory and verify input file
 
-    auto_cor, auto_ii, auto_pp, auto_np, auto_dp = load_parameters(arguments.maf)
+    auto_cor, auto_ii, auto_pp, auto_np, auto_dp = load_parameters(arguments.maf, arguments.model_file)
+
+    print (auto_cor, auto_ii, auto_pp, auto_np, auto_dp)
+    sys.exit()
 
     arguments = initialize_parameters(arguments, auto_cor, auto_ii, auto_pp, auto_np, auto_dp)
 
@@ -137,44 +140,39 @@ def initialize_parameters(arguments, auto_cor, auto_ii, auto_pp, auto_np, auto_d
     return arguments
 
 
-def load_parameters(maf_value):
-    # Names of the parameters and their corresponding JSON files
-    parameters = {
-        'cor': cf.load_cor(),
-        'iteration': cf.load_ii(),
-        'pp': cf.load_pp(),
-        'np': cf.load_np(),
-        'dp': cf.load_dp()
-    }
+
+def load_spline_from_json(parameter_dict):
+    # Convert the keys and values to float and sort them
+    sorted_keys = sorted(parameter_dict.keys(), key=lambda x: float(x))
+    sorted_values = [parameter_dict[key] for key in sorted_keys]
+
+    # Create the spline (linear interpolation in this case)
+    spline = interp1d([float(k) for k in sorted_keys], sorted_values, kind='linear', fill_value="extrapolate")
+    return spline
+
+def calculate_parameter_value(spline, maf_value):
+    return float(spline(maf_value))
+
+def load_parameters(maf_value, model_file):
+    # Load the model file
+    with open(model_file, 'r') as file:
+        model_data = json.load(file)
 
     splines = {}
 
-    # Load splines from JSON files
-    for param, filename in parameters.items():
-        splines[param] = load_spline_from_json(parameters[param])
+    # Load splines from model data for each parameter
+    for param in ['cor', 'ii', 'pp', 'dp', 'np']:
+        splines[param] = load_spline_from_json(model_data[param])
 
-    # Calculate and print the parameters values for the given MAF
+    # Calculate and return the parameters values for the given MAF
     results = {}
     for param, spline in splines.items():
         value = calculate_parameter_value(spline, maf_value)
         results[param] = value
 
-    return results['cor'], results['iteration'], results['pp'], results['np'], results['dp']
+    return results['cor'], results['ii'], results['pp'], results['np'], results['dp']
 
 
-def load_spline_from_json(data):
-    # Convert keys back to floats and sort by keys
-    x_values = np.array(sorted(map(float, data.keys())))
-    y_values = np.array([data[str(x)] for x in x_values])
-    spline = UnivariateSpline(x_values, y_values, s=None)
-    return spline
-
-
-def calculate_parameter_value(spline, maf):
-    """ Calculate the parameter value for a given maf using the spline. """
-    value = spline(maf)
-    # Ensure that the value is non-negative
-    return max(value, 0)
 
 
 def print_majority_alelles(consensus_dict, output_path):
