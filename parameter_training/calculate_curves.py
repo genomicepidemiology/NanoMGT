@@ -3,7 +3,7 @@ import numpy as np
 from scipy.interpolate import UnivariateSpline
 import matplotlib.pyplot as plt
 
-
+"""
 model = 'mixed'
 # Updated parameter sets based on your new values
 parameters_list = [
@@ -14,7 +14,7 @@ parameters_list = [
     {'np_interval': [2.793], 'pp_interval': [0.218], 'dp_interval': [0.131], 'iteration_increase_interval': [0.103], 'cor_interval': [0.536]}
 ]
 
-"""
+
 model = 'clean'
 # Data for "clean" category
 parameters_list = [
@@ -25,7 +25,7 @@ parameters_list = [
     {'np_interval': [2.009], 'pp_interval': [0.186], 'dp_interval': [0.144], 'iteration_increase_interval': [0.0497], 'cor_interval': [0.459]}
 ]
 
-
+"""
 model = 'contaminated'
 # Data for "clean" category
 parameters_list = [
@@ -35,7 +35,7 @@ parameters_list = [
     {'np_interval': [3.719], 'pp_interval': [0.274], 'dp_interval': [0.151], 'iteration_increase_interval': [0.1301], 'cor_interval': [0.503]},
     {'np_interval': [3.451], 'pp_interval': [0.233], 'dp_interval': [0.145], 'iteration_increase_interval': [0.118], 'cor_interval': [0.513]}
 ]
-"""
+
 
 # Initialize lists for each parameter type
 cor_intervals = []
@@ -56,7 +56,7 @@ x_values = np.linspace(0.01, 0.05, 5)  # Sequence of indices 0.01 through 0.05 f
 fine_x_values = np.linspace(0.01, 0.05, 500)  # Use 500 points for the desired output
 spline_results = {}
 
-for idx, (name, data) in enumerate(zip(['cor', 'iteration', 'pp', 'np', 'dp'],
+for idx, (name, data) in enumerate(zip(['cor', 'ii', 'pp', 'np', 'dp'],
                                        [cor_intervals, iteration_intervals, pp_intervals, np_intervals, dp_intervals])):
     # Calculate weights (optional) - for now, we skip weighting for simplicity
     spline = UnivariateSpline(x_values, data, s=None)
