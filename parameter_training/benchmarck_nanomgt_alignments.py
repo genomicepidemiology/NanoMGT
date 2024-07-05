@@ -112,6 +112,7 @@ def generate_spline_json(output_folder, maf_intervals, model_name):
         json.dump(spline_results, f, indent=4)
 
     print(f"Spline coefficients have been saved to {output_file}.")
+    
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, json_info_path,
                      ii, proxi, dp_window, pp, np, dp, consensus_dict, bio_validation_dict, minor_mutation_expected):
     confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, min_n, maf, cor)
@@ -213,7 +214,7 @@ def calculate_metrics(expected_mutations, actual_mutations):
 
     return precision, recall, f1, total_tp, total_fp, total_fn
 
-def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, parameters, maps_path, json_info_path, training_or_validation_extension_json):
+def benchmark_sample(max_workers, new_output_folder, alignment_folder, maf, parameters, maps_path, json_info_path, training_or_validation_extension_json):
     min_n = 3
     proxi = 5
     dp_window = 15
@@ -251,34 +252,20 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
     minor_mutation_expected = benchmark_analysis_result(sample, json_info_path, maps_path, training_or_validation_extension_json)
 
-    with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
-        futures_to_params = {
-            executor.submit(
-                train_parameters, maf, alignment_folder, min_n,
-                combo[0], new_output_folder, maps_path, json_info_path, combo[1], proxi, dp_window,
-                combo[2], combo[3], combo[4], consensus_dict, bio_validation_dict, minor_mutation_expected
-            ): combo for combo in all_params
-        }
+    f1, parameter_string, precision, recall, tp, fp, fn = train_parameters(maf, alignment_folder, min_n,
+                cor, new_output_folder, maps_path, json_info_path, ii, proxi, dp_window,
+                pp, np, dp, consensus_dict, bio_validation_dict, minor_mutation_expected)
 
-        for future in concurrent.futures.as_completed(futures_to_params):
-            params = futures_to_params[future]
-            processed_combinations += 1
-            print(f"Processed {processed_combinations}/{total_combinations} combinations.")
-            try:
-                result = future.result()
-                f1, parameter_string, precision, recall, tp, fp, fn = result
-                all_results.append([f1, parameter_string, precision, recall, tp, fp, fn])
+    all_results.append([f1, parameter_string, precision, recall, tp, fp, fn])
 
-                if f1 > best_score:
-                    best_score = f1
-                    best_params = parameter_string
-                    top_precision = precision
-                    top_recall = recall
-                    top_tp = tp
-                    top_fp = fp
-                    top_fn = fn
-            except Exception as exc:
-                print(f"Generated an exception: {exc}")
+    if f1 > best_score:
+        best_score = f1
+        best_params = parameter_string
+        top_precision = precision
+        top_recall = recall
+        top_tp = tp
+        top_fp = fp
+        top_fn = fn
 
     with open(results_filename, 'w', newline='') as file:
         writer = csv.writer(file)
@@ -560,7 +547,7 @@ def run_round_of_parameter_search(round_number, maf_interval, folders, output_tr
             if batch_id >= maf:
                 alignment_folder = os.path.join(alignment_results_path, folder)
                 new_output_folder = setup_directory(round_path, folder)
-                run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
+                benchmark_sample(cpus, new_output_folder, alignment_folder, maf / 100,
                                      parameters_interval_search, maps_path, json_info_path,
                                      training_or_validation_extension_json)
 
@@ -596,7 +583,7 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
         for folder in folders:
             alignment_folder = os.path.join(alignment_results_path, folder)
             new_output_folder = setup_directory(maf_path, folder)
-            run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
+            benchmark_sample(cpus, new_output_folder, alignment_folder, maf / 100,
                                  parameters_interval_search, maps_path, json_info_path,
                                  training_or_validation_extension_json)
 
