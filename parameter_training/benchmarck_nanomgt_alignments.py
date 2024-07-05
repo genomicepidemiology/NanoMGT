@@ -215,6 +215,7 @@ def calculate_metrics(expected_mutations, actual_mutations):
     return precision, recall, f1, total_tp, total_fp, total_fn
 
 def benchmark_sample(max_workers, new_output_folder, alignment_folder, maf, parameters, maps_path, json_info_path, training_or_validation_extension_json):
+    print (new_output_folder)
     min_n = 3
     proxi = 5
     dp_window = 15
@@ -496,28 +497,6 @@ def extract_param_value(parameter_string, param):
             except ValueError:
                 return None
     return None
-
-def process_directory(directory):
-    result_dict = {}
-
-    for filename in os.listdir(directory):
-        if filename.endswith(".csv"):
-            parts = filename.split('_')
-            param = parts[0]
-            maf = parts[1]
-
-            file_path = os.path.join(directory, filename)
-            df = pd.read_csv(file_path)
-
-            processed_results = determine_gradient_value(df, param)
-
-            if maf not in result_dict:
-                result_dict[maf] = {}
-
-            for result in processed_results:
-                result_dict[maf][param] = result['param_value_to_return']
-
-    return result_dict
 
 def setup_folders(maf_interval, alignment_results_path):
     folders = [f for f in os.listdir(alignment_results_path) if os.path.isdir(os.path.join(alignment_results_path, f))]
