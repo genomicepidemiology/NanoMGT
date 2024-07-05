@@ -219,11 +219,11 @@ def benchmark_sample(max_workers, new_output_folder, alignment_folder, maf, para
     proxi = 5
     dp_window = 15
 
-    cor_interval = parameters['cor_interval']
-    ii_interval = parameters['ii_interval']
-    pp_interval = parameters['pp_interval']
-    np_interval = parameters['np_interval']
-    dp_interval = parameters['dp_interval']
+    cor = parameters['cor_interval'][0]
+    ii = parameters['ii_interval'][0]
+    pp = parameters['pp_interval'][0]
+    np = parameters['np_interval'][0]
+    dp = parameters['dp_interval'][0]
 
     best_score = 0
     best_params = None
