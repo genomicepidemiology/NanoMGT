@@ -233,10 +233,6 @@ def benchmark_sample(max_workers, new_output_folder, alignment_folder, maf, para
     top_fp = None
     top_fn = None
 
-    all_params = list(product(cor_interval, ii_interval, pp_interval, np_interval, dp_interval))
-    total_combinations = len(all_params)
-    print(f"Total number of parameter combinations: {total_combinations}")
-
     results_filename = new_output_folder + "/all_results.csv"
     top_result_filename = new_output_folder + "/top_result.csv"
 
