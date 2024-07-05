@@ -1,18 +1,11 @@
 import os
 import sys
-import gzip
-import time
+import json
 import pandas as pd
 import numpy as np
 import csv
 import re
-import multiprocessing
-import json
-from Bio import SeqIO
-from itertools import combinations
 import concurrent.futures
-from itertools import product
-import argparse
 from collections import defaultdict
 from scipy.interpolate import UnivariateSpline
 
@@ -20,39 +13,107 @@ sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + s
 
 from nanomgt import nanopore_variantcaller as nvc
 
-alignment_results_path = '/home/projects/cge/people/malhal/nanomgt_new_results/mixed/'
+# Modify these paths as needed.
+alignment_results_path = '/home/projects/cge/people/malhal/nanomgt_new_results/clean_validation/'
 maps_path = '/home/projects/cge/people/malhal/nanomgt_reads/variant_maps/'
-json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batches_mixed'
-training_or_validation_extension_json = '_training.json'
-files = os.listdir(alignment_results_path)
-folders = [f for f in os.listdir(alignment_results_path)]
-
-output_training_folder = 'mixed_training_output'
-os.makedirs(output_training_folder, exist_ok=True)
+json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batches_clean'
+training_or_validation_extension_json = '_validation.json'
+output_training_folder = 'clean_benchmark'
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
+maf_interval = [5, 4, 3, 2, 1]
+cpus = 4
 
-maf_interval = [3]
+def main():
+    parameters_interval_search_maf_1 = {
+        'cor_interval': [0.5],
+        'ii_interval': [0.1],
+        'pp_interval': [0.2],
+        'np_interval': [3],
+        'dp_interval': [0.1]
+    }
 
-cor_interval_search = [0.1, 0.3, 0.5, 0.7]
-dp_interval_search = [0.01, 0.1, 0.2, 0.3, 0.4]
-np_interval_search = [1, 1.5, 2, 2.5, 3]
-pp_interval_search = [0.1, 0.1, 0.2, 0.3, 0.4]
-ii_interval_search = [0.01, 0.1, 0.2, 0.3]
+    parameters_interval_search_maf_2 = {
+        'cor_interval': [0.5],
+        'ii_interval': [0.1],
+        'pp_interval': [0.2],
+        'np_interval': [3],
+        'dp_interval': [0.1]
+    }
 
+    parameters_interval_search_maf_3 = {
+        'cor_interval': [0.5],
+        'ii_interval': [0.1],
+        'pp_interval': [0.2],
+        'np_interval': [3],
+        'dp_interval': [0.1]
+    }
 
-parameters_interval_search = {
-    'cor_interval': cor_interval_search,
-    'ii_interval': ii_interval_search,
-    'pp_interval': pp_interval_search,
-    'np_interval': np_interval_search,
-    'dp_interval': dp_interval_search
-}
+    parameters_interval_search_maf_4 = {
+        'cor_interval': [0.5],
+        'ii_interval': [0.1],
+        'pp_interval': [0.2],
+        'np_interval': [3],
+        'dp_interval': [0.1]
+    }
 
-cpus = 39
+    parameters_interval_search_maf_5 = {
+        'cor_interval': [0.5],
+        'ii_interval': [0.1],
+        'pp_interval': [0.2],
+        'np_interval': [3],
+        'dp_interval': [0.1]
+    }
 
+    all_parameter_intervals = {}
+    all_parameter_intervals[1] = parameters_interval_search_maf_1
+    all_parameter_intervals[2] = parameters_interval_search_maf_2
+    all_parameter_intervals[3] = parameters_interval_search_maf_3
+    all_parameter_intervals[4] = parameters_interval_search_maf_4
+    all_parameter_intervals[5] = parameters_interval_search_maf_5
+
+    for item in all_parameter_intervals:
+        folders = [f for f in os.listdir(alignment_results_path) if os.path.isdir(os.path.join(alignment_results_path, f))]
+        run_parameter_search(folders, [item], all_parameter_intervals[item], output_training_folder)
+
+def generate_spline_json(output_folder, maf_intervals, model_name):
+    parameter_files = [f"{output_folder}/5_round/maf_{maf}_average_best_params.json" for maf in maf_intervals]
+    parameters_list = []
+
+    for file_path in parameter_files:
+        with open(file_path, 'r') as f:
+            params = json.load(f)
+            parameters_list.append(params)
+
+    cor_intervals = []
+    iteration_intervals = []
+    pp_intervals = []
+    np_intervals = []
+    dp_intervals = []
+
+    for params in parameters_list:
+        cor_intervals.append(params.get('cor', 0))
+        iteration_intervals.append(params.get('ii', 0))
+        pp_intervals.append(params.get('pp', 0))
+        np_intervals.append(params.get('np', 0))
+        dp_intervals.append(params.get('dp', 0))
+
+    x_values = np.linspace(0.01, 0.05, len(parameters_list))
+    fine_x_values = np.linspace(0.01, 0.05, 500)
+    spline_results = {}
+
+    for name, data in zip(['cor', 'ii', 'pp', 'np', 'dp'],
+                          [cor_intervals, iteration_intervals, pp_intervals, np_intervals, dp_intervals]):
+        spline = UnivariateSpline(x_values, data, s=None)
+        spline_fit_fine = spline(fine_x_values)
+        spline_results[name] = {str(x): float(y) for x, y in zip(fine_x_values, spline_fit_fine)}
+
+    output_file = f'{model_name}.json'
+    with open(output_file, 'w') as f:
+        json.dump(spline_results, f, indent=4)
+
+    print(f"Spline coefficients have been saved to {output_file}.")
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, json_info_path,
-                    ii, proxi, dp_window, pp, np, dp, consensus_dict, bio_validation_dict, minor_mutation_expected):
-
+                     ii, proxi, dp_window, pp, np, dp, consensus_dict, bio_validation_dict, minor_mutation_expected):
     confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, min_n, maf, cor)
 
     confirmed_mutation_dict, co_occurrence_tmp_dict, iteration_count, mutation_threshold_dict =\
@@ -62,7 +123,7 @@ def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_pa
     parameter_string = f"maf_{maf}_cor_{cor}_pp_{pp}_np_{np}_dp_{dp}_ii_{ii}"
 
     nvc.format_output(new_output_folder, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
-                  co_occurrence_tmp_dict, mutation_threshold_dict, parameter_string)
+                      co_occurrence_tmp_dict, mutation_threshold_dict, parameter_string)
 
     minor_mutation_results = convert_mutation_dict_to_object(confirmed_mutation_dict)
 
@@ -97,10 +158,6 @@ def load_mutations_from_files(file_paths):
 
     return mutations_dict
 
-def get_number_of_columns(dataframe):
-    return dataframe.shape[1]
-
-
 def benchmark_analysis_result(sample, json_file_path, maps_path, training_or_validation_extension_json):
     batch_id = int(sample.split('_')[-1])
     species = sample.split('_')[0] + '_' + sample.split('_')[1]
@@ -123,7 +180,6 @@ def benchmark_analysis_result(sample, json_file_path, maps_path, training_or_val
     mutation_map = load_mutations_from_files(map_files)
 
     return mutation_map
-
 
 def convert_mutation_dict_to_object(mutation_dict):
     mutation_object = {}
@@ -195,7 +251,6 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
 
     minor_mutation_expected = benchmark_analysis_result(sample, json_info_path, maps_path, training_or_validation_extension_json)
 
-
     with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as executor:
         futures_to_params = {
             executor.submit(
@@ -240,11 +295,10 @@ def run_jobs_in_parallel(max_workers, new_output_folder, alignment_folder, maf, 
             if file.endswith('minor_mutations.csv'):
                 if not file.startswith(best_params):
                     os.system('rm {}/{}'.format(new_output_folder, file))
+
 def extract_parameters(param_string):
     param_pattern = r'([a-z_]+)_([0-9.]+)'
     return {key: float(value) for key, value in re.findall(param_pattern, param_string)}
-
-
 
 def calculate_best_parameters(file_name):
     df = pd.read_csv(file_name)
@@ -265,13 +319,11 @@ def calculate_best_parameters(file_name):
             parameters_data[key]['best_f1_score'] = f1_score
             parameters_data[key]['best_params'] = parameters
 
-    # Extract the top-scoring combinations
     if not parameters_data:
-        print("No data to analyze.")  # Or handle the empty case as needed
+        print("No data to analyze.")
         return None
 
     top_f1_score = max(data['best_f1_score'] for data in parameters_data.values())
-    # If isolates are identical F1 will always be 0, so we exclude it from the training
     if top_f1_score is None or top_f1_score == 0:
         return None  # Return None if the best F1-score is None or 0
 
@@ -280,10 +332,8 @@ def calculate_best_parameters(file_name):
     if len(top_parameters) == 1:
         return top_parameters[0]
 
-    # Define the order of parameters to sort by
     penalty_order = ['np', 'pp', 'dp', 'cor', 'ii']
 
-    # Sort the top parameters by the penalty order
     def sort_key(params):
         return tuple(params.get(param, float('inf')) for param in penalty_order)
 
@@ -301,6 +351,7 @@ def generate_test_values(average_value, num_increments, percentage):
     for i in range(-num_increments, num_increments + 1):
         test_values.append(average_value + i * increment)
     return test_values
+
 def create_test_object(default_params, param, test_values):
     test_objects = []
     for value in test_values:
@@ -316,18 +367,12 @@ def determine_gradient_value(df, param):
         param_values = group['Parameter Value'].values
         f1_scores = group['F1 Score'].values
 
-        #print(f"Raw param values for {param}, maf {maf}: {param_values}")
-        #print(f"Raw f1 scores for {param}, maf {maf}: {f1_scores}")
-
         param_f1_map = defaultdict(list)
         for param_value, f1_score in zip(param_values, f1_scores):
             param_f1_map[param_value].append(f1_score)
 
         param_values_new = np.array(list(param_f1_map.keys()))
         f1_scores_new = np.array([np.mean(f1_scores) for f1_scores in param_f1_map.values()])
-
-        #print(f"Merged param values for {param}, maf {maf}: {param_values_new}")
-        #print(f"Merged f1 scores for {param}, maf {maf}: {f1_scores_new}")
 
         if len(param_values_new) < 2 or len(f1_scores_new) < 2:
             print(f"Skipping {param}, maf {maf} due to insufficient data points")
@@ -340,7 +385,6 @@ def determine_gradient_value(df, param):
             continue
 
         if f1_scores_range == 0:
-            #print(f"Zero range for f1 scores detected, using average param value for {param}, maf {maf}")
             param_value_to_return = np.mean(param_values_new)
             results.append({
                 'maf': maf,
@@ -348,7 +392,7 @@ def determine_gradient_value(df, param):
                 'param_value_to_return': param_value_to_return,
                 'first_f1_score': f1_scores_new[0],
                 'last_f1_score': f1_scores_new[-1],
-                'lowest_slope_angle': 0  # since there's no slope, set to 0
+                'lowest_slope_angle': 0
             })
             continue
 
@@ -390,7 +434,6 @@ def determine_gradient_value(df, param):
         })
     return results
 
-
 def process_total_parameter_results(total_parameter_results):
     result_dict = {}
     for param, maf_data in total_parameter_results.items():
@@ -402,22 +445,14 @@ def process_total_parameter_results(total_parameter_results):
                         {'MAF': maf, 'Batch ID': batch_id, 'F1 Score': f1_score, 'Parameter Value': param_value})
             df = pd.DataFrame(df_rows)
 
-            # Log the dataframe for the current param and maf
-            print(f"DataFrame for param: {param}, maf: {maf}")
-            print(df)
-
             processed_results = determine_gradient_value(df, param)
 
             if maf not in result_dict:
                 result_dict[maf] = {}
             for result in processed_results:
                 result_dict[maf][param] = result['param_value_to_return']
-                # Log the processed result for debugging
-                print(f"Processed result for param: {param}, maf: {maf}")
-                print(result)
 
     return result_dict
-
 
 def load_results(param_list, maf_interval, output_training_folder):
     total_parameter_results = {}
@@ -425,7 +460,6 @@ def load_results(param_list, maf_interval, output_training_folder):
         total_parameter_results[param] = {}
         for maf in maf_interval:
             total_parameter_results[param][maf] = {}
-            print(os.path.join(output_training_folder, "maf_{}".format(maf)))
             for folder in os.listdir(os.path.join(output_training_folder, "maf_{}".format(maf))):
                 if folder.startswith(param):
                     batch_id = int(folder.split('_')[-1])
@@ -444,12 +478,9 @@ def load_results(param_list, maf_interval, output_training_folder):
                                 total_parameter_results[param][maf][batch_id][0].append(parameter_value)
                                 total_parameter_results[param][maf][batch_id][1].append(f1_score)
 
-                    # Sort the lists
                     total_parameter_results[param][maf][batch_id][0].sort()
                     total_parameter_results[param][maf][batch_id][1].sort()
-                    print(f"Loaded results for param: {param}, maf: {maf}, batch_id: {batch_id}")
 
-    # Calculate averages and create new object with unique values
     average_parameter_results = {}
     for param in param_list:
         average_parameter_results[param] = {}
@@ -505,143 +536,69 @@ def process_directory(directory):
 
     return result_dict
 
-def load_top_hit(file_path, param_to_fetch):
-    df = pd.read_csv(file_path)
+def setup_folders(maf_interval, alignment_results_path):
+    folders = [f for f in os.listdir(alignment_results_path) if os.path.isdir(os.path.join(alignment_results_path, f))]
+    os.makedirs(output_training_folder, exist_ok=True)
+    for maf in maf_interval:
+        os.makedirs(os.path.join(output_training_folder, f'maf_{maf}'), exist_ok=True)
+    return folders
 
-    if df.isnull().values.any() or df.empty:
-        return None, None
+def setup_directory(base_path, subfolder):
+    path = os.path.join(base_path, subfolder)
+    os.makedirs(path, exist_ok=True)
+    return path
 
-    top_hit = df.iloc[0]
-    f1_score = top_hit['F1 Score']
-    parameters = top_hit['Parameters']
-
-    if isinstance(parameters, bytes):
-        parameters = parameters.decode('utf-8')
-    elif not isinstance(parameters, str):
-        parameters = str(parameters)
-
-    param_pattern = r'{}_([0-9.]+)'.format(param_to_fetch)
-    match = re.search(param_pattern, parameters)
-    if match:
-        param_value = float(match.group(1))
-    else:
-        raise ValueError(f"Parameter {param_to_fetch} not found in the parameters string.")
-
-    return f1_score, param_value
-
-
-"""
-for maf in maf_interval:
-    os.makedirs(output_training_folder + '/maf_' + str(maf), exist_ok=True)
-    for folder in folders:
-        if "staphylococcus_aureus_45" not in folder:
+def run_round_of_parameter_search(round_number, maf_interval, folders, output_training_folder,
+                                  parameters_interval_search):
+    for maf in maf_interval:
+        round_folder = f"{round_number}_round_maf_{maf}"
+        round_path = setup_directory(output_training_folder, round_folder)
+        for folder in folders:
             batch_id = int(folder.split('_')[-1])
             if batch_id > 10:
-                batch_id = batch_id - 10
+                batch_id -= 10
             if batch_id >= maf:
                 alignment_folder = os.path.join(alignment_results_path, folder)
-                new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
-                os.makedirs(new_output_folder, exist_ok=True)
-                print ('Searching parameters for ', folder)
+                new_output_folder = setup_directory(round_path, folder)
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
-                                     parameters_interval_search, maps_path, json_info_path, training_or_validation_extension_json)
-                #train_parameters(maf / 100, alignment_folder, 3, 0.4, new_output_folder, maps_path, json_info_path,
-                #    0.1, 5, 15, 0.44, 5, 0.15)
-"""
-all_best_params = defaultdict(list)
+                                     parameters_interval_search, maps_path, json_info_path,
+                                     training_or_validation_extension_json)
 
-for maf in maf_interval:
-    print(f"maf_{maf}")
-    average_best_params = {}
-    for folder in folders:
-        if "staphylococcus_aureus_45" not in folder:
-            print (folder)
-            batch_id = int(folder.split('_')[-1])
-            if batch_id > 10:
-                batch_id = batch_id - 10
-            if batch_id >= maf:
-                new_output_folder = output_training_folder + '/' + 'maf_' + str(maf) + '/' + folder
-                results_filename = new_output_folder + "/all_results.csv"
-                best_params = calculate_best_parameters(results_filename)
-                if best_params != None:
-                    for param, value in best_params.items():
-                        param_name = param[1:]
-                        if param_name in param_list:
-                            all_best_params[param_name].append(value)
-    for param in param_list:
-        if param in all_best_params:
-            values = all_best_params[param]
-            average_value = sum(values) / len(values)
-            average_best_params[param] = average_value
-    output_file_path = os.path.join(output_training_folder, "maf_{}_average_best_params.json".format(maf))
-    with open(output_file_path, 'w') as json_file:
-        json.dump(average_best_params, json_file, indent=4)
-
-
-
-# Number of increments to test
-num_increments = 1  # For example, testing 2 increments on each side
-rounds = [2, 3, 4, 5]
-round_increment_dict = {
-    2: 0.20,
-    3: 0.15,
-    4: 0.10,
-    5: 0.05
-}
-for round in rounds:
-    print ('starting round ', round)
-    for maf in maf_interval:
-        print (maf)
-        os.makedirs(output_training_folder + '/{}_round_maf_{}'.format(round, maf), exist_ok=True)
-        if round == 2:
-            output_file_path = os.path.join(output_training_folder, "maf_{}_average_best_params.json".format(maf))
-        else:
-            output_file_path = os.path.join(output_training_folder, "{}_round_maf_{}_average_best_params.json".format(round-1, maf))
-        default_params = load_default_parameters(output_file_path)
-        print (default_params)
-
-        for param, default_value in default_params.items():
-            test_values = generate_test_values(default_value, num_increments, round_increment_dict[round])
-            parameters_interval_search[param + '_interval'] = test_values  # Add generated values to the interval search
-
-        for folder in folders:
-            if "staphylococcus_aureus_45" not in folder:
-                batch_id = int(folder.split('_')[-1])
-                if batch_id == 10:
-                    abundance = batch_id
-                else:
-                    abundance = batch_id = int(folder.split('_')[-1][-1])
-                if abundance >= maf:
-                    alignment_folder = os.path.join(alignment_results_path, folder)
-                    new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
-                    os.makedirs(new_output_folder, exist_ok=True)
-                    run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
-                                         parameters_interval_search, maps_path, json_info_path, training_or_validation_extension_json)
+def collect_and_store_best_params(maf_interval, folders, output_training_folder, param_list):
     all_best_params = defaultdict(list)
-
     for maf in maf_interval:
         average_best_params = {}
         for folder in folders:
-            if "staphylococcus_aureus_45" not in folder:
-                batch_id = int(folder.split('_')[-1])
-                if batch_id == 10:
-                    abundance = batch_id
-                else:
-                    abundance = batch_id = int(folder.split('_')[-1][-1])
-                if abundance >= maf:
-                    new_output_folder = output_training_folder + '/' + '/{}_round_maf_{}'.format(round, maf) + '/' + folder
-                    results_filename = new_output_folder + "/all_results.csv"
-                    best_params = calculate_best_parameters(results_filename)
-                    if best_params != None:
-                        for param, value in best_params.items():
-                            param_name = param[1:]
-                            if param_name in param_list:
-                                all_best_params[param_name].append(value)
+            batch_id = int(folder.split('_')[-1])
+            if batch_id > 10:
+                batch_id -= 10
+            if batch_id >= maf:
+                results_filename = os.path.join(output_training_folder, f"maf_{maf}", folder, "all_results.csv")
+                best_params = calculate_best_parameters(results_filename)
+                if best_params is not None:
+                    for param, value in best_params.items():
+                        if param[1:] in param_list:
+                            all_best_params[param[1:]].append(value)
         for param in param_list:
             if param in all_best_params:
-                values = all_best_params[param]
-                average_value = sum(values) / len(values)
+                average_value = sum(all_best_params[param]) / len(all_best_params[param])
                 average_best_params[param] = average_value
-        output_file_path = os.path.join(output_training_folder, "{}_round_maf_{}_average_best_params.json".format(round, maf))
-        with open(output_file_path, 'w') as json_file:
+        json_path = os.path.join(output_training_folder, f"maf_{maf}_average_best_params.json")
+        with open(json_path, 'w') as json_file:
             json.dump(average_best_params, json_file, indent=4)
+
+def run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder):
+    print ('run_parameter_search')
+    print (maf_interval)
+    for maf in maf_interval:
+        maf_folder = f"maf_{maf}"
+        maf_path = setup_directory(output_training_folder, maf_folder)
+        for folder in folders:
+            alignment_folder = os.path.join(alignment_results_path, folder)
+            new_output_folder = setup_directory(maf_path, folder)
+            run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
+                                 parameters_interval_search, maps_path, json_info_path,
+                                 training_or_validation_extension_json)
+
+if __name__ == "__main__":
+    main()
