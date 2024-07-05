@@ -8,6 +8,8 @@ import re
 import concurrent.futures
 from collections import defaultdict
 from scipy.interpolate import UnivariateSpline
+from concurrent.futures import ProcessPoolExecutor, as_completed
+
 
 sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + sys.path
 
@@ -21,7 +23,7 @@ training_or_validation_extension_json = '_validation.json'
 output_training_folder = 'clean_benchmark'
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 maf_interval = [5, 4, 3, 2, 1]
-cpus = 4
+cpus = 35
 
 def main():
     parameters_interval_search_maf_1 = {
@@ -510,22 +512,6 @@ def setup_directory(base_path, subfolder):
     os.makedirs(path, exist_ok=True)
     return path
 
-def run_round_of_parameter_search(round_number, maf_interval, folders, output_training_folder,
-                                  parameters_interval_search):
-    for maf in maf_interval:
-        round_folder = f"{round_number}_round_maf_{maf}"
-        round_path = setup_directory(output_training_folder, round_folder)
-        for folder in folders:
-            batch_id = int(folder.split('_')[-1])
-            if batch_id > 10:
-                batch_id -= 10
-            if batch_id >= maf:
-                alignment_folder = os.path.join(alignment_results_path, folder)
-                new_output_folder = setup_directory(round_path, folder)
-                benchmark_sample(cpus, new_output_folder, alignment_folder, maf / 100,
-                                     parameters_interval_search, maps_path, json_info_path,
-                                     training_or_validation_extension_json)
-
 def collect_and_store_best_params(maf_interval, folders, output_training_folder, param_list):
     all_best_params = defaultdict(list)
     for maf in maf_interval:
@@ -549,18 +535,36 @@ def collect_and_store_best_params(maf_interval, folders, output_training_folder,
         with open(json_path, 'w') as json_file:
             json.dump(average_best_params, json_file, indent=4)
 
+
 def run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder):
-    print ('run_parameter_search')
-    print (maf_interval)
-    for maf in maf_interval:
-        maf_folder = f"maf_{maf}"
-        maf_path = setup_directory(output_training_folder, maf_folder)
-        for folder in folders:
-            alignment_folder = os.path.join(alignment_results_path, folder)
-            new_output_folder = setup_directory(maf_path, folder)
-            benchmark_sample(cpus, new_output_folder, alignment_folder, maf / 100,
-                                 parameters_interval_search, maps_path, json_info_path,
-                                 training_or_validation_extension_json)
+    print('run_parameter_search')
+    print(maf_interval)
+
+    # Create a ProcessPoolExecutor with the specified number of CPUs
+    with ProcessPoolExecutor(max_workers=cpus) as executor:
+        futures = []
+        for maf in maf_interval:
+            maf_folder = f"maf_{maf}"
+            maf_path = setup_directory(output_training_folder, maf_folder)
+            for folder in folders:
+                alignment_folder = os.path.join(alignment_results_path, folder)
+                new_output_folder = setup_directory(maf_path, folder)
+
+                # Submit tasks to the executor pool
+                future = executor.submit(benchmark_sample, cpus, new_output_folder, alignment_folder, maf / 100,
+                                         parameters_interval_search, maps_path, json_info_path,
+                                         training_or_validation_extension_json)
+                futures.append(future)
+
+        # Collect results as they complete
+        for future in as_completed(futures):
+            try:
+                # Result retrieval or exception handling
+                result = future.result()
+                print(f"Task completed with result: {result}")
+            except Exception as exc:
+                print(f"Generated an exception: {exc}")
+
 
 if __name__ == "__main__":
     main()
