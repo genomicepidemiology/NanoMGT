@@ -27,43 +27,43 @@ cpus = 35
 
 def main():
     parameters_interval_search_maf_1 = {
-        'cor_interval': [0.5],
-        'ii_interval': [0.1],
-        'pp_interval': [0.2],
-        'np_interval': [3],
-        'dp_interval': [0.1]
+        'cor_interval': [0.388],
+        'ii_interval': [0.156],
+        'pp_interval': [0.279],
+        'np_interval': [3.689],
+        'dp_interval': [0.234]
     }
 
     parameters_interval_search_maf_2 = {
-        'cor_interval': [0.5],
-        'ii_interval': [0.1],
-        'pp_interval': [0.2],
-        'np_interval': [3],
-        'dp_interval': [0.1]
+        'cor_interval': [0.424],
+        'ii_interval': [0.129],
+        'pp_interval': [0.246],
+        'np_interval': [3.033],
+        'dp_interval': [0.228]
     }
 
     parameters_interval_search_maf_3 = {
-        'cor_interval': [0.5],
-        'ii_interval': [0.1],
-        'pp_interval': [0.2],
-        'np_interval': [3],
-        'dp_interval': [0.1]
+        'cor_interval': [0.524],
+        'ii_interval': [0.074],
+        'pp_interval': [0.255],
+        'np_interval': [2.400],
+        'dp_interval': [0.161]
     }
 
     parameters_interval_search_maf_4 = {
-        'cor_interval': [0.5],
-        'ii_interval': [0.1],
-        'pp_interval': [0.2],
-        'np_interval': [3],
-        'dp_interval': [0.1]
+        'cor_interval': [0.512],
+        'ii_interval': [0.055],
+        'pp_interval': [0.215],
+        'np_interval': [2.161],
+        'dp_interval': [0.160]
     }
 
     parameters_interval_search_maf_5 = {
-        'cor_interval': [0.5],
-        'ii_interval': [0.1],
-        'pp_interval': [0.2],
-        'np_interval': [3],
-        'dp_interval': [0.1]
+        'cor_interval': [0.459],
+        'ii_interval': [0.0497],
+        'pp_interval': [0.186],
+        'np_interval': [2.009],
+        'dp_interval': [0.144]
     }
 
     all_parameter_intervals = {}

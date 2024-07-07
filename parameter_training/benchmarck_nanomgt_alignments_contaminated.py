@@ -16,54 +16,54 @@ sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + s
 from nanomgt import nanopore_variantcaller as nvc
 
 # Modify these paths as needed.
-alignment_results_path = '/home/projects/cge/people/malhal/nanomgt_new_results/contaminated_validation/'
+alignment_results_path = '/home/projects/cge/people/malhal/nanomgt_new_results/mixed_validation/'
 maps_path = '/home/projects/cge/people/malhal/nanomgt_reads/variant_maps/'
-json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batches_contaminated'
+json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batches_mixed'
 training_or_validation_extension_json = '_validation.json'
-output_training_folder = 'contaminated_benchmark'
+output_training_folder = 'mixed_benchmark'
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 maf_interval = [5, 4, 3, 2, 1]
 cpus = 35
 
 def main():
     parameters_interval_search_maf_1 = {
-        'cor_interval': [0.48],
-        'ii_interval': [0.1],
-        'pp_interval': [0.2],
-        'np_interval': [3],
-        'dp_interval': [0.1]
+        'cor_interval': [0.453],
+        'ii_interval': [0.179],
+        'pp_interval': [0.289],
+        'np_interval': [4.024],
+        'dp_interval': [0.213]
     }
 
     parameters_interval_search_maf_2 = {
-        'cor_interval': [0.5],
-        'ii_interval': [0.1],
-        'pp_interval': [0.2],
-        'np_interval': [3],
-        'dp_interval': [0.1]
+        'cor_interval': [0.462],
+        'ii_interval': [0.196],
+        'pp_interval': [0.328],
+        'np_interval': [3.780],
+        'dp_interval': [0.167]
     }
 
     parameters_interval_search_maf_3 = {
-        'cor_interval': [0.5],
-        'ii_interval': [0.1],
-        'pp_interval': [0.2],
-        'np_interval': [3],
-        'dp_interval': [0.1]
+        'cor_interval': [0.451],
+        'ii_interval': [0.102],
+        'pp_interval': [0.280],
+        'np_interval': [3.726],
+        'dp_interval': [0.182]
     }
 
     parameters_interval_search_maf_4 = {
-        'cor_interval': [0.5],
-        'ii_interval': [0.1],
-        'pp_interval': [0.2],
-        'np_interval': [3],
-        'dp_interval': [0.1]
+        'cor_interval': [0.503],
+        'ii_interval': [0.1301],
+        'pp_interval': [0.274],
+        'np_interval': [3.719],
+        'dp_interval': [0.151]
     }
 
     parameters_interval_search_maf_5 = {
-        'cor_interval': [0.5],
-        'ii_interval': [0.1],
-        'pp_interval': [0.2],
-        'np_interval': [3],
-        'dp_interval': [0.1]
+        'cor_interval': [0.513],
+        'ii_interval': [0.118],
+        'pp_interval': [0.233],
+        'np_interval': [3.451],
+        'dp_interval': [0.145]
     }
 
     all_parameter_intervals = {}

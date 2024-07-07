@@ -15,6 +15,8 @@ sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + s
 
 from nanomgt import nanopore_variantcaller as nvc
 
+#NOTE: This is for benchmarking mixed' parameters for the 3 data sets.
+
 # Modify these paths as needed.
 alignment_results_path = '/home/projects/cge/people/malhal/nanomgt_new_results/mixed_validation/'
 maps_path = '/home/projects/cge/people/malhal/nanomgt_reads/variant_maps/'
