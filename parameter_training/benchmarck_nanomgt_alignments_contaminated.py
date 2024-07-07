@@ -27,7 +27,7 @@ cpus = 35
 
 def main():
     parameters_interval_search_maf_1 = {
-        'cor_interval': [0.5],
+        'cor_interval': [0.48],
         'ii_interval': [0.1],
         'pp_interval': [0.2],
         'np_interval': [3],
