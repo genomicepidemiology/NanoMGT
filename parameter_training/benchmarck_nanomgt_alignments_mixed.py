@@ -18,11 +18,11 @@ from nanomgt import nanopore_variantcaller as nvc
 #NOTE: This is for benchmarking mixed' parameters for the 3 data sets.
 
 # Modify these paths as needed.
-alignment_results_path = '/home/projects/cge/people/malhal/nanomgt_new_results/mixed_validation/'
+alignment_results_path = '/home/projects/cge/people/malhal/nanomgt_new_results/clean_validation/'
 maps_path = '/home/projects/cge/people/malhal/nanomgt_reads/variant_maps/'
-json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batches_mixed'
+json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batches_clean'
 training_or_validation_extension_json = '_validation.json'
-output_training_folder = 'mixed_benchmark'
+output_training_folder = 'clean_benchmark'
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
 maf_interval = [5, 4, 3, 2, 1]
 cpus = 35
