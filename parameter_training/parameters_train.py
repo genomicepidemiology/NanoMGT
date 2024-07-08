@@ -510,18 +510,16 @@ def setup_directory(base_path, subfolder):
     os.makedirs(path, exist_ok=True)
     return path
 
-def run_round_of_parameter_search(round_number, maf_interval, folders, output_training_folder,
+def run_round_of_parameter_search(round_number, maf_interval, folders, output_folder,
                                   parameters_interval_search):
     for maf in maf_interval:
-        round_folder = f"{round_number}_round_maf_{maf}"
-        round_path = setup_directory(output_training_folder, round_folder)
         for folder in folders:
             batch_id = int(folder.split('_')[-1])
             if batch_id > 10:
                 batch_id -= 10
             if batch_id >= maf:
                 alignment_folder = os.path.join(alignment_results_path, folder)
-                new_output_folder = setup_directory(round_path, folder)
+                new_output_folder = setup_directory(output_folder, folder)
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                      parameters_interval_search, maps_path, json_info_path,
                                      training_or_validation_extension_json)
@@ -586,6 +584,7 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
 
             round_folder = f"{round_number}_round_maf_{maf}"
             round_path = setup_directory(output_training_folder, round_folder)
+            print (round_path)
             run_round_of_parameter_search(round_number, [maf], folders, round_path, parameters_interval_search)
 
         round_path = f"{round_number}_round"
