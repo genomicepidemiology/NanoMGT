@@ -71,6 +71,6 @@ def process_datasets(base_path, output_file):
                     writer.writerow([dataset, int(maf)/100, abundance, f"{avg_f1:.4f}", f"{avg_precision:.4f}", f"{avg_recall:.4f}"])
 
 if __name__ == "__main__":
-    base_path = '/home/projects/cge/people/malhal/nanomgt_benchmark'
+    base_path = '/home/projects/cge/people/malhal/nanomgt_benchmark_model_contaminated'
     output_file = 'aggregated_metrics.csv'
     process_datasets(base_path, output_file)

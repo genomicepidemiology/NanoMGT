@@ -16,7 +16,7 @@ sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + s
 from nanomgt import nanopore_variantcaller as nvc
 
 # Modify these paths as needed.
-alignment_results_path = '/home/projects/cge/people/malhal/nanomgt_new_results/contaminated_validation/'
+alignment_results_path = '/home/projects/cge/people/malhal/120_validation_alignments/'
 maps_path = '/home/projects/cge/people/malhal/nanomgt_reads/variant_maps/'
 json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batches_contaminated'
 training_or_validation_extension_json = '_validation.json'

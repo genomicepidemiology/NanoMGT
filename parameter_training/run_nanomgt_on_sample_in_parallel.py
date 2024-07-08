@@ -3,7 +3,7 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 
 # Define the path where the FASTQ files are located
-path = "/home/people/malhal/data/new_nanomgt/clean_data/120/120_validation_reads"
+path = "/home/people/malhal/data/new_nanomgt/clean_data/170/170_validation_reads"
 
 # List all fastq files in the directory
 fastq_files = [f for f in os.listdir(path) if f.endswith('.fastq')]
