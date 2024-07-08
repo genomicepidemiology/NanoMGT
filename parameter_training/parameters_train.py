@@ -8,6 +8,7 @@ import re
 import concurrent.futures
 from collections import defaultdict
 from scipy.interpolate import UnivariateSpline
+from itertools import product
 
 sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + sys.path
 
