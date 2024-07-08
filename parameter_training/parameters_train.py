@@ -519,8 +519,9 @@ def run_round_of_parameter_search(round_number, maf_interval, folders, output_fo
                 batch_id -= 10
             if batch_id >= maf:
                 alignment_folder = os.path.join(alignment_results_path, folder)
-                path = os.path.join(output_folder, folder, 'maf_' + str(maf))
-                new_output_folder = setup_directory(path)
+                path = os.path.join(output_folder, folder)
+                maf_folder = f"maf_{maf}"
+                new_output_folder = setup_directory(maf_folder, path)
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                      parameters_interval_search, maps_path, json_info_path,
                                      training_or_validation_extension_json)
