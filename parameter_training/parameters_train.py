@@ -564,9 +564,9 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                      parameters_interval_search, maps_path, json_info_path,
                                      training_or_validation_extension_json)
-    """
-    collect_and_store_best_params(maf_interval, folders, output_training_folder, param_list)
 
+    collect_and_store_best_params(maf_interval, folders, output_training_folder, param_list)
+    """
     num_increments = 0
     rounds = [2, 3, 4, 5]
     round_increment_dict = {2: 0.20, 3: 0.15, 4: 0.10, 5: 0.05}
