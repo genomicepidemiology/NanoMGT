@@ -591,8 +591,7 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
             print (round_path)
             run_round_of_parameter_search(round_number, [maf], folders, round_path, parameters_interval_search)
 
-        round_path = f"{round_number}_round"
-        collect_and_store_best_params(maf_interval, folders, setup_directory(output_training_folder, round_path),
+        collect_and_store_best_params(maf_interval, folders, output_training_folder,
                                       param_list)
 
 if __name__ == "__main__":
