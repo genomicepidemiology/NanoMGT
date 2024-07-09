@@ -528,7 +528,7 @@ def run_round_of_parameter_search(round_number, maf_interval, folders, output_fo
                                      parameters_interval_search, maps_path, json_info_path,
                                      training_or_validation_extension_json)
 
-def collect_and_store_best_params(maf_interval, folders, output_training_folder, param_list):
+def collect_and_store_best_params(maf_interval, folders, output_training_folder, param_list, round):
     all_best_params = defaultdict(list)
     for maf in maf_interval:
         average_best_params = {}
@@ -537,7 +537,11 @@ def collect_and_store_best_params(maf_interval, folders, output_training_folder,
             if batch_id > 10:
                 batch_id -= 10
             if batch_id >= maf:
-                results_filename = os.path.join(output_training_folder, f"maf_{maf}", folder, "all_results.csv")
+                if round == None:
+                    results_filename = os.path.join(output_training_folder, f"maf_{maf}", folder, "all_results.csv")
+                else:
+                    round_folder = f"{round_number}_round_maf_{maf}"
+                    results_filename = os.path.join(output_training_folder, round_folder, f"maf_{maf}", folder, "all_results.csv")
                 print (results_filename)
                 best_params = calculate_best_parameters(results_filename)
                 if best_params is not None:
@@ -568,7 +572,7 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
                                      parameters_interval_search, maps_path, json_info_path,
                                      training_or_validation_extension_json)
 
-    collect_and_store_best_params(maf_interval, folders, output_training_folder, param_list)
+    collect_and_store_best_params(maf_interval, folders, output_training_folder, param_list, None)
     """
     num_increments = 0
     rounds = [2, 3, 4, 5]
@@ -593,7 +597,7 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
             run_round_of_parameter_search(round_number, [maf], folders, round_path, parameters_interval_search)
 
         collect_and_store_best_params(maf_interval, folders, output_training_folder,
-                                      param_list)
+                                      param_list, round)
 
 if __name__ == "__main__":
     main()
