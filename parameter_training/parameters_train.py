@@ -553,6 +553,8 @@ def collect_and_store_best_params(maf_interval, folders, output_training_folder,
                 average_value = sum(all_best_params[param]) / len(all_best_params[param])
                 average_best_params[param] = average_value
         json_path = os.path.join(output_training_folder, f"maf_{maf}_average_best_params.json")
+        print (json_path)
+        print (average_best_params)
         with open(json_path, 'w') as json_file:
             json.dump(average_best_params, json_file, indent=4)
 
