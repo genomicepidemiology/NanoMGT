@@ -561,7 +561,7 @@ def collect_and_store_best_params(maf_interval, folders, output_training_folder,
             json.dump(average_best_params, json_file, indent=4)
 
 def run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder):
-    """
+
     for maf in maf_interval:
         maf_folder = f"maf_{maf}"
         maf_path = setup_directory(output_training_folder, maf_folder)
@@ -577,7 +577,7 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
                                      training_or_validation_extension_json)
 
     collect_and_store_best_params(maf_interval, folders, output_training_folder, param_list, None)
-    """
+
     num_increments = 0
     rounds = [2, 3, 4, 5]
     round_increment_dict = {2: 0.20, 3: 0.15, 4: 0.10, 5: 0.05}
