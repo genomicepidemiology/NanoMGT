@@ -512,14 +512,17 @@ def setup_directory(base_path, subfolder):
 
 def run_round_of_parameter_search(round_number, maf_interval, folders, output_folder,
                                   parameters_interval_search):
+
     for maf in maf_interval:
+        maf_folder = f"maf_{maf}"
+        maf_path = setup_directory(output_folder, maf_folder)
         for folder in folders:
             batch_id = int(folder.split('_')[-1])
             if batch_id > 10:
                 batch_id -= 10
             if batch_id >= maf:
                 alignment_folder = os.path.join(alignment_results_path, folder)
-                new_output_folder = setup_directory(output_folder, folder)
+                new_output_folder = setup_directory(maf_path, folder)
                 print (new_output_folder)
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                      parameters_interval_search, maps_path, json_info_path,
