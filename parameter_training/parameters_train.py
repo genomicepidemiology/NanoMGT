@@ -556,9 +556,7 @@ def collect_and_store_best_params(maf_interval, folders, output_training_folder,
             json_path = os.path.join(output_training_folder, f"maf_{maf}_average_best_params.json")
         else:
             json_path = os.path.join(output_training_folder,
-                         f"{round - 1}_round_maf_{maf}_average_best_params.json")
-        print (json_path)
-        print (average_best_params)
+                         f"{round}_round_maf_{maf}_average_best_params.json")
         with open(json_path, 'w') as json_file:
             json.dump(average_best_params, json_file, indent=4)
 
@@ -585,7 +583,7 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
     round_increment_dict = {2: 0.20, 3: 0.15, 4: 0.10, 5: 0.05}
     for round_number in rounds:
         print(f'Starting round {round_number}')
-        """
+
         for maf in maf_interval:
             if round_number == 2:
                 previous_round_path = os.path.join(output_training_folder, f"maf_{maf}_average_best_params.json")
@@ -602,7 +600,6 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
             round_path = setup_directory(output_training_folder, round_folder)
             print (round_path)
             run_round_of_parameter_search(round_number, [maf], folders, round_path, parameters_interval_search)
-        """
 
         collect_and_store_best_params(maf_interval, folders, output_training_folder,
                                       param_list, round_number)
