@@ -538,6 +538,7 @@ def collect_and_store_best_params(maf_interval, folders, output_training_folder,
                 batch_id -= 10
             if batch_id >= maf:
                 results_filename = os.path.join(output_training_folder, f"maf_{maf}", folder, "all_results.csv")
+                print (results_filename)
                 best_params = calculate_best_parameters(results_filename)
                 if best_params is not None:
                     for param, value in best_params.items():

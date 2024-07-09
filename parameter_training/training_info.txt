@@ -1,0 +1,5 @@
+To retrain NanoMGT paramters on new data, do the following:
+
+1.) Select the data to train on. For simulating multistrain sample, isolates from a series of species should be selected
+and a json should be constructed similar to mixed_isolates.json where all sequencing IDs/prefixes are dived based on species.
+2.)
