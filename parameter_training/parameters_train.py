@@ -21,22 +21,23 @@ json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batche
 training_or_validation_extension_json = '_training.json'
 output_training_folder = 'clean_test_for_final_script_only_5_maf'
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
-maf_interval = [5, 4, 3, 2]
-cpus = 39
+maf_interval = [5, 4, 3, 2, 1]
+cpus = 30
 model_name = 'model_test'
 
 def main():
+    #Insert initial parameter space here.
     parameters_interval_search = {
-        'cor_interval': [0.4],
-        'ii_interval': [0.1],
-        'pp_interval': [0.2],
-        'np_interval': [2],
-        'dp_interval': [0.1]
+        'cor_interval': [0.1, 0.2, 0.3],
+        'ii_interval': [0.1, 0.2, 0.3],
+        'pp_interval': [0.1, 0.2, 0.3],
+        'np_interval': [1, 2, 3],
+        'dp_interval': [0.1, 0.2 , 0.3]
     }
     if len(maf_interval) < 4:
         sys.exit('Atleast 4 maf_interval values must be selected')
     folders = [f for f in os.listdir(alignment_results_path) if os.path.isdir(os.path.join(alignment_results_path, f))]
-    #run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder)
+    run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder)
     generate_spline_json(output_training_folder, maf_interval, model_name)
 
 def generate_spline_json(output_folder, maf_intervals, model_name):
@@ -61,8 +62,6 @@ def generate_spline_json(output_folder, maf_intervals, model_name):
         np_intervals.append(params.get('np', 0))
         dp_intervals.append(params.get('dp', 0))
 
-    # Print for debugging
-    print(f"Parameters List: {parameters_list}")
 
     maf_intervals_decimal = sorted([maf / 100.0 for maf in maf_intervals])
     x_values = np.linspace(min(maf_intervals_decimal), max(maf_intervals_decimal), len(maf_intervals))
@@ -74,7 +73,6 @@ def generate_spline_json(output_folder, maf_intervals, model_name):
                           [cor_intervals, iteration_intervals, pp_intervals, np_intervals, dp_intervals]):
         print(f"Attempting spline for {name} with data points: {len(data)}")  # Debug output
         if len(data) >= 4:
-            print (data)
             spline = UnivariateSpline(x_values, data, s=None)
             spline_fit_fine = spline(fine_x_values)
             spline_results[name] = {str(x): float(y) for x, y in zip(fine_x_values, spline_fit_fine)}
@@ -539,7 +537,6 @@ def run_round_of_parameter_search(round_number, maf_interval, folders, output_fo
             if batch_id >= maf:
                 alignment_folder = os.path.join(alignment_results_path, folder)
                 new_output_folder = setup_directory(maf_path, folder)
-                print (new_output_folder)
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                      parameters_interval_search, maps_path, json_info_path,
                                      training_or_validation_extension_json)
@@ -558,7 +555,6 @@ def collect_and_store_best_params(maf_interval, folders, output_training_folder,
                 else:
                     round_folder = f"{round}_round_maf_{maf}"
                     results_filename = os.path.join(output_training_folder, round_folder, f"maf_{maf}", folder, "all_results.csv")
-                print (results_filename)
                 best_params = calculate_best_parameters(results_filename)
                 if best_params is not None:
                     for param, value in best_params.items():
@@ -593,8 +589,7 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
 
     collect_and_store_best_params(maf_interval, folders, output_training_folder, param_list, None)
 
-    # TBD CLEAN THIS
-    num_increments = 0
+    num_increments = 1
     rounds = [2, 3, 4, 5]
     round_increment_dict = {2: 0.20, 3: 0.15, 4: 0.10, 5: 0.05}
     for round_number in rounds:
@@ -614,7 +609,6 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
 
             round_folder = f"{round_number}_round_maf_{maf}"
             round_path = setup_directory(output_training_folder, round_folder)
-            print (round_path)
             run_round_of_parameter_search(round_number, [maf], folders, round_path, parameters_interval_search)
 
         collect_and_store_best_params(maf_interval, folders, output_training_folder,
