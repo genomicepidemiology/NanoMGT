@@ -564,7 +564,7 @@ def collect_and_store_best_params(maf_interval, folders, output_training_folder,
             json.dump(average_best_params, json_file, indent=4)
 
 def run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder):
-
+    """
     for maf in maf_interval:
         maf_folder = f"maf_{maf}"
         maf_path = setup_directory(output_training_folder, maf_folder)
@@ -578,7 +578,7 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
                 run_jobs_in_parallel(cpus, new_output_folder, alignment_folder, maf / 100,
                                      parameters_interval_search, maps_path, json_info_path,
                                      training_or_validation_extension_json)
-
+    """
     collect_and_store_best_params(maf_interval, folders, output_training_folder, param_list, None)
 
     num_increments = 0
