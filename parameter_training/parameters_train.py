@@ -564,6 +564,7 @@ def collect_and_store_best_params(maf_interval, folders, output_training_folder,
             json.dump(average_best_params, json_file, indent=4)
 
 def run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder):
+    # TBD CLEAN THIS
     """
     for maf in maf_interval:
         maf_folder = f"maf_{maf}"
@@ -581,8 +582,11 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
     """
     collect_and_store_best_params(maf_interval, folders, output_training_folder, param_list, None)
 
+    # TBD CLEAN THIS
     num_increments = 0
-    rounds = [2, 3, 4, 5]
+    #rounds = [2, 3, 4, 5]
+    #TBD CLEAN THIS
+    rounds = [3, 4, 5]
     round_increment_dict = {2: 0.20, 3: 0.15, 4: 0.10, 5: 0.05}
     for round_number in rounds:
         print(f'Starting round {round_number}')
