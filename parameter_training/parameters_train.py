@@ -34,7 +34,7 @@ def main():
         'dp_interval': [0.1, 0.2]
     }
     folders = [f for f in os.listdir(alignment_results_path) if os.path.isdir(os.path.join(alignment_results_path, f))]
-    #run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder)
+    run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder)
     generate_spline_json(output_training_folder, maf_interval, model_name)
 
 def generate_spline_json(output_folder, maf_intervals, model_name):
