@@ -1,14 +1,20 @@
 from setuptools import setup, find_packages
+from nanomgt import
+__version__ = version.__version__
+
 
 setup(
     name='NanoMGT',
-    version='1.0.0',
+    version=__version__,
     packages=find_packages(),
-    data_files=[],
-    include_package_data=True,
+    include_package_data=True,  # Ensure this is set to True
+    package_data={
+        '': ['*.json'],  # Include all json files from any package
+        'nanomgt': ['*.json'],  # Specifically include json files from the nanomgt package if needed
+    },
     url='https://github.com/genomicepidemiology/nanomgt',
     license='',
-    install_requires=(),
+    install_requires=[],
     author='Malte B. Hallgren',
     scripts=['bin/nanomgt'],
     author_email='malhal@food.dtu.dk',

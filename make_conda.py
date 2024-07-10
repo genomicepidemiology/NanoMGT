@@ -17,7 +17,8 @@ data = {
     "build": {
         "number": 0,
         "noarch": "python",
-        "script": "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vvv"
+        "script": "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vvv",
+        "script_env": ["PYTHONNOUSERSITE=1"]
     },
     "requirements": {
         "host": [
@@ -28,15 +29,22 @@ data = {
             "kma >=1.4.9"
         ]
     },
+    "test": {
+        "imports": ["nanomgt"]
+    },
     "about": {
         "home": "https://github.com/genomicepidemiology/nanomgt",
         "summary": "NanoMGT - Nanopore Marker Gene Typer",
-        "license": "Apache-2.0"
+        "license": "Apache-2.0",
+        "license_file": "LICENSE"
+    },
+    "extra": {
+        "recipe-maintainers": ["malhal"]
     }
 }
 
 # Convert the data to YAML and print it
-os.system('mkdir conda')
+os.system('mkdir -p conda')
 yaml_str = yaml.dump(data, sort_keys=False)
 
 with open('conda/meta.yaml', 'w') as f:
