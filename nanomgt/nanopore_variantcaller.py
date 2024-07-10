@@ -16,7 +16,6 @@ from scipy.interpolate import interp1d
 from nanomgt.nanopore_mutations import parse_sam_and_find_mutations
 from nanomgt.nanopore_mutations import extract_alignment
 from nanomgt.nanopore_mutations import create_mutation_vector
-import nanomgt.curve_functions as cf
 
 sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')] + sys.path
 
