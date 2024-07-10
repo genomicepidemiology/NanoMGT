@@ -35,8 +35,7 @@ data = {
     "about": {
         "home": "https://github.com/genomicepidemiology/nanomgt",
         "summary": "NanoMGT - Nanopore Marker Gene Typer",
-        "license": "Apache-2.0",
-        "license_file": "LICENSE"
+        "license": "Apache-2.0"
     },
     "extra": {
         "recipe-maintainers": ["malhal"]
