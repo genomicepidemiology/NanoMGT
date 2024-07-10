@@ -75,7 +75,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     consensus_dict = build_consensus_dict(os.path.join(arguments.output, 'rmlst_alignment.res'),
                                           os.path.join(arguments.output, 'rmlst_alignment.mat'))
 
-    #print_majority_alelles(consensus_dict, arguments.output)
+    print_majority_alelles(consensus_dict, arguments.output)
 
     if arguments.majority_alleles_only:  # End the program if only majority alleles are requested
         sys.exit()
@@ -95,7 +95,7 @@ def nanopore_metagenomics_variantcaller(arguments):
     for item in confirmed_mutation_dict:
         print(item, confirmed_mutation_dict[item])
 
-    print_minor_variants(confirmed_mutation_dict, consensus_dict, arguments.output)
+    #print_minor_variants(confirmed_mutation_dict, consensus_dict, arguments.output)
     ## Format and output the results
     format_output(arguments.output, confirmed_mutation_dict, consensus_dict, bio_validation_dict,
                   co_occurrence_tmp_dict, mutation_threshold_dict, '')
