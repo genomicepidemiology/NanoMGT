@@ -597,9 +597,7 @@ def run_parameter_search(folders, maf_interval, parameters_interval_search, outp
 
     # TBD CLEAN THIS
     num_increments = 0
-    #rounds = [2, 3, 4, 5]
-    #TBD CLEAN THIS
-    rounds = [3, 4, 5]
+    rounds = [2, 3, 4, 5]
     round_increment_dict = {2: 0.20, 3: 0.15, 4: 0.10, 5: 0.05}
     for round_number in rounds:
         print(f'Starting round {round_number}')
