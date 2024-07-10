@@ -34,7 +34,7 @@ def main():
         'dp_interval': [0.1, 0.2]
     }
     folders = [f for f in os.listdir(alignment_results_path) if os.path.isdir(os.path.join(alignment_results_path, f))]
-    run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder)
+    #run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder)
     generate_spline_json(output_training_folder, maf_interval, model_name)
 
 def generate_spline_json(output_folder, maf_intervals, model_name):
@@ -59,8 +59,13 @@ def generate_spline_json(output_folder, maf_intervals, model_name):
         np_intervals.append(params.get('np', 0))
         dp_intervals.append(params.get('dp', 0))
 
-    x_values = np.linspace(0.01, 0.05, len(parameters_list))
-    fine_x_values = np.linspace(0.01, 0.05, 500)
+    print (parameters_list)
+
+    # Convert MAF intervals to decimal form, sort them, and use them as x_values
+    maf_intervals_decimal = sorted([maf / 100.0 for maf in maf_intervals])
+    x_values = np.linspace(min(maf_intervals_decimal), max(maf_intervals_decimal), len(maf_intervals))
+    fine_x_values = np.linspace(min(maf_intervals_decimal), max(maf_intervals_decimal), 500)
+
     spline_results = {}
 
     for name, data in zip(['cor', 'ii', 'pp', 'np', 'dp'],

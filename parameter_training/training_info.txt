@@ -1,13 +1,14 @@
-To retrain NanoMGT paramters on new data, do the following:
 
-1.) Select the data to train on. For simulating multistrain sample, isolates from a series of species should be selected
-and a json should be constructed similar to mixed_isolates.json where all sequencing IDs/prefixes are dived based on species.
-2.) Adjust the variables in generate_training_and_validation.jsons.py to create JSON files for both training and validation sets.
-If few samples are used, these files may need to be altered manually as the script will use the first 3 isolates for training no matter what.
-3.) Adjust the variables in generate_batch_jsons.py to simulate the batch JSON files.
-4.) Adjust the variables in gernerate_reads_mixes_from_jsons.py to generate multistrain samples.
-This script assumes seqtk is installed and avaliable in your path (conda install -c bioconda seqtk)
-5.) Adjust the variables in the parameters_train.py script and run it to train.
-The output will be both JSON files with the parameters for each iteration round and MAF value.
-The final output is the model.json (name will depend on the variable), which can be used when running Nanomgt by giving its path.
-In training on an HPC, it should be considered to train seperate MAF values in different jobs, as they can be parallelized.
+To retrain NanoMGT parameters on new data, follow these steps:
+
+1. Select the data to train on. For simulating multi-strain samples, isolates from a series of species should be selected,
+   and a JSON file should be constructed similar to 'mixed_isolates.json' where all sequencing IDs/prefixes are divided based on species.
+2. Adjust the variables in 'generate_training_and_validation.jsons.py' to create JSON files for both training and validation sets.
+   If few samples are used, these files may need to be altered manually as the script will use the first three isolates for training regardless.
+3. Adjust the variables in 'generate_batch_jsons.py' to simulate the batch JSON files.
+4. Adjust the variables in 'generate_reads_mixes_from_jsons.py' to generate multi-strain samples.
+   This script assumes 'seqtk' is installed and available in your path (conda install -c bioconda seqtk).
+5. Adjust the variables in the 'parameters_train.py' script and run it to train.
+   The output will be JSON files with the parameters for each iteration round and MAF value.
+   The final output is the 'model.json' (name will depend on the variable), which can be used when running NanoMGT by specifying its path.
+   When training on a HPC, consider training separate MAF values in different jobs, as they can be parallelized.
