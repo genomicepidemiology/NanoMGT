@@ -72,6 +72,7 @@ def generate_spline_json(output_folder, maf_intervals, model_name):
                           [cor_intervals, iteration_intervals, pp_intervals, np_intervals, dp_intervals]):
         print(f"Attempting spline for {name} with data points: {len(data)}")  # Debug output
         if len(data) >= 4:
+            print (data)
             spline = UnivariateSpline(x_values, data, s=None)
             spline_fit_fine = spline(fine_x_values)
             spline_results[name] = {str(x): float(y) for x, y in zip(fine_x_values, spline_fit_fine)}
