@@ -21,7 +21,7 @@ json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batche
 training_or_validation_extension_json = '_training.json'
 output_training_folder = 'clean_test_for_final_script_only_5_maf'
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
-maf_interval = [5, 4, 3]
+maf_interval = [2]
 cpus = 39
 model_name = 'model_test'
 
@@ -33,11 +33,11 @@ def main():
         'np_interval': [2, 3],
         'dp_interval': [0.1, 0.2]
     }
-    if len(maf_interval) < 3:
-        sys.exit('Atleast 3 maf_interval values must be selected')
+    #if len(maf_interval) < 4:
+    #    sys.exit('Atleast 4 maf_interval values must be selected')
     folders = [f for f in os.listdir(alignment_results_path) if os.path.isdir(os.path.join(alignment_results_path, f))]
-    #run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder)
-    generate_spline_json(output_training_folder, maf_interval, model_name)
+    run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder)
+    #generate_spline_json(output_training_folder, maf_interval, model_name)
 
 def generate_spline_json(output_folder, maf_intervals, model_name):
     parameter_files = [f"{output_folder}/5_round_maf_{maf}_average_best_params.json" for maf in maf_intervals]
@@ -73,7 +73,7 @@ def generate_spline_json(output_folder, maf_intervals, model_name):
     for name, data in zip(['cor', 'ii', 'pp', 'np', 'dp'],
                           [cor_intervals, iteration_intervals, pp_intervals, np_intervals, dp_intervals]):
         print(f"Attempting spline for {name} with data points: {len(data)}")  # Debug output
-        if len(data) >= 3:
+        if len(data) >= 4:
             print (data)
             spline = UnivariateSpline(x_values, data, s=None)
             spline_fit_fine = spline(fine_x_values)
