@@ -59,6 +59,7 @@ def generate_spline_json(output_folder, maf_intervals, model_name):
         np_intervals.append(params.get('np', 0))
         dp_intervals.append(params.get('dp', 0))
 
+    print (parameters_list)
     x_values = np.linspace(0.01, 0.05, len(parameters_list))
     fine_x_values = np.linspace(0.01, 0.05, 500)
     spline_results = {}
