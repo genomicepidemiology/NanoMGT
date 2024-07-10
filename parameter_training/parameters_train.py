@@ -59,9 +59,9 @@ def generate_spline_json(output_folder, maf_intervals, model_name):
         np_intervals.append(params.get('np', 0))
         dp_intervals.append(params.get('dp', 0))
 
-    print (parameters_list)
+    # Print for debugging
+    print(f"Parameters List: {parameters_list}")
 
-    # Convert MAF intervals to decimal form, sort them, and use them as x_values
     maf_intervals_decimal = sorted([maf / 100.0 for maf in maf_intervals])
     x_values = np.linspace(min(maf_intervals_decimal), max(maf_intervals_decimal), len(maf_intervals))
     fine_x_values = np.linspace(min(maf_intervals_decimal), max(maf_intervals_decimal), 500)
@@ -70,7 +70,8 @@ def generate_spline_json(output_folder, maf_intervals, model_name):
 
     for name, data in zip(['cor', 'ii', 'pp', 'np', 'dp'],
                           [cor_intervals, iteration_intervals, pp_intervals, np_intervals, dp_intervals]):
-        if len(data) >= 4:  # Check if there are enough points for spline fitting
+        print(f"Attempting spline for {name} with data points: {len(data)}")  # Debug output
+        if len(data) >= 4:
             spline = UnivariateSpline(x_values, data, s=None)
             spline_fit_fine = spline(fine_x_values)
             spline_results[name] = {str(x): float(y) for x, y in zip(fine_x_values, spline_fit_fine)}
@@ -82,6 +83,10 @@ def generate_spline_json(output_folder, maf_intervals, model_name):
         json.dump(spline_results, f, indent=4)
 
     print(f"Spline coefficients have been saved to {output_file}.")
+
+
+
+
 def train_parameters(maf, results_folder, min_n, cor, new_output_folder, maps_path, json_info_path,
     ii, proxi, dp_window, pp, np, dp, consensus_dict, bio_validation_dict, minor_mutation_expected):
     confirmed_mutation_dict = nvc.derive_mutation_positions(consensus_dict, min_n, maf, cor)
