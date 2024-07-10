@@ -21,17 +21,17 @@ json_info_path = '/home/projects/cge/people/malhal/nanomgt_json/simulated_batche
 training_or_validation_extension_json = '_training.json'
 output_training_folder = 'clean_test_for_final_script_only_5_maf'
 param_list = ['np', 'cor', 'pp', 'dp', 'ii']
-maf_interval = [5]
+maf_interval = [5, 4, 3]
 cpus = 39
 model_name = 'model_test'
 
 def main():
     parameters_interval_search = {
-        'cor_interval': [0.5],
+        'cor_interval': [0.4, 0.5],
         'ii_interval': [0.1, 0.2],
-        'pp_interval': [0.2],
-        'np_interval': [3],
-        'dp_interval': [0.1]
+        'pp_interval': [0.2, 0.3],
+        'np_interval': [2, 3],
+        'dp_interval': [0.1, 0.2]
     }
     folders = [f for f in os.listdir(alignment_results_path) if os.path.isdir(os.path.join(alignment_results_path, f))]
     #run_parameter_search(folders, maf_interval, parameters_interval_search, output_training_folder)
