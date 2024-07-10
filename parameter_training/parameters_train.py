@@ -27,11 +27,11 @@ model_name = 'model_test'
 
 def main():
     parameters_interval_search = {
-        'cor_interval': [0.4, 0.5],
-        'ii_interval': [0.1, 0.2],
-        'pp_interval': [0.2, 0.3],
-        'np_interval': [2, 3],
-        'dp_interval': [0.1, 0.2]
+        'cor_interval': [0.4],
+        'ii_interval': [0.1],
+        'pp_interval': [0.2],
+        'np_interval': [2],
+        'dp_interval': [0.1]
     }
     #if len(maf_interval) < 4:
     #    sys.exit('Atleast 4 maf_interval values must be selected')
