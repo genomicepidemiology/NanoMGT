@@ -55,7 +55,7 @@ def main():
     parser.add_argument('--q_score', action="store", type=int, dest='q_score', default=14,
                         help='Minimum average q-score for reads to be included. Default: 14')
     parser.add_argument('--model_file', action="store", type=str, dest='model_file', default='combined_parameters.json',
-                        help='JSON model file')
+                        help='JSON model file. Default is the combined model presented in the publication.')
     parser.add_argument('--majority_alleles_only', action="store_true", dest='majority_alleles_only',
                         help='Only output majority alleles.')
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
